@@ -4,8 +4,10 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
-@Entity(name="job")
+@Entity
+@Table(name="job")
 public class Job {
 
 	static public enum JobStatus {
