@@ -1,15 +1,24 @@
 package org.imirsel.nema.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.JoinColumn;
 
 @Entity
 @Table(name="job")
-public class Job {
+public class Job implements Serializable {
 
+	/**
+	 * Version of this class.
+	 */
+	private static final long serialVersionUID = 3383935885803288343L;
+	
 	static public enum JobStatus {
       UNKNOWN(-1), SUBMITTED(0), STARTED(1), ENDED(2);
 
@@ -174,7 +183,8 @@ public class Job {
 	public void setOwnerEmail(String ownerEmail) {
 		this.ownerEmail = ownerEmail;
 	}
-	@Column(name="flowId")
+	@JoinColumn(name = "flowInstanceId")
+	@ManyToOne(fetch=FetchType.EAGER)
 	public Flow getFlow() {
 		return flow;
 	}

@@ -1,5 +1,6 @@
 package org.imirsel.nema.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -8,7 +9,12 @@ import javax.persistence.Column;
 
 @Entity
 @Table(name="notification")
-public class Notification {
+public class Notification implements Serializable {
+	/**
+	 * Version of this class.
+	 */
+	private static final long serialVersionUID = -2583085614468213225L;
+	
 	private Long id;
 	private Long recipientId;
 	private Date dateCreated;
