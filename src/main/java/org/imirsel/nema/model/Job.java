@@ -2,6 +2,10 @@ package org.imirsel.nema.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+
+@Entity(name="job")
 public class Job {
 
 	static public enum JobStatus {
@@ -77,90 +81,105 @@ public class Job {
 	private Flow flow;
 	private String executionInstanceId;
 	
+	@Column(name="id")
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
+	@Column(name="description")
 	public String getDescription() {
 		return description;
 	}
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	@Column(name="host")
 	public String getHost() {
 		return host;
 	}
 	public void setHost(String host) {
 		this.host = host;
 	}
+	@Column(name="port")
 	public Integer getPort() {
 		return port;
 	}
 	public void setPort(Integer port) {
 		this.port = port;
 	}
+	@Column(name="submitTimestamp")
 	public Date getSubmitTimestamp() {
 		return submitTimestamp;
 	}
 	public void setSubmitTimestamp(Date submitTimestamp) {
 		this.submitTimestamp = submitTimestamp;
 	}
+	@Column(name="startTimestamp")
 	public Date getStartTimestamp() {
 		return startTimestamp;
 	}
 	public void setStartTimestamp(Date startTimestamp) {
 		this.startTimestamp = startTimestamp;
 	}
+	@Column(name="endTimestamp")
 	public Date getEndTimestamp() {
 		return endTimestamp;
 	}
 	public void setEndTimestamp(Date endTimestamp) {
 		this.endTimestamp = endTimestamp;
 	}
+	@Column(name="statusCode")
 	public Integer getStatusCode() {
 		return statusCode;
 	}
 	public void setStatusCode(Integer statusCode) {
 		this.statusCode = statusCode;
 	}
+	@Column(name="token")
     public String getToken() {
 		return token;
 	}
 	public void setToken(String token) {
 		this.token = token;
 	}
+	@Column(name="name")
 	public String getName() {
 		return name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
+	@Column(name="updateTimestamp")
 	public Date getUpdateTimestamp() {
 		return updateTimestamp;
 	}
 	public void setUpdateTimestamp(Date updateTimestamp) {
 		this.updateTimestamp = updateTimestamp;
 	}
+	@Column(name="ownerId")
 	public Long getOwnerId() {
 		return ownerId;
 	}
 	public void setOwnerId(Long ownerId) {
 		this.ownerId = ownerId;
 	}
+	@Column(name="ownerEmail")
 	public String getOwnerEmail() {
 		return ownerEmail;
 	}
 	public void setOwnerEmail(String ownerEmail) {
 		this.ownerEmail = ownerEmail;
 	}
+	@Column(name="flowId")
 	public Flow getFlow() {
 		return flow;
 	}
 	public void setFlow(Flow flow) {
 		this.flow = flow;
 	}
+	@Column(name="executionInstanceId")
 	public String getExecutionInstanceId() {
 		return executionInstanceId;
 	}
