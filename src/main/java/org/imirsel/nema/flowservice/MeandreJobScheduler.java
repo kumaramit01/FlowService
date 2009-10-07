@@ -1,3 +1,15 @@
+/*
+ * $Id$
+ *
+ * ===================================================================
+ *
+ * IGPA Center for Technology and Public Policy
+ * Copyright (c) 2008 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF
+ * ILLINOIS. All rights reserved.
+ *
+ * ===================================================================
+ *
+ */
 package org.imirsel.nema.flowservice;
 
 import net.jcip.annotations.GuardedBy;
@@ -6,7 +18,8 @@ import net.jcip.annotations.ThreadSafe;
 import org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig;
 import org.imirsel.nema.model.Job;
 
-import java.util.HashSet;
+import javax.annotation.PostConstruct;
+
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
@@ -19,49 +32,71 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
- * Receives {@link Job} execution requests and distributes them to a set
- * of Meandre servers.
+ * Receives {@link Job} execution requests and distributes them to a set of
+ * Meandre servers.
  *
  * @author shirk
  * @since 1.0
+ * @proposedRating red TODO: author
+ * @acceptedRating red TODO: reviewer
  */
 @ThreadSafe
 public class MeandreJobScheduler implements JobScheduler {
 
    //~ Instance fields ---------------------------------------------------------
 
-   /** Lock for the job queue. */
-   private final Lock queueLock = new ReentrantLock();
-	   
+   /** The configuration for this job scheduler. */
+   private MeandreJobSchedulerConfig config;
+
    /** All jobs are placed on this queue as they come into the scheduler. */
    @GuardedBy("queueLock")
    private final Queue<Job> jobQueue = new LinkedList<Job>();
 
-   /** 
+   /** Decides which server gets the next job. */
+   @GuardedBy("workersLock")
+   private MeandreLoadBalancer loadBalancer;
+
+   /** Lock for the job queue. */
+   private final Lock queueLock = new ReentrantLock();
+
+   /** Periodically checks for jobs in the queue and runs them. */
+   @SuppressWarnings("unused")
+   private ScheduledFuture<?> runJobsFuture;
+
+   /** Meandre servers for processing jobs. */
+   @GuardedBy("workersLock")
+   private Set<MeandreServer> workers;
+
+   /**
     * Lock for both the set of workers and the load balancer which contains
     * references to the workers.
     */
    private final Lock workersLock = new ReentrantLock();
 
-   /** Meandre servers for processing jobs. */
-   @GuardedBy("workersLock")
-   private final Set<MeandreServer> workers;
-   
-   /** Decides which server gets the next job. */
-   @GuardedBy("workersLock")
-   private final MeandreLoadBalancer loadBalancer;
+   //~ Instance initializers ---------------------------------------------------
 
-   /** Periodically checks for jobs in the queue and runs them. */
-   @SuppressWarnings("unused")
-   private final ScheduledFuture<?> runJobsFuture;
+   {
+      ScheduledExecutorService executor = Executors
+         .newSingleThreadScheduledExecutor();
+
+      runJobsFuture = executor.scheduleAtFixedRate(
+         new RunQueuedJobs(), 10, 5, TimeUnit.SECONDS);
+   }
 
    //~ Constructors ------------------------------------------------------------
 
    /**
     * Creates a new instance.
+    */
+   public MeandreJobScheduler() {
+
+   }
+
+   /**
+    * Creates a new instance given a configuration and a load balancer.
     *
-    * @param config TODO: Description of parameter config.
-    * @param balancer TODO: Description of parameter balancer.
+    * @param config The configuration details for this job scheduler.
+    * @param balancer The load balancer to use for distributing jobs.
     */
    public MeandreJobScheduler(
       MeandreJobSchedulerConfig config, MeandreLoadBalancer balancer) {
@@ -70,15 +105,20 @@ public class MeandreJobScheduler implements JobScheduler {
       for (MeandreServer server : workers) {
          loadBalancer.addServer(server);
       }
-
-      ScheduledExecutorService executor = Executors
-      .newSingleThreadScheduledExecutor();
-      
-      runJobsFuture = executor.scheduleAtFixedRate(
-         new RunQueuedJobs(), 10, 5, TimeUnit.SECONDS);
    }
 
    //~ Methods -----------------------------------------------------------------
+
+   /**
+    * Initializes this instance.
+    */
+   @PostConstruct
+   public void init() {
+      workers = config.getServers();
+      for (MeandreServer server : workers) {
+         loadBalancer.addServer(server);
+      }
+   }
 
    /**
     * @see org.imirsel.nema.flowservice.JobScheduler#abortJob(org.imirsel.nema.model.Job)
@@ -205,6 +245,33 @@ public class MeandreJobScheduler implements JobScheduler {
     * @return The load balancer currently in use.
     */
    public MeandreLoadBalancer getLoadBalancer() { return loadBalancer; }
+
+   /**
+    * Set the {@link MeandreLoadBalancer} to use.
+    *
+    * @param loadBalancer The {@link MeandreLoadBalancer} to use.
+    */
+   public void setLoadBalancer(MeandreLoadBalancer loadBalancer) {
+      this.loadBalancer = loadBalancer;
+   }
+
+   /**
+    * Return the {@link MeandreJobSchedulerConfig} currently in use.
+    *
+    * @return The {@link MeandreJobSchedulerConfig} currently in use.
+    */
+   public MeandreJobSchedulerConfig getMeandreJobSchedulerConfig() {
+      return config;
+   }
+
+   /**
+    * Set the {@link MeandreJobSchedulerConfig} to use.
+    *
+    * @param config The {@link MeandreJobSchedulerConfig} to use.
+    */
+   public void setMeandreJobSchedulerConfig(MeandreJobSchedulerConfig config) {
+      this.config = config;
+   }
 
    //~ Inner Classes -----------------------------------------------------------
 

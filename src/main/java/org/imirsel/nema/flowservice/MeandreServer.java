@@ -9,9 +9,9 @@ import org.meandre.client.MeandreClient;
 // Make thread safe
 public class MeandreServer {
 
-	private final String host;
-	private final int port;
-	private final int maxConcurrentJobs;
+	private String host;
+	private int port;
+	private int maxConcurrentJobs = 1;
 	private final Set<Job> runningJobs = new HashSet<Job>(8);
 	private final Set<Job> abortPending = new HashSet<Job>(8);
 	
@@ -24,6 +24,10 @@ public class MeandreServer {
 		// create meandre client
 	}
 
+	public MeandreServer() {
+		
+	}
+	
 	public MeandreClient getMeandreClient() {
 		return null;
 	}
@@ -31,11 +35,18 @@ public class MeandreServer {
 	public String getHost() {
 		return host;
 	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
 	
 	public int getPort() {
 		return port;
 	}
 	
+	public void setPort(int port) {
+		this.port = port;
+	}
 	public int getMaxConcurrentJobs() {
 		return maxConcurrentJobs;
 	}

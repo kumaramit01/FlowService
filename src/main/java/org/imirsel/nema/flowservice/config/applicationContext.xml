@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:aop="http://www.springframework.org/schema/aop"
-   xmlns:context="http://www.springframework.org/schema/context"
-   xmlns:tx="http://www.springframework.org/schema/tx"
-   xmlns:mqc="http://activemq.apache.org/schema/core"
-   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mqc="http://activemq.apache.org/schema/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
          http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
          http://www.springframework.org/schema/aop 
          http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
@@ -15,29 +13,34 @@
          http://www.springframework.org/schema/tx 
          http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-   <!-- Configurer that replaces ${...} placeholders with values from a properties file -->
-   <!-- (in this case, JDBC-related settings for the dataSource definition below) -->
-   <context:property-placeholder location="jdbc.properties,mail.properties"/>
+	<context:annotation-config/>
+	
+	<context:property-placeholder location="jdbc.properties,mail.properties" />
 
-   <!-- Local C3P0 DataSource that works in any environment -->
-   <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-      <property name="driverClass" value="${jdbc.driverClassName}"/>
-      <property name="jdbcUrl" value="${jdbc.url}"/>
-      <property name="user" value="${jdbc.username}"/>
-      <property name="password" value="${jdbc.password}"/>
-   </bean>
+	<!-- Local C3P0 DataSource that works in any environment -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="${jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
 
-   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-      <property name="dataSource" ref="dataSource"/>
-   </bean>
-   
-	<bean id="hibernateSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="hibernateSessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 		<property name="annotatedClasses">
 			<list>
-				<value>org.imirsel.nema.model.Flow</value>
+				<value>org.imirsel.nema.model.Flow
+				</value>
 				<value>org.imirsel.nema.model.Job</value>
-				<value>org.imirsel.nema.model.Notification</value>
+				<value>org.imirsel.nema.model.Notification
+				</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -49,7 +52,40 @@
 		</property>
 	</bean>
 
-	<bean id="flowService" class="org.imirsel.nema.flowservice.NemaFlowService" />
+   <bean id="headServer" class="org.imirsel.nema.flowservice.MeandreServer">
+       <property name="host" value="http://localhost"/>
+       <property name="port" value="1000"/>
+   </bean>
+
+   <bean id="worker1" class="org.imirsel.nema.flowservice.MeandreServer">
+       <property name="host" value="http://localhost"/>
+       <property name="port" value="1000"/>
+   </bean>
+   
+   <bean id="worker2" class="org.imirsel.nema.flowservice.MeandreServer">
+       <property name="host" value="http://localhost"/>
+       <property name="port" value="1001"/>
+   </bean>
+   
+   <bean id="jobSchedulerConfig" class="org.imirsel.nema.flowservice.config.SimpleMeandreJobSchedulerConfig">
+       <property name="head" ref="headServer"/>
+       <property name="servers">
+          <set>
+             <ref bean="worker1"/>
+             <ref bean="worker2"/>
+          </set>
+       </property>
+   </bean>
+
+	<bean id="loadBalancer" class="org.imirsel.nema.flowservice.RoundRobinLoadBalancer" />
+   <bean id="jobScheduler" class="org.imirsel.nema.flowservice.MeandreJobScheduler">
+      <property name="loadBalancer" ref="loadBalancer" />
+      <property name="meandreJobSchedulerConfig" ref="jobSchedulerConfig" />
+   </bean>
+   
+	<bean id="flowService" class="org.imirsel.nema.flowservice.NemaFlowService">
+		<property name="jobScheduler" ref="jobScheduler" />
+	</bean>
 
 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
 		<property name="serviceName" value="FlowService" />
@@ -57,5 +93,5 @@
 		<property name="serviceInterface" value="org.imirsel.nema.flowservice.FlowService" />
 		<property name="registryPort" value="1099" />
 	</bean>
-	
+
 </beans>
