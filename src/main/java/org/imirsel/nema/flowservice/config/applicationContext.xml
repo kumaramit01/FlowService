@@ -1,20 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flow="http://www.springframework.org/schema/webflow-config"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-	     http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-         http://www.springframework.org/schema/webflow-config 
-         http://www.springframework.org/schema/webflow-config/spring-webflow-config-1.0.xsd">
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:aop="http://www.springframework.org/schema/aop"
+   xmlns:context="http://www.springframework.org/schema/context"
+   xmlns:tx="http://www.springframework.org/schema/tx"
+   xmlns:mqc="http://activemq.apache.org/schema/core"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+         http://www.springframework.org/schema/aop 
+         http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+         http://www.springframework.org/schema/context 
+         http://www.springframework.org/schema/context/spring-context-2.5.xsd
+         http://www.springframework.org/schema/tx 
+         http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean id="jndiDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName" value="jdbc/LiferayPool" />
-		<property name="resourceRef" value="true" />
-	</bean>
+   <!-- Configurer that replaces ${...} placeholders with values from a properties file -->
+   <!-- (in this case, JDBC-related settings for the dataSource definition below) -->
+   <context:property-placeholder location="jdbc.properties,mail.properties"/>
 
-	<bean id="hibernateSessionFactory"
-		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-		<property name="dataSource" ref="jndiDataSource" />
+   <!-- Local C3P0 DataSource that works in any environment -->
+   <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+      <property name="driverClass" value="${jdbc.driverClassName}"/>
+      <property name="jdbcUrl" value="${jdbc.url}"/>
+      <property name="user" value="${jdbc.username}"/>
+      <property name="password" value="${jdbc.password}"/>
+   </bean>
+
+   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+      <property name="dataSource" ref="dataSource"/>
+   </bean>
+   
+	<bean id="hibernateSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
 		<property name="annotatedClasses">
 			<list>
 				<value>org.imirsel.nema.model.Flow</value>
@@ -37,7 +55,6 @@
 		<property name="serviceName" value="FlowService" />
 		<property name="service" ref="flowService" />
 		<property name="serviceInterface" value="org.imirsel.nema.flowservice.FlowService" />
-		<!-- defaults to 1099 -->
 		<property name="registryPort" value="1099" />
 	</bean>
 	
