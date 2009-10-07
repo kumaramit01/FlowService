@@ -5,6 +5,6 @@ import java.util.Set;
 import org.imirsel.nema.flowservice.MeandreServer;
 
 public interface MeandreJobSchedulerConfig {
-	public MeandreServer getHeadNode();
+	public MeandreServer getHead();
 	public Set<MeandreServer> getServers();
 }

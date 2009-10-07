@@ -24,7 +24,7 @@ public class MeandreJobSchedulerTest {
 	public void setUp() throws Exception {
 	      MeandreJobSchedulerConfig config =
 	          new MeandreJobSchedulerConfig() {
-	             public MeandreServer getHeadNode() {
+	             public MeandreServer getHead() {
 	                return new MeandreServer("localhost", 10000, 1);
 	             }
 

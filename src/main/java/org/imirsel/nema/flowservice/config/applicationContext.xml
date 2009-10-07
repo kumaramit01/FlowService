@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flow="http://www.springframework.org/schema/webflow-config"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	     http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+         http://www.springframework.org/schema/webflow-config 
+         http://www.springframework.org/schema/webflow-config/spring-webflow-config-1.0.xsd">
+
+	<bean id="jndiDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="jdbc/LiferayPool" />
+		<property name="resourceRef" value="true" />
+	</bean>
+
+	<bean id="hibernateSessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="jndiDataSource" />
+		<property name="annotatedClasses">
+			<list>
+				<value>org.imirsel.nema.model.Flow</value>
+				<value>org.imirsel.nema.model.Job</value>
+				<value>org.imirsel.nema.model.Notification</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="flowService" class="org.imirsel.nema.flowservice.NemaFlowService" />
+
+	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="serviceName" value="FlowService" />
+		<property name="service" ref="flowService" />
+		<property name="serviceInterface" value="org.imirsel.nema.flowservice.FlowService" />
+		<!-- defaults to 1099 -->
+		<property name="registryPort" value="1099" />
+	</bean>
+	
+</beans>

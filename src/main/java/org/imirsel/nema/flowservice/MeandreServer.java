@@ -12,8 +12,8 @@ public class MeandreServer {
 	private final String host;
 	private final int port;
 	private final int maxConcurrentJobs;
-	private final Set<Job> runningJobs = new HashSet(8);
-	private final Set<Job> abortPending = new HashSet(8);
+	private final Set<Job> runningJobs = new HashSet<Job>(8);
+	private final Set<Job> abortPending = new HashSet<Job>(8);
 	
 	private MeandreClient meandreClient;
 	
