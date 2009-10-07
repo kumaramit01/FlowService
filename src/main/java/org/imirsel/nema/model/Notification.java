@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Column;
 
@@ -19,7 +23,9 @@ public class Notification implements Serializable {
 	private Long recipientId;
 	private Date dateCreated;
 	private String message;
+	private Job job;
 	
+	@Id
 	@Column(name="id")
 	public Long getId() {
 		return id;
@@ -48,6 +54,16 @@ public class Notification implements Serializable {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="jobId")
+	public Job getJob() {
+		return job;
+	}
+	public void setJob(Job job) {
+		this.job = job;
+	}
+
+
 	
 	
 	

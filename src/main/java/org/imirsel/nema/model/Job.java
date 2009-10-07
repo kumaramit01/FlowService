@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
@@ -91,7 +92,8 @@ public class Job implements Serializable {
 	private String ownerEmail;
 	private Flow flow;
 	private String executionInstanceId;
-	
+
+	@Id
 	@Column(name="id")
 	public Long getId() {
 		return id;

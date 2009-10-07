@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
@@ -26,6 +27,8 @@ public class Flow implements Serializable {
     private Long creatorId;
     private Flow instanceOf;
     
+    
+    @Id
     @Column(name="id")
 	public Long getId() {
 		return id;
