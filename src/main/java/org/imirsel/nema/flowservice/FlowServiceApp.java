@@ -4,7 +4,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-
+/**
+ * Main class for the NEMA Flow Service.
+ * 
+ * @author shirk
+ */
 public class FlowServiceApp {
 
 	/**
@@ -15,7 +19,6 @@ public class FlowServiceApp {
 		try {
 			ApplicationContext ctx = new ClassPathXmlApplicationContext("org/imirsel/nema/flowservice/config/applicationContext.xml");
 		} catch (BeansException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

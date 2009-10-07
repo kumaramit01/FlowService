@@ -99,6 +99,7 @@ public class MeandreJobScheduler implements JobScheduler {
     */
    @PostConstruct
    public void init() {
+	  assert config!=null:"No configuration was provided to the job scheduler.";
       workers = config.getServers();
       for (MeandreServer server : workers) {
          loadBalancer.addServer(server);
