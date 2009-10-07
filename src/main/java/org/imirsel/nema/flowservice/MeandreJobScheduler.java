@@ -1,15 +1,3 @@
-/*
- * $Id$
- *
- * ===================================================================
- *
- * IGPA Center for Technology and Public Policy
- * Copyright (c) 2008 THE BOARD OF TRUSTEES OF THE UNIVERSITY OF
- * ILLINOIS. All rights reserved.
- *
- * ===================================================================
- *
- */
 package org.imirsel.nema.flowservice;
 
 import net.jcip.annotations.GuardedBy;
@@ -37,8 +25,6 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author shirk
  * @since 1.0
- * @proposedRating red TODO: author
- * @acceptedRating red TODO: reviewer
  */
 @ThreadSafe
 public class MeandreJobScheduler implements JobScheduler {
@@ -89,7 +75,7 @@ public class MeandreJobScheduler implements JobScheduler {
     * Creates a new instance.
     */
    public MeandreJobScheduler() {
-
+System.out.println("*****************************************************");
    }
 
    /**
@@ -114,6 +100,7 @@ public class MeandreJobScheduler implements JobScheduler {
     */
    @PostConstruct
    public void init() {
+	   System.out.println("<-------------------------------------- Calling Init");
       workers = config.getServers();
       for (MeandreServer server : workers) {
          loadBalancer.addServer(server);
