@@ -75,7 +75,6 @@ public class MeandreJobScheduler implements JobScheduler {
     * Creates a new instance.
     */
    public MeandreJobScheduler() {
-System.out.println("*****************************************************");
    }
 
    /**
@@ -100,7 +99,6 @@ System.out.println("*****************************************************");
     */
    @PostConstruct
    public void init() {
-	   System.out.println("<-------------------------------------- Calling Init");
       workers = config.getServers();
       for (MeandreServer server : workers) {
          loadBalancer.addServer(server);
