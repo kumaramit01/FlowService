@@ -5,9 +5,12 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GenerationType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -88,7 +91,8 @@ public class Flow implements Serializable {
 	public void setCreatorId(Long creatorId) {
 		this.creatorId = creatorId;
 	}
-	@Column(name="flowInstanceId")
+	@JoinColumn(name = "flowInstanceId")
+	@ManyToOne(fetch=FetchType.EAGER)
 	public Flow getInstanceOf() {
 		return instanceOf;
 	}
