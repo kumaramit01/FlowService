@@ -6,10 +6,14 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
+
+import org.hibernate.annotations.GenerationTime;
 
 @Entity
 @Table(name="job")
@@ -95,34 +99,35 @@ public class Job implements Serializable {
 
 	@Id
 	@Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-	@Column(name="description")
+	@Column(name="description",length=20000000)
 	public String getDescription() {
 		return description;
 	}
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	@Column(name="host")
+	@Column(name="host", nullable=false)
 	public String getHost() {
 		return host;
 	}
 	public void setHost(String host) {
 		this.host = host;
 	}
-	@Column(name="port")
+	@Column(name="port", nullable=false)
 	public Integer getPort() {
 		return port;
 	}
 	public void setPort(Integer port) {
 		this.port = port;
 	}
-	@Column(name="submitTimestamp")
+	@Column(name="submitTimestamp", nullable=false)
 	public Date getSubmitTimestamp() {
 		return submitTimestamp;
 	}
@@ -143,42 +148,43 @@ public class Job implements Serializable {
 	public void setEndTimestamp(Date endTimestamp) {
 		this.endTimestamp = endTimestamp;
 	}
-	@Column(name="statusCode")
+	@Column(name="statusCode",nullable=false)
 	public Integer getStatusCode() {
 		return statusCode;
 	}
 	public void setStatusCode(Integer statusCode) {
 		this.statusCode = statusCode;
 	}
-	@Column(name="token")
+	@Column(name="token",nullable=false)
     public String getToken() {
 		return token;
 	}
 	public void setToken(String token) {
 		this.token = token;
 	}
-	@Column(name="name")
+	@Column(name="name",nullable=false)
 	public String getName() {
 		return name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
-	@Column(name="updateTimestamp")
+	@Column(name="updateTimestamp",updatable=false,insertable=false)
+	@org.hibernate.annotations.Generated(GenerationTime.ALWAYS)
 	public Date getUpdateTimestamp() {
 		return updateTimestamp;
 	}
 	public void setUpdateTimestamp(Date updateTimestamp) {
 		this.updateTimestamp = updateTimestamp;
 	}
-	@Column(name="ownerId")
+	@Column(name="ownerId", nullable=false)
 	public Long getOwnerId() {
 		return ownerId;
 	}
 	public void setOwnerId(Long ownerId) {
 		this.ownerId = ownerId;
 	}
-	@Column(name="ownerEmail")
+	@Column(name="ownerEmail", nullable=false)
 	public String getOwnerEmail() {
 		return ownerEmail;
 	}
@@ -193,7 +199,7 @@ public class Job implements Serializable {
 	public void setFlow(Flow flow) {
 		this.flow = flow;
 	}
-	@Column(name="executionInstanceId")
+	@Column(name="executionInstanceId",nullable=false,length=20000000)
 	public String getExecutionInstanceId() {
 		return executionInstanceId;
 	}

@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -27,27 +29,28 @@ public class Notification implements Serializable {
 	
 	@Id
 	@Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-	@Column(name="recipientId")
+	@Column(name="recipientId",nullable=false)
 	public Long getRecipientId() {
 		return recipientId;
 	}
 	public void setRecipientId(Long recipientId) {
 		this.recipientId = recipientId;
 	}
-	@Column(name="dateCreated")
+	@Column(name="dateCreated",nullable=false)
 	public Date getDateCreated() {
 		return dateCreated;
 	}
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
-	@Column(name="message")
+	@Column(name="message",nullable=false,length=20000000)
 	public String getMessage() {
 		return message;
 	}

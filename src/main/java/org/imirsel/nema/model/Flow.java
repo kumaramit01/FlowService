@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GenerationType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -22,7 +24,7 @@ public class Flow implements Serializable {
     private String description;
     private Date dateCreated;
     private String keyWords;
-    private Boolean isTemplate;
+    private Boolean template;
     private String url;
     private Long creatorId;
     private Flow instanceOf;
@@ -30,55 +32,56 @@ public class Flow implements Serializable {
     
     @Id
     @Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-    @Column(name="name")
+    @Column(name="name",nullable=false)
 	public String getName() {
 		return name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
-	@Column(name="description")
+	@Column(name="description",nullable=false)
 	public String getDescription() {
 		return description;
 	}
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	@Column(name="dateCreated")
+	@Column(name="dateCreated",nullable=false)
 	public Date getDateCreated() {
 		return dateCreated;
 	}
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
-	@Column(name="keyWords")
+	@Column(name="keyWords",nullable=false)
 	public String getKeyWords() {
 		return keyWords;
 	}
 	public void setKeyWords(String keyWords) {
 		this.keyWords = keyWords;
 	}
-	@Column(name="isTemplate")
-	public Boolean getIsTemplate() {
-		return isTemplate;
+	@Column(name="isTemplate",nullable=false)
+	public Boolean isTemplate() {
+		return template;
 	}
-	public void setIsTemplate(Boolean isTemplate) {
-		this.isTemplate = isTemplate;
+	public void setTemplate(Boolean template) {
+		this.template = template;
 	}
-	@Column(name="url")
+	@Column(name="url",nullable=false)
 	public String getUrl() {
 		return url;
 	}
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	@Column(name="creatorId")
+	@Column(name="creatorId",nullable=false)
 	public Long getCreatorId() {
 		return creatorId;
 	}
@@ -106,7 +109,7 @@ public class Flow implements Serializable {
 		result = prime * result
 				+ ((instanceOf == null) ? 0 : instanceOf.hashCode());
 		result = prime * result
-				+ ((isTemplate == null) ? 0 : isTemplate.hashCode());
+				+ ((template == null) ? 0 : template.hashCode());
 		result = prime * result
 				+ ((keyWords == null) ? 0 : keyWords.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
@@ -147,10 +150,10 @@ public class Flow implements Serializable {
 				return false;
 		} else if (!instanceOf.equals(other.instanceOf))
 			return false;
-		if (isTemplate == null) {
-			if (other.isTemplate != null)
+		if (template == null) {
+			if (other.template != null)
 				return false;
-		} else if (!isTemplate.equals(other.isTemplate))
+		} else if (!template.equals(other.template))
 			return false;
 		if (keyWords == null) {
 			if (other.keyWords != null)
