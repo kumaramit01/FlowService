@@ -36,11 +36,9 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="annotatedClasses">
 			<list>
-				<value>org.imirsel.nema.model.Flow
-				</value>
+				<value>org.imirsel.nema.model.Flow</value>
 				<value>org.imirsel.nema.model.Job</value>
-				<value>org.imirsel.nema.model.Notification
-				</value>
+				<value>org.imirsel.nema.model.Notification</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

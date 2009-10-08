@@ -2,6 +2,7 @@ package org.imirsel.nema.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
 
@@ -96,7 +98,8 @@ public class Job implements Serializable {
 	private String ownerEmail;
 	private Flow flow;
 	private String executionInstanceId;
-
+	public Set<JobResult> results;
+	
 	@Id
 	@Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -192,7 +195,7 @@ public class Job implements Serializable {
 		this.ownerEmail = ownerEmail;
 	}
 	@JoinColumn(name = "flowInstanceId")
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.EAGER,optional=false)
 	public Flow getFlow() {
 		return flow;
 	}
@@ -208,6 +211,14 @@ public class Job implements Serializable {
 	}
 	public JobStatus getJobStatus() {
 	      return JobStatus.toJobStatus(statusCode);
+	}
+	@JoinColumn(name="id")
+	@OneToMany(mappedBy="job")
+	public Set<JobResult> getResults() {
+		return results;
+	}
+	public void setResults(Set<JobResult> results) {
+		this.results = results;
 	}
 	@Override
 	public int hashCode() {
@@ -229,6 +240,7 @@ public class Job implements Serializable {
 				+ ((ownerEmail == null) ? 0 : ownerEmail.hashCode());
 		result = prime * result + ((ownerId == null) ? 0 : ownerId.hashCode());
 		result = prime * result + ((port == null) ? 0 : port.hashCode());
+		result = prime * result + ((results == null) ? 0 : results.hashCode());
 		result = prime * result
 				+ ((startTimestamp == null) ? 0 : startTimestamp.hashCode());
 		result = prime * result
@@ -299,6 +311,11 @@ public class Job implements Serializable {
 				return false;
 		} else if (!port.equals(other.port))
 			return false;
+		if (results == null) {
+			if (other.results != null)
+				return false;
+		} else if (!results.equals(other.results))
+			return false;
 		if (startTimestamp == null) {
 			if (other.startTimestamp != null)
 				return false;
@@ -326,6 +343,5 @@ public class Job implements Serializable {
 			return false;
 		return true;
 	}
-
 	
 }
