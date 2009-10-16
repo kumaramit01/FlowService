@@ -27,7 +27,8 @@ public interface FlowService {
    public void abortJob(long jobId) throws IllegalStateException;
 
 	/**
-	 * Delete a {@link Job} and the results it produced.
+	 * Delete a {@link Job}, the flow instance that was executed, 
+	 * and the results the {@link Job} produced.
 	 * 
 	 * @param jobId Unique ID of the {@link Job} to delete.
 	 * @throws IllegalStateException if the {@link Job} is not finished.

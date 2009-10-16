@@ -98,7 +98,7 @@ public class Job implements Serializable {
 	private String ownerEmail;
 	private Flow flow;
 	private String executionInstanceId;
-	public Set<JobResult> results;
+	private Set<JobResult> results;
 	
 	@Id
 	@Column(name="id")
@@ -220,6 +220,10 @@ public class Job implements Serializable {
 	public void setResults(Set<JobResult> results) {
 		this.results = results;
 	}
+	public boolean isEnded() {
+	    return getJobStatus() == JobStatus.ENDED;	
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
