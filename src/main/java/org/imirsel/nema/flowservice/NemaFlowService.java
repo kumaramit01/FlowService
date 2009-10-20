@@ -225,7 +225,6 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 	@Override
 	public void jobStatusUpdate(Job job) {
 		Notification notification = new Notification();
-		notification.setJob(job);
 		notification.setRecipientId(job.getOwnerId());
 		notification.setRecipientEmail(job.getOwnerEmail());
 		StringBuilder messageBuilder = new StringBuilder();
@@ -242,8 +241,6 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 			  break;
 		}
 		notification.setMessage(messageBuilder.toString());
-		
-		// set recipient email?
 		notificationDao.save(notification);
 	}
 

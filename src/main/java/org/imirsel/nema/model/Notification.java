@@ -26,7 +26,6 @@ public class Notification implements Serializable {
 	private String recipientEmail;
 	private Date dateCreated;
 	private String message;
-	private Job job;
 	private Boolean sent;
 	
 	@Id
@@ -59,14 +58,6 @@ public class Notification implements Serializable {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="jobId")
-	public Job getJob() {
-		return job;
-	}
-	public void setJob(Job job) {
-		this.job = job;
-	}
 	@Column(name="sent", nullable=false)
 	public Boolean getSent() {
 		return sent;
@@ -89,7 +80,6 @@ public class Notification implements Serializable {
 		result = prime * result
 				+ ((dateCreated == null) ? 0 : dateCreated.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((job == null) ? 0 : job.hashCode());
 		result = prime * result + ((message == null) ? 0 : message.hashCode());
 		result = prime * result
 				+ ((recipientEmail == null) ? 0 : recipientEmail.hashCode());
@@ -116,11 +106,6 @@ public class Notification implements Serializable {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
-			return false;
-		if (job == null) {
-			if (other.job != null)
-				return false;
-		} else if (!job.equals(other.job))
 			return false;
 		if (message == null) {
 			if (other.message != null)
