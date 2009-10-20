@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.imirsel.nema.NoSuchEntityException;
 import org.imirsel.nema.model.Flow;
 import org.imirsel.nema.model.Job;
@@ -26,7 +28,7 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 
 	private JobScheduler jobScheduler;
 	
-	private final JobStatusMonitor jobStatusMonitor = new JobStatusMonitor();
+	private JobStatusMonitor jobStatusMonitor;
 	
 	private FlowDao flowDao;
 	
@@ -35,6 +37,16 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 	private JobResultDao resultDao;
 	
 	private NotificationDao notificationDao;
+	
+	public NemaFlowService() {
+		
+	}
+	
+	@PostConstruct
+	public void init() {
+		assert jobDao!=null:"Job DAO is null!";
+		jobStatusMonitor = new JobStatusMonitor(jobDao);
+	}
 	
 	/**
 	 * @see org.imirsel.nema.flowservice.FlowService#abortJob(long)
@@ -213,6 +225,9 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 	@Override
 	public void jobStatusUpdate(Job job) {
 		// handle the status update
+		// create notification
+		// send if needed
+		// if job is done, remove from the monitor
 	}
 
 }
