@@ -3,6 +3,7 @@ package org.imirsel.nema.flowservice;
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
+import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig;
 import org.imirsel.nema.model.Job;
 
@@ -53,6 +54,8 @@ public class MeandreJobScheduler implements JobScheduler {
    @GuardedBy("workersLock")
    private Set<MeandreServer> workers;
 
+   private JobDao jobDao;
+   
    /**
     * Lock for both the set of workers and the load balancer which contains
     * references to the workers.
@@ -169,11 +172,20 @@ public class MeandreJobScheduler implements JobScheduler {
                return;
             }
 
-            Job job = jobQueue.poll();
+            Job job = jobQueue.peek();
 
-            // update job
-            // persist job
-            server.executeJob(job);
+            job.setHost(server.getHost());
+            job.setPort(server.getPort());
+            
+            jobDao.save(job);
+            
+            try {
+               server.executeJob(job);
+               jobQueue.remove();
+            } catch (ExecutionException e) {
+               e.printStackTrace();
+            }
+            
          }
       } finally {
          queueLock.unlock();
@@ -259,6 +271,24 @@ public class MeandreJobScheduler implements JobScheduler {
       this.config = config;
    }
 
+   /**
+    * Set the {@link JobDao} to use.
+    * 
+    * @param jobDao The {@link JobDao} implementation to use.
+    */
+   public void setJobDao(JobDao jobDao) {
+	   this.jobDao = jobDao;
+   }
+   
+   /**
+    * Return the {@link JobDao} implementation currently in use.
+    * 
+    * @return {@link JobDao} implementation currently in use.
+    */
+   public JobDao getJobDao() {
+	   return jobDao;
+   }
+   
    //~ Inner Classes -----------------------------------------------------------
 
    private class RunQueuedJobs implements Runnable {

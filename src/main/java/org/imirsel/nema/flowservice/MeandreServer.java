@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.imirsel.nema.model.Job;
 import org.meandre.client.MeandreClient;
+import org.meandre.client.TransmissionException;
 
 // Make thread safe
 public class MeandreServer {
@@ -21,7 +22,7 @@ public class MeandreServer {
 		this.host = host;
 		this.port = port;
 		this.maxConcurrentJobs = maxConcurrentJobs;
-		// create meandre client
+		this.meandreClient = new MeandreClient(host,port);
 	}
 
 	public MeandreServer() {
@@ -59,13 +60,20 @@ public class MeandreServer {
 	    return maxConcurrentJobs == runningJobs.size();
 	}
 	
-	public void executeJob(Job job) {
+	public void executeJob(Job job) throws ExecutionException {
+		if(runningJobs.size()>=maxConcurrentJobs) {
+			// do something else here...throw exception?
+			return;
+		}
 		System.out.println("Server " + host + ":" + port + " executing job.");
-		// check that num running is < max
-		// submit job to server
-		// increment counter
+		try {
+			meandreClient.runFlow(job.getFlow().getUrl(), false);
+		} catch (TransmissionException e) {
+			throw new ExecutionException("Job " + job.getId() + " failed to execute.",e);
+		}
 		runningJobs.add(job);
 	}
+	
 	public void abortJob(Job job) {
 		// make sure an abort isn't already pending
 		// submit abort request to server via client

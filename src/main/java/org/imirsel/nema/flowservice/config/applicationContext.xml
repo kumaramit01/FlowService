@@ -50,6 +50,10 @@
 		</property>
 	</bean>
 
+    <bean id="jobDao" class="org.imirsel.nema.dao.hibernate.JobDaoHibernate">
+        <property name="sessionFactory" ref="hibernateSessionFactory"/>
+    </bean>
+    
    <bean id="headServer" class="org.imirsel.nema.flowservice.MeandreServer">
        <property name="host" value="http://localhost"/>
        <property name="port" value="1000"/>
@@ -72,6 +76,7 @@
 	<bean id="loadBalancer" class="org.imirsel.nema.flowservice.RoundRobinLoadBalancer" />
    <bean id="jobScheduler" class="org.imirsel.nema.flowservice.MeandreJobScheduler">
       <property name="loadBalancer" ref="loadBalancer" />
+      <property name="jobDao" ref="jobDao"/>
       <property name="meandreJobSchedulerConfig" ref="jobSchedulerConfig" />
    </bean>
    

@@ -1,9 +1,7 @@
 package org.imirsel.nema.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -18,10 +16,7 @@ import javax.persistence.Table;
 import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 
-import net.jcip.annotations.GuardedBy;
-
 import org.hibernate.annotations.GenerationTime;
-import org.imirsel.nema.flowservice.JobStatusUpdateHandler;
 
 /**
  * Represents a NEMA DIY job.
