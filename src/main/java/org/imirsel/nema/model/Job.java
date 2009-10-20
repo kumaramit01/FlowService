@@ -23,6 +23,12 @@ import net.jcip.annotations.GuardedBy;
 import org.hibernate.annotations.GenerationTime;
 import org.imirsel.nema.flowservice.JobStatusUpdateHandler;
 
+/**
+ * Represents a NEMA DIY job.
+ * 
+ * @author shirk
+ * @since 1.0
+ */
 @Entity
 @Table(name="job")
 public class Job implements Serializable {

@@ -56,13 +56,8 @@
    </bean>
 
    <bean id="worker1" class="org.imirsel.nema.flowservice.MeandreServer">
-       <property name="host" value="http://localhost"/>
-       <property name="port" value="1000"/>
-   </bean>
-   
-   <bean id="worker2" class="org.imirsel.nema.flowservice.MeandreServer">
-       <property name="host" value="http://localhost"/>
-       <property name="port" value="1001"/>
+       <property name="host" value="http://128.174.154.145"/>
+       <property name="port" value="1714"/>
    </bean>
    
    <bean id="jobSchedulerConfig" class="org.imirsel.nema.flowservice.config.SimpleMeandreJobSchedulerConfig">
@@ -70,7 +65,6 @@
        <property name="servers">
           <set>
              <ref bean="worker1"/>
-             <ref bean="worker2"/>
           </set>
        </property>
    </bean>

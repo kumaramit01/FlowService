@@ -224,10 +224,27 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 
 	@Override
 	public void jobStatusUpdate(Job job) {
-		// handle the status update
-		// create notification
-		// send if needed
-		// if job is done, remove from the monitor
+		Notification notification = new Notification();
+		notification.setJob(job);
+		notification.setRecipientId(job.getOwnerId());
+		notification.setRecipientEmail(job.getOwnerEmail());
+		StringBuilder messageBuilder = new StringBuilder();
+		messageBuilder.append("Job " + job.getId() + " (" + job.getName() + ")" + " ");
+		switch(job.getJobStatus()) {
+		  case SUBMITTED:
+			  messageBuilder.append("was submitted: " + job.getSubmitTimestamp().toString() + ".");
+			  break;
+		  case STARTED:
+			  messageBuilder.append("was started: " + job.getStartTimestamp().toString() + ".");
+			  break;
+		  case ENDED:
+			  messageBuilder.append("has ended: " + job.getStartTimestamp().toString() + ".");
+			  break;
+		}
+		notification.setMessage(messageBuilder.toString());
+		
+		// set recipient email?
+		notificationDao.save(notification);
 	}
 
 }

@@ -13,6 +13,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+/**
+ * Represents a Meandre flow.
+ * 
+ * @author shirk
+ */
 @Entity
 @Table(name="flow")
 public class Flow implements Serializable {

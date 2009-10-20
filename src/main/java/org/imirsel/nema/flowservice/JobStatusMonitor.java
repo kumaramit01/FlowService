@@ -6,7 +6,10 @@ import net.jcip.annotations.ThreadSafe;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.model.Job;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -49,7 +52,7 @@ public class JobStatusMonitor {
          .newSingleThreadScheduledExecutor();
 
       updateDetectorFuture = executor.scheduleAtFixedRate(
-         new UpdateDetector(), 10, 5, TimeUnit.SECONDS);
+         new StatusUpdateDetector(), 10, 5, TimeUnit.SECONDS);
    }
 
    //~ Constructors ------------------------------------------------------------
@@ -94,19 +97,24 @@ public class JobStatusMonitor {
 
    //~ Inner Classes -----------------------------------------------------------
 
-   private class UpdateDetector implements Runnable {
+   private class StatusUpdateDetector implements Runnable {
       public void run() {
          System.out.println("> Checking for jobs status updates.");
          jobsLock.lock();
          try {
-            for (Job job : jobs.keySet()) {
-               Job dbJob = jobDao.get(job.getId());
-               Integer oldStatus = job.getStatusCode();
-               Integer newStatus = dbJob.getStatusCode();
+        	Iterator<Job> jobIterator = jobs.keySet().iterator();
+            while (jobIterator.hasNext()) {
+               Job staleJob = jobIterator.next();
+               Job freshJob = jobDao.get(staleJob.getId());
+               Integer oldStatus = staleJob.getStatusCode();
+               Integer newStatus = freshJob.getStatusCode();
                if (!oldStatus.equals(newStatus)) {
-                  job.setStatusCode(dbJob.getStatusCode());
-                  jobs.get(job)
-                  .jobStatusUpdate(job);
+                  staleJob.setStatusCode(freshJob.getStatusCode());
+                  // Invoke the update handler for this job
+                  jobs.get(staleJob).jobStatusUpdate(staleJob);
+                  if(staleJob.isEnded()) {
+                	  jobIterator.remove();
+                  }
                }
             }
          } finally {
