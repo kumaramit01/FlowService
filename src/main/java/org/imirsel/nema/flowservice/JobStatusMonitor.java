@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * TODO: Description of class {@link JobStatusMonitor}.
  *
- * @author sbirk
+ * @author shirk
  * @since 1.0
  */
 @ThreadSafe
@@ -27,15 +27,17 @@ public class JobStatusMonitor {
 
    //~ Instance fields ---------------------------------------------------------
 
+   /** TODO: Description of field {@link JobStatusMonitor#jobDao}. */
+   private final JobDao jobDao;
+
+   /** TODO: Description of field {@link JobStatusMonitor#jobs}. */
    @GuardedBy("jobsLock")
    private final Map<Job, JobStatusUpdateHandler> jobs =
       new HashMap<Job, JobStatusUpdateHandler>();
 
-   /** Concurrency lock for the jobs list */
+   /** Concurrency lock for the jobs list. */
    private final Lock jobsLock = new ReentrantLock();
 
-   private final JobDao jobDao;
-   
    /** Periodically checks for jobs status changes. */
    @SuppressWarnings("unused")
    private ScheduledFuture<?> updateDetectorFuture;
@@ -50,10 +52,15 @@ public class JobStatusMonitor {
          new UpdateDetector(), 10, 5, TimeUnit.SECONDS);
    }
 
-   public JobStatusMonitor(JobDao jobDao) {
-	   this.jobDao = jobDao;
-   }
-   
+   //~ Constructors ------------------------------------------------------------
+
+   /**
+    * TODO: Creates a new {@link $class.name$} object.
+    *
+    * @param jobDao TODO: Description of parameter jobDao.
+    */
+   public JobStatusMonitor(JobDao jobDao) { this.jobDao = jobDao; }
+
    //~ Methods -----------------------------------------------------------------
 
    /**
@@ -88,8 +95,23 @@ public class JobStatusMonitor {
    //~ Inner Classes -----------------------------------------------------------
 
    private class UpdateDetector implements Runnable {
-      public void run() { System.out.println("> Checking for jobs status updates.");
-         
+      public void run() {
+         System.out.println("> Checking for jobs status updates.");
+         jobsLock.lock();
+         try {
+            for (Job job : jobs.keySet()) {
+               Job dbJob = jobDao.get(job.getId());
+               Integer oldStatus = job.getStatusCode();
+               Integer newStatus = dbJob.getStatusCode();
+               if (!oldStatus.equals(newStatus)) {
+                  job.setStatusCode(dbJob.getStatusCode());
+                  jobs.get(job)
+                  .jobStatusUpdate(job);
+               }
+            }
+         } finally {
+            jobsLock.unlock();
+         }
       }
    }
 }
