@@ -22,9 +22,11 @@ import org.springframework.orm.ObjectRetrievalFailureException;
  * @author shirk
  * @since 1.0
  */
-public class NemaFlowService implements FlowService {
+public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 
 	private JobScheduler jobScheduler;
+	
+	private final JobStatusMonitor jobStatusMonitor = new JobStatusMonitor();
 	
 	private FlowDao flowDao;
 	
@@ -101,8 +103,9 @@ public class NemaFlowService implements FlowService {
 		job.setSubmitTimestamp(new Date());
 		
 		jobDao.save(job);
-		
 		jobScheduler.scheduleJob(job);
+		jobStatusMonitor.monitor(job,this);
+		
 		return job;
 	}
 
@@ -157,9 +160,6 @@ public class NemaFlowService implements FlowService {
 	}
 
 	
-	
-	
-	
 	/**
 	 * Return the {@link JobScheduler} instance currently being used.
 	 * 
@@ -209,4 +209,10 @@ public class NemaFlowService implements FlowService {
 	public void setNotificationDao(NotificationDao notificationDao) {
 		this.notificationDao = notificationDao;
 	}
+
+	@Override
+	public void jobStatusUpdate(Job job) {
+		// handle the status update
+	}
+
 }

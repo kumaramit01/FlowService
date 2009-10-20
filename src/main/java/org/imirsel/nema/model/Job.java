@@ -1,7 +1,9 @@
 package org.imirsel.nema.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -14,8 +16,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
+import javax.persistence.Transient;
+
+import net.jcip.annotations.GuardedBy;
 
 import org.hibernate.annotations.GenerationTime;
+import org.imirsel.nema.flowservice.JobStatusUpdateHandler;
 
 @Entity
 @Table(name="job")
@@ -29,13 +35,13 @@ public class Job implements Serializable {
 	static public enum JobStatus {
       UNKNOWN(-1), SUBMITTED(0), STARTED(1), ENDED(2);
 
-      private final int code;
+    private final int code;
 
-      private JobStatus(int code) { this.code = code; }
+    private JobStatus(int code) { this.code = code; }
 
-      private int getCode() { return code; }
+    private int getCode() { return code; }
 
-      @Override
+    @Override
 	public String toString() {
          String name = null;
          switch (code) {
@@ -155,9 +161,13 @@ public class Job implements Serializable {
 	public Integer getStatusCode() {
 		return statusCode;
 	}
+	
 	public void setStatusCode(Integer statusCode) {
-		this.statusCode = statusCode;
+		if(!this.statusCode.equals(statusCode)) {
+		  this.statusCode = statusCode;
+		}
 	}
+	
 	@Column(name="token",nullable=false)
     public String getToken() {
 		return token;
@@ -209,6 +219,7 @@ public class Job implements Serializable {
 	public void setExecutionInstanceId(String executionInstanceId) {
 		this.executionInstanceId = executionInstanceId;
 	}
+	@Transient
 	public JobStatus getJobStatus() {
 	      return JobStatus.toJobStatus(statusCode);
 	}
@@ -220,6 +231,7 @@ public class Job implements Serializable {
 	public void setResults(Set<JobResult> results) {
 		this.results = results;
 	}
+	@Transient
 	public boolean isEnded() {
 	    return getJobStatus() == JobStatus.ENDED;	
 	}
