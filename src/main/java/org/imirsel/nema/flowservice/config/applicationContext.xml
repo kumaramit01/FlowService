@@ -54,7 +54,19 @@
    <bean id="jobDao" class="org.imirsel.nema.dao.hibernate.JobDaoHibernate">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
-    
+
+   <bean id="jobResultDao" class="org.imirsel.nema.dao.hibernate.JobResultDaoHibernate">
+       <property name="sessionFactory" ref="hibernateSessionFactory"/>
+   </bean>
+   
+   <bean id="flowDao" class="org.imirsel.nema.dao.hibernate.FlowDaoHibernate">
+       <property name="sessionFactory" ref="hibernateSessionFactory"/>
+   </bean>
+   
+   <bean id="notificationDao" class="org.imirsel.nema.dao.hibernate.NotificationDaoHibernate">
+       <property name="sessionFactory" ref="hibernateSessionFactory"/>
+   </bean>
+   
    <bean id="jobStatusMonitor" class="org.imirsel.nema.flowservice.monitor.PollingJobStatusMonitor">
         <property name="jobDao" ref="jobDao"/>
    </bean>
@@ -89,6 +101,10 @@
 	<bean id="flowService" class="org.imirsel.nema.flowservice.NemaFlowService">
 		<property name="jobScheduler" ref="jobScheduler" />
 		<property name="jobStatusMonitor" ref="jobStatusMonitor"/>
+		<property name="jobDao" ref="jobDao"/>
+		<property name="jobResultDao" ref="jobResultDao"/>
+		<property name="flowDao" ref="flowDao"/>
+		<property name="notificationDao" ref="notificationDao" />
 	</bean>
 
 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
