@@ -16,7 +16,6 @@ import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.dao.JobResultDao;
 import org.imirsel.nema.dao.NotificationDao;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
-import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
 import org.springframework.orm.ObjectRetrievalFailureException;
 
 /**
@@ -25,7 +24,7 @@ import org.springframework.orm.ObjectRetrievalFailureException;
  * @author shirk
  * @since 1.0
  */
-public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
+public class NemaFlowService implements FlowService {
 
 	private JobScheduler jobScheduler;
 	
@@ -39,13 +38,15 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 	
 	private NotificationDao notificationDao;
 	
-	public NemaFlowService() {
-		
+	private NotificationCreator notificationCreator;
+	
+	public NemaFlowService() {	
 	}
 	
 	@PostConstruct
 	public void init() {
        System.out.println("Initializing NEMA Flow Service...");
+       notificationCreator = new NotificationCreator(notificationDao);
 	}
 	
 	/**
@@ -117,7 +118,7 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 		
 		jobDao.save(job);
 		jobScheduler.scheduleJob(job);
-		jobStatusMonitor.monitor(job,this);
+		jobStatusMonitor.monitor(job,notificationCreator);
 		
 		return job;
 	}
@@ -239,30 +240,6 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 
 	public void setResultDao(JobResultDao resultDao) {
 		this.resultDao = resultDao;
-	}
-
-	@Override
-	public void jobStatusUpdate(Job job) {
-		Notification notification = new Notification();
-		notification.setRecipientId(job.getOwnerId());
-		notification.setRecipientEmail(job.getOwnerEmail());
-		StringBuilder messageBuilder = new StringBuilder();
-		messageBuilder.append("Job " + job.getId() + " (" + job.getName() + ")" + " ");
-		switch(job.getJobStatus()) {
-		  case SUBMITTED:
-			  messageBuilder.append("was submitted: " + job.getSubmitTimestamp().toString() + ".");
-			  break;
-		  case STARTED:
-			  messageBuilder.append("was started: " + job.getStartTimestamp().toString() + ".");
-			  break;
-		  case ENDED:
-			  messageBuilder.append("has ended: " + job.getStartTimestamp().toString() + ".");
-			  break;
-			  
-	      // ADD THE REST OF THE STATUS CODES HERE
-		}
-		notification.setMessage(messageBuilder.toString());
-		notificationDao.save(notification);
 	}
 
 }
