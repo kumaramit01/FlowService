@@ -31,7 +31,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    /** TODO: Description of field {@link PollingJobStatusMonitor#jobDao}. */
    private JobDao jobDao;
 
-   /** MAYBE THE VALUE IN THIS K/V PAIR SHOULD BE A COLLECTION? */
+   /** MAYBE THE VALUE IN THIS K/V PAIR SHOULD BE A SET? */
    @GuardedBy("jobsLock")
    private final Map<Job, JobStatusUpdateHandler> jobs =
       new HashMap<Job, JobStatusUpdateHandler>();

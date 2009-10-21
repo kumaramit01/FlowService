@@ -62,7 +62,7 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
         // Job must be running to be aborted.
 		if(!job.isRunning()) {
 			throw new IllegalStateException("Cannot abort job " + jobId + 
-					" because it has already ended.");
+					" because it has already completed.");
 		}
 		jobScheduler.abortJob(job);
 	}
@@ -258,6 +258,8 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 		  case ENDED:
 			  messageBuilder.append("has ended: " + job.getStartTimestamp().toString() + ".");
 			  break;
+			  
+	      // ADD THE REST OF THE STATUS CODES HERE
 		}
 		notification.setMessage(messageBuilder.toString());
 		notificationDao.save(notification);

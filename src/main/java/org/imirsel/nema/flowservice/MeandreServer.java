@@ -100,7 +100,7 @@ public class MeandreServer implements JobStatusUpdateHandler {
 	       abortPending.remove(job);
 		}
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -145,5 +145,7 @@ public class MeandreServer implements JobStatusUpdateHandler {
 			return false;
 		return true;
 	}
+	
+
 
 }
