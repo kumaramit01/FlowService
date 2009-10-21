@@ -266,7 +266,7 @@ public class Job implements Serializable {
 	}
 	@Transient
 	public boolean isRunning() {
-	    return getJobStatus() == JobStatus.ENDED;	
+	    return getJobStatus() == JobStatus.STARTED;
 	}
 	
 	@Column(name="numTries",nullable=false)
