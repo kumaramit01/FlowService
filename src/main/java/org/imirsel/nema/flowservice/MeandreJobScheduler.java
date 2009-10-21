@@ -9,6 +9,7 @@ import org.imirsel.nema.model.Job;
 
 import javax.annotation.PostConstruct;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
@@ -30,6 +31,8 @@ import java.util.concurrent.locks.ReentrantLock;
 @ThreadSafe
 public class MeandreJobScheduler implements JobScheduler {
 
+   public static final int MAX_EXECUTION_TRIES = 5;
+	
    //~ Instance fields ---------------------------------------------------------
 
    /** The configuration for this job scheduler. */
@@ -173,16 +176,31 @@ public class MeandreJobScheduler implements JobScheduler {
             }
 
             Job job = jobQueue.peek();
-
-            job.setHost(server.getHost());
-            job.setPort(server.getPort());
             
+            if(job.getNumTries()>=MAX_EXECUTION_TRIES) {
+            	job.setStatusCode(Job.JobStatus.FAILED.getCode());
+            	jobDao.save(job);
+            	jobQueue.remove();
+            	continue;
+            }
+            
+            job.setNumTries(job.getNumTries()+1);
+            job.setStatusCode(Job.JobStatus.SUBMITTED.getCode());
+            job.setSubmitTimestamp(new Date());
             jobDao.save(job);
             
             try {
                server.executeJob(job);
+               
+               job.setHost(server.getHost());
+               job.setPort(server.getPort());
+               
+               jobDao.save(job);
                jobQueue.remove();
             } catch (ExecutionException e) {
+               job.setSubmitTimestamp(null);
+               job.setStatusCode(Job.JobStatus.UNKNOWN.getCode());
+               
                e.printStackTrace();
             }
             

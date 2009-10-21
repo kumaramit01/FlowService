@@ -1,4 +1,4 @@
-package org.imirsel.nema.flowservice;
+package org.imirsel.nema.flowservice.monitor;
 
 import org.imirsel.nema.model.Job;
 

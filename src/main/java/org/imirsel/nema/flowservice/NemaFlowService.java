@@ -1,6 +1,5 @@
 package org.imirsel.nema.flowservice;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +15,8 @@ import org.imirsel.nema.dao.FlowDao;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.dao.JobResultDao;
 import org.imirsel.nema.dao.NotificationDao;
+import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
+import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
 import org.springframework.orm.ObjectRetrievalFailureException;
 
 /**
@@ -44,8 +45,7 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 	
 	@PostConstruct
 	public void init() {
-		assert jobDao!=null:"Job DAO is null!";
-		jobStatusMonitor = new JobStatusMonitor(jobDao);
+       System.out.println("Initializing NEMA Flow Service...");
 	}
 	
 	/**
@@ -60,7 +60,7 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 			throw new NoSuchEntityException("Job " + jobId + " does not exist.");
 		}
         // Job must be running to be aborted.
-		if(job.isEnded()) {
+		if(!job.isRunning()) {
 			throw new IllegalStateException("Cannot abort job " + jobId + 
 					" because it has already ended.");
 		}
@@ -79,7 +79,7 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 			throw new NoSuchEntityException("Job " + jobId + " does not exist.");
 		}
 		// Job must be finished to be deleted.
-		if(!job.isEnded()) {
+		if(job.isRunning()) {
 			throw new IllegalArgumentException("Cannot delete job " + jobId + 
 					" because it is still running.");
 		}
@@ -112,7 +112,8 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 		job.setFlow(flowInstance);
 		job.setOwnerId(userId);
 		job.setOwnerEmail(userEmail);
-		job.setSubmitTimestamp(new Date());
+		
+		// remove this job.setSubmitTimestamp(new Date());
 		
 		jobDao.save(job);
 		jobScheduler.scheduleJob(job);
@@ -220,6 +221,24 @@ public class NemaFlowService implements FlowService, JobStatusUpdateHandler {
 	
 	public void setNotificationDao(NotificationDao notificationDao) {
 		this.notificationDao = notificationDao;
+	}
+
+	
+	public JobStatusMonitor getJobStatusMonitor() {
+		return jobStatusMonitor;
+	}
+
+	public void setJobStatusMonitor(JobStatusMonitor jobStatusMonitor) {
+		this.jobStatusMonitor = jobStatusMonitor;
+	}
+
+	
+	public JobResultDao getResultDao() {
+		return resultDao;
+	}
+
+	public void setResultDao(JobResultDao resultDao) {
+		this.resultDao = resultDao;
 	}
 
 	@Override

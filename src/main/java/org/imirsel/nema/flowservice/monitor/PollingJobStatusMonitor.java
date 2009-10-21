@@ -1,4 +1,4 @@
-package org.imirsel.nema.flowservice;
+package org.imirsel.nema.flowservice.monitor;
 
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
@@ -6,10 +6,8 @@ import net.jcip.annotations.ThreadSafe;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.model.Job;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,20 +18,20 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
- * TODO: Description of class {@link JobStatusMonitor}.
+ * TODO: Description of class {@link PollingJobStatusMonitor}.
  *
  * @author shirk
  * @since 1.0
  */
 @ThreadSafe
-public class JobStatusMonitor {
+public class PollingJobStatusMonitor implements JobStatusMonitor {
 
    //~ Instance fields ---------------------------------------------------------
 
-   /** TODO: Description of field {@link JobStatusMonitor#jobDao}. */
-   private final JobDao jobDao;
+   /** TODO: Description of field {@link PollingJobStatusMonitor#jobDao}. */
+   private JobDao jobDao;
 
-   /** TODO: Description of field {@link JobStatusMonitor#jobs}. */
+   /** MAYBE THE VALUE IN THIS K/V PAIR SHOULD BE A COLLECTION? */
    @GuardedBy("jobsLock")
    private final Map<Job, JobStatusUpdateHandler> jobs =
       new HashMap<Job, JobStatusUpdateHandler>();
@@ -52,7 +50,7 @@ public class JobStatusMonitor {
          .newSingleThreadScheduledExecutor();
 
       updateDetectorFuture = executor.scheduleAtFixedRate(
-         new StatusUpdateDetector(), 10, 5, TimeUnit.SECONDS);
+         new StatusUpdateDetector(), 10, 10, TimeUnit.SECONDS);
    }
 
    //~ Constructors ------------------------------------------------------------
@@ -62,7 +60,7 @@ public class JobStatusMonitor {
     *
     * @param jobDao TODO: Description of parameter jobDao.
     */
-   public JobStatusMonitor(JobDao jobDao) { this.jobDao = jobDao; }
+   public PollingJobStatusMonitor() {  }
 
    //~ Methods -----------------------------------------------------------------
 
@@ -106,13 +104,14 @@ public class JobStatusMonitor {
             while (jobIterator.hasNext()) {
                Job staleJob = jobIterator.next();
                Job freshJob = jobDao.get(staleJob.getId());
+               // SYNC ALL PROPERTIES HERE
                Integer oldStatus = staleJob.getStatusCode();
                Integer newStatus = freshJob.getStatusCode();
                if (!oldStatus.equals(newStatus)) {
                   staleJob.setStatusCode(freshJob.getStatusCode());
                   // Invoke the update handler for this job
                   jobs.get(staleJob).jobStatusUpdate(staleJob);
-                  if(staleJob.isEnded()) {
+                  if(!staleJob.isRunning()) {
                 	  jobIterator.remove();
                   }
                }
@@ -122,4 +121,16 @@ public class JobStatusMonitor {
          }
       }
    }
+
+public JobDao getJobDao() {
+	return jobDao;
+}
+
+public void setJobDao(JobDao jobDao) {
+	this.jobDao = jobDao;
+}
+
+
+   
+   
 }

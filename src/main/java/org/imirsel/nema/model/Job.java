@@ -34,13 +34,13 @@ public class Job implements Serializable {
 	private static final long serialVersionUID = 3383935885803288343L;
 	
 	static public enum JobStatus {
-      UNKNOWN(-1), SUBMITTED(0), STARTED(1), ENDED(2);
+      UNKNOWN(-1), SUBMITTED(0), STARTED(1), ENDED(2), FAILED(3), ABORTED(4);
 
     private final int code;
 
     private JobStatus(int code) { this.code = code; }
 
-    private int getCode() { return code; }
+    public int getCode() { return code; }
 
     @Override
 	public String toString() {
@@ -49,19 +49,34 @@ public class Job implements Serializable {
 
             case -1: {
                name = "Unknown";
+               break;
             }
 
             case 0: {
                name = "Submitted";
+               break;
             }
 
             case 1: {
                name = "Started";
+               break;
             }
 
             case 2: {
                name = "Ended";
+               break;
             }
+            
+            case 3: {
+                name = "Ended";
+                break;
+             }
+
+            case 4: {
+                name = "Aborted";
+                break;
+             }
+            
          }
          return name;
       }
@@ -72,19 +87,34 @@ public class Job implements Serializable {
 
             case -1: {
                status = JobStatus.UNKNOWN;
+               break;
             }
 
             case 0: {
                status = JobStatus.SUBMITTED;
+               break;
             }
 
             case 1: {
                status = JobStatus.STARTED;
+               break;
             }
 
             case 2: {
                status = JobStatus.ENDED;
+               break;
             }
+            
+            case 3: {
+                status = JobStatus.FAILED;
+                break;
+             }
+            
+            case 4: {
+                status = JobStatus.ABORTED;
+                break;
+             }
+            
          }
          return status;
       }
@@ -104,6 +134,7 @@ public class Job implements Serializable {
 	private Long ownerId;
 	private String ownerEmail;
 	private Flow flow;
+	private Integer numTries;
 	private String executionInstanceId;
 	private Set<JobResult> results;
 	
@@ -165,6 +196,7 @@ public class Job implements Serializable {
 	
 	public void setStatusCode(Integer statusCode) {
 		if(!this.statusCode.equals(statusCode)) {
+		  setUpdateTimestamp(new Date());
 		  this.statusCode = statusCode;
 		}
 	}
@@ -233,8 +265,16 @@ public class Job implements Serializable {
 		this.results = results;
 	}
 	@Transient
-	public boolean isEnded() {
+	public boolean isRunning() {
 	    return getJobStatus() == JobStatus.ENDED;	
+	}
+	
+	@Column(name="numTries",nullable=false)
+	public Integer getNumTries() {
+		return numTries;
+	}
+	public void setNumTries(Integer numTries) {
+		this.numTries = numTries;
 	}
 	
 	@Override

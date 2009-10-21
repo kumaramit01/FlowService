@@ -3,15 +3,18 @@ package org.imirsel.nema.flowservice;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
+import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
 import org.imirsel.nema.model.Job;
 import org.meandre.client.MeandreClient;
 import org.meandre.client.TransmissionException;
 
 // Make thread safe
-public class MeandreServer {
+public class MeandreServer implements JobStatusUpdateHandler { 
 
 	private String host;
 	private int port;
+	private JobStatusMonitor jobStatusMonitor;
 	private int maxConcurrentJobs = 1;
 	private final Set<Job> runningJobs = new HashSet<Job>(8);
 	private final Set<Job> abortPending = new HashSet<Job>(8);
@@ -60,6 +63,15 @@ public class MeandreServer {
 	    return maxConcurrentJobs == runningJobs.size();
 	}
 	
+	
+	public JobStatusMonitor getJobStatusMonitor() {
+		return jobStatusMonitor;
+	}
+
+	public void setJobStatusMonitor(JobStatusMonitor jobStatusMonitor) {
+		this.jobStatusMonitor = jobStatusMonitor;
+	}
+
 	public void executeJob(Job job) throws ExecutionException {
 		if(runningJobs.size()>=maxConcurrentJobs) {
 			// do something else here...throw exception?
@@ -72,6 +84,7 @@ public class MeandreServer {
 			throw new ExecutionException("Job " + job.getId() + " failed to execute.",e);
 		}
 		runningJobs.add(job);
+		jobStatusMonitor.monitor(job, this);
 	}
 	
 	public void abortJob(Job job) {
@@ -80,6 +93,14 @@ public class MeandreServer {
 		// then executor thread needs to run to check database for status change (which is made by the  probe) and decrement the running counter.
 	}
 
+	@Override
+	public void jobStatusUpdate(Job job) {
+		if(!job.isRunning()) {
+	       runningJobs.remove(job);
+	       abortPending.remove(job);
+		}
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -125,7 +146,4 @@ public class MeandreServer {
 		return true;
 	}
 
-
-	
-	
 }
