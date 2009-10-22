@@ -21,6 +21,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Logger;
 
 
 /**
@@ -33,7 +34,10 @@ import java.util.concurrent.locks.ReentrantLock;
 @ThreadSafe
 public class MeandreJobScheduler implements JobScheduler {
 
-   public static final int MAX_EXECUTION_TRIES = 5;
+   private static final Logger logger = 
+		Logger.getLogger(MeandreJobScheduler.class.getName());
+	
+   private static final int MAX_EXECUTION_TRIES = 5;
 	
    //~ Instance fields ---------------------------------------------------------
 
@@ -122,7 +126,8 @@ public class MeandreJobScheduler implements JobScheduler {
       try {
 		executingServer.abortJob(job);
 	} catch (ServerException e) {
-		e.printStackTrace();
+		// TODO Perhaps do something more intelligent here
+		throw new RuntimeException(e);
 	}
    }
 
@@ -169,27 +174,19 @@ public class MeandreJobScheduler implements JobScheduler {
       workersLock.lock();
       try {
          if (jobQueue.size() < 1) {
-            System.out.println("> No queued jobs.");
+            logger.fine("> No queued jobs.");
             return;
          }
          while (!jobQueue.isEmpty()) {
             MeandreServer server = loadBalancer.nextAvailableServer();
             if (server == null) {
-               System.out.println(
+               logger.info(
                   "> " + jobQueue.size() +
                   " jobs are queued but all servers are busy.");
                return;
             }
 
             Job job = jobQueue.peek();
-            
-            // MOVE TO CATCH BLOCK BELOW??
-            if(job.getNumTries()==MAX_EXECUTION_TRIES) {
-            	job.setJobStatus(JobStatus.FAILED);
-            	jobDao.save(job);
-            	jobQueue.remove();
-            	continue;
-            }
             
             job.incrementNumTries();
             job.setJobStatus(JobStatus.SUBMITTED);
@@ -205,12 +202,19 @@ public class MeandreJobScheduler implements JobScheduler {
                jobDao.save(job);
                jobQueue.remove();
             } catch (ServerException e) {
+               e.printStackTrace();
                job.setSubmitTimestamp(null);
                job.setJobStatus(JobStatus.UNKNOWN);
+
+               if(job.getNumTries()==MAX_EXECUTION_TRIES) {
+               	 job.setJobStatus(JobStatus.FAILED);
+               	 job.setEndTimestamp(new Date());
+               	 job.setUpdateTimestamp(new Date());
+               	 jobQueue.remove();
+               }
                
-               e.printStackTrace();
+               jobDao.save(job);
             }
-            
          }
       } finally {
          queueLock.unlock();
@@ -318,7 +322,7 @@ public class MeandreJobScheduler implements JobScheduler {
 
    private class RunQueuedJobs implements Runnable {
       public void run() {
-         System.out.println("> Checking for queued jobs.");
+         logger.fine("> Checking for queued jobs.");
          runJobs();
       }
    }

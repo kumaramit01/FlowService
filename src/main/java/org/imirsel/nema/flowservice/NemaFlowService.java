@@ -27,7 +27,7 @@ import org.springframework.orm.ObjectRetrievalFailureException;
  */
 public class NemaFlowService implements FlowService {
 
-	public static final Logger logger = 
+	private static final Logger logger = 
 		Logger.getLogger(NemaFlowService.class.getName());
 	
 	private JobScheduler jobScheduler;

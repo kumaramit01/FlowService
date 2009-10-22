@@ -17,6 +17,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Logger;
 
 
 /**
@@ -27,7 +28,9 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @ThreadSafe
 public class PollingJobStatusMonitor implements JobStatusMonitor {
-
+   private static final Logger logger = 
+		Logger.getLogger(PollingJobStatusMonitor.class.getName());
+	
    //~ Instance fields ---------------------------------------------------------
 
    /** TODO: Description of field {@link PollingJobStatusMonitor#jobDao}. */
@@ -105,7 +108,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
 
    private class StatusUpdateDetector implements Runnable {
       public void run() {
-         System.out.println("> Checking for jobs status updates.");
+         logger.fine("> Checking for jobs status updates.");
          jobsLock.lock();
          try {
         	Iterator<Job> jobIterator = jobs.keySet().iterator();
