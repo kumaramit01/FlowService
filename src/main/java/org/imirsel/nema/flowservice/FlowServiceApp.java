@@ -16,7 +16,9 @@ public class FlowServiceApp {
 		Logger.getLogger(FlowServiceApp.class.getName());
 	
 	/**
-	 * @param args
+	 * Main method for executing the application.
+	 * 
+	 * @param args Arguments for the application.
 	 */
 	public static void main(String[] args) {
 		try {

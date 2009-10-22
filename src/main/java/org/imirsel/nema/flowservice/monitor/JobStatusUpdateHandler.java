@@ -2,8 +2,19 @@ package org.imirsel.nema.flowservice.monitor;
 
 import org.imirsel.nema.model.Job;
 
+/**
+ * Interface for objects that want to be notified of {@link Job} status updates.
+ * 
+ * @author shirk
+ * @since 1.0
+ */
 public interface JobStatusUpdateHandler {
 
-	// this should not block
+	/**
+	 * Receive a status update and handle it accordingly. The implementation
+	 * of this method should not block or perform time consuming tasks.
+	 * 
+	 * @param job The {@link Job} whose status was just updated.
+	 */
 	public void jobStatusUpdate(Job job);
 }

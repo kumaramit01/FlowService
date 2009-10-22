@@ -21,21 +21,26 @@ import java.util.logging.Logger;
 
 
 /**
- * TODO: Description of class {@link PollingJobStatusMonitor}.
+ * A job monitor that polls the database for status updates.
  *
  * @author shirk
  * @since 1.0
  */
 @ThreadSafe
 public class PollingJobStatusMonitor implements JobStatusMonitor {
+	
    private static final Logger logger = 
 		Logger.getLogger(PollingJobStatusMonitor.class.getName());
 	
    //~ Instance fields ---------------------------------------------------------
 
-   /** TODO: Description of field {@link PollingJobStatusMonitor#jobDao}. */
+   /** Used to access jobs in the data store. */
    private JobDao jobDao;
 
+   /**
+    * Maps jobs that are being monitored to objects that are waiting to be
+    * notified of status changes.
+    */
    @GuardedBy("jobsLock")
    private final Map<Job, Set<JobStatusUpdateHandler>> jobs =
       new HashMap<Job, Set<JobStatusUpdateHandler>>();
@@ -60,21 +65,20 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    //~ Constructors ------------------------------------------------------------
 
    /**
-    * TODO: Creates a new {@link $class.name$} object.
+    * Create a new instance with the specified {@link JobDao}.
     *
-    * @param jobDao TODO: Description of parameter jobDao.
+    * @param jobDao The {@link JobDao} to use to access job info.
     */
    public PollingJobStatusMonitor() {  }
 
    //~ Methods -----------------------------------------------------------------
 
    /**
-    * TODO: Description of method {@link $class.name$#monitor}.
-    *
-    * @param job TODO: Description of parameter job.
-    * @param updateHandler TODO: Description of parameter updateHandler.
+    * @see JobStatusMonitor#start(Job, JobStatusUpdateHandler)
     */
-   public void monitor(Job job, JobStatusUpdateHandler updateHandler) {
+   public void start(Job job, JobStatusUpdateHandler updateHandler) {
+	  logger.fine("Starting to monitor job " + job.getId() + " for " + 
+			  updateHandler + ".");
       jobsLock.lock();
       try {
     	 if(jobs.containsKey(job)) {
@@ -91,14 +95,20 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    }
 
    /**
-    * TODO: Description of method {@link $class.name$#remove}.
-    *
-    * @param job TODO: Description of parameter job.
+   * @see JobStatusMonitor#stop(Job, JobStatusUpdateHandler)
     */
-   public void remove(Job job) {
+   public void stop(Job job, JobStatusUpdateHandler updateHandler) {
+	  logger.fine("Stopping the monitoring of job " + job.getId() + " for " + 
+				  updateHandler + ".");
       jobsLock.lock();
       try {
-         jobs.remove(job);
+    	 Set<JobStatusUpdateHandler> handlers = jobs.get(job);
+    	 if(handlers!=null) {
+    		 handlers.remove(updateHandler);
+    		 if(handlers.isEmpty()) {
+    			 jobs.remove(job);
+    		 }
+    	 }
       } finally {
          jobsLock.unlock();
       }
@@ -106,9 +116,12 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
 
    //~ Inner Classes -----------------------------------------------------------
 
+   /**
+    * Runs each time the monitor wakes up to get updated job statuses.
+    */
    private class StatusUpdateDetector implements Runnable {
       public void run() {
-         logger.fine("> Checking for jobs status updates.");
+         logger.fine("> Checking for job status updates.");
          jobsLock.lock();
          try {
         	Iterator<Job> jobIterator = jobs.keySet().iterator();
@@ -118,6 +131,9 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
                Integer oldStatus = cachedJob.getStatusCode();
                Integer newStatus = persistedJob.getStatusCode();
                if (!oldStatus.equals(newStatus)) {
+            	  logger.fine("Status update for job " + cachedJob.getId() + 
+            			  "occurred: was " + cachedJob.getJobStatus() + 
+            			  ", now " + persistedJob.getJobStatus() + ".");
                   cachedJob.setStatusCode(persistedJob.getStatusCode());
                   cachedJob.setUpdateTimestamp(persistedJob.getUpdateTimestamp());
                   cachedJob.setSubmitTimestamp(persistedJob.getStartTimestamp());
@@ -130,6 +146,8 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
                   }
                   // Stop monitoring this job if it is finished
                   if(!cachedJob.isRunning()) {
+                	  logger.fine("Job " + cachedJob.getId() + 
+                			  " has ended. Removing it from the status monitor.");
                 	  jobIterator.remove();
                   }
                }
@@ -140,10 +158,18 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
       }
    }
 
+   /**
+    * Return the {@link JobDao} currently in use.
+    * @return The {@link JobDao} currently in use.
+    */
 public JobDao getJobDao() {
 	return jobDao;
 }
 
+/**
+ * Set the {@link JobDao} to use.
+ * @param jobDao The {@link JobDao} to use.
+ */
 public void setJobDao(JobDao jobDao) {
 	this.jobDao = jobDao;
 }

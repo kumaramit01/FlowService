@@ -120,7 +120,7 @@ public class NemaFlowService implements FlowService {
 		
 		jobDao.save(job);
 		jobScheduler.scheduleJob(job);
-		jobStatusMonitor.monitor(job,notificationCreator);
+		jobStatusMonitor.start(job,notificationCreator);
 		
 		return job;
 	}

@@ -5,14 +5,29 @@ import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.Notification;
 
+/**
+ * Creates {@link Notification}s for users as {@link Job} status updates occur.
+ * 
+ * @author shirk
+ * @since 1.0
+ */
 public class NotificationCreator implements JobStatusUpdateHandler {
 
 	private final NotificationDao notificationDao;
 	
+	/**
+	 * Create a new instance with the specified {@link NotificationDao}.
+	 * 
+	 * @param notificaitonDao The {@link NotificationDao} to use to store
+	 * {@link Notification}s persistently.
+	 */
 	public NotificationCreator(NotificationDao notificaitonDao) {
 		this.notificationDao = notificaitonDao;
 	}
 	
+	/**
+	 * Receive a job update and create a {@link Notification} for it.
+	 */
 	@Override
 	public void jobStatusUpdate(Job job) {
 		Notification notification = new Notification();

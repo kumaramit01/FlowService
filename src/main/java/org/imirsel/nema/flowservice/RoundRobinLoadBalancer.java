@@ -168,6 +168,9 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
       return false;
    }
    
+   /**
+    * Return the number of servers this load balancer is managing.
+    */
    public synchronized int size() {
 	   return size;
    }
