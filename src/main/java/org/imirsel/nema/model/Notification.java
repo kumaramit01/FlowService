@@ -10,6 +10,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Column;
 
+/**
+ * Represents a notification to be sent to an end user.
+ * 
+ * @author shirk
+ * @since 1.0
+ */
 @Entity
 @Table(name="notification")
 public class Notification implements Serializable {

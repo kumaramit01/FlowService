@@ -12,6 +12,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+/**
+ * Represents an output resulting from a job execution.
+ * 
+ * @author shirk
+ * @since 1.0
+ */
 @Entity
 @Table(name="jobResult")
 public class JobResult implements Serializable {
