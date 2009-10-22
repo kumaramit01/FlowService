@@ -194,10 +194,13 @@ public class MeandreJobScheduler implements JobScheduler {
             jobDao.save(job);
             
             try {
+               // TODO this will return an exec response, which will contain
+            	// the port number. put port number in job bean before save
                server.executeJob(job);
                
                job.setHost(server.getHost());
                job.setPort(server.getPort());
+               //job.setExecPort(execResponse.getPort());
                
                jobDao.save(job);
                jobQueue.remove();

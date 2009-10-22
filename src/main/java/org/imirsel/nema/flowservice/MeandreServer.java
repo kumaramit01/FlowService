@@ -85,7 +85,8 @@ public class MeandreServer implements JobStatusUpdateHandler {
 		}
 		logger.fine("Server " + getServerString() + " executing job " + job.getId() + ".");
 		try {
-			meandreClient.runAsyncFlow(job.getFlow().getUrl(), false);
+			meandreClient.runFlow(job.getFlow().getUrl(), false);
+			
 		} catch (TransmissionException e) {
 			throw new ServerException("A problem occurred while " +
 					"communicating with server " +  getServerString() + 
@@ -102,7 +103,7 @@ public class MeandreServer implements JobStatusUpdateHandler {
 		}
 		// THE INT ARGUMENT NEEDS TO BE A PORT NUMBER
 		try {
-			meandreClient.abortFlow(0);
+			meandreClient.abortFlow(job.getExecPort());
 		} catch (TransmissionException e) {
 			throw new ServerException("Could not abort job " + 
 					job.getId() + ".",e);
