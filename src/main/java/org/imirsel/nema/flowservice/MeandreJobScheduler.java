@@ -1,5 +1,7 @@
 package org.imirsel.nema.flowservice;
 
+import static org.imirsel.nema.model.Job.JobStatus;
+
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
@@ -178,14 +180,14 @@ public class MeandreJobScheduler implements JobScheduler {
             Job job = jobQueue.peek();
             
             if(job.getNumTries()>=MAX_EXECUTION_TRIES) {
-            	job.setStatusCode(Job.JobStatus.FAILED.getCode());
+            	job.setJobStatus(JobStatus.FAILED);
             	jobDao.save(job);
             	jobQueue.remove();
             	continue;
             }
             
-            job.setNumTries(job.getNumTries()+1);
-            job.setStatusCode(Job.JobStatus.SUBMITTED.getCode());
+            job.incrementNumTries();
+            job.setJobStatus(JobStatus.SUBMITTED);
             job.setSubmitTimestamp(new Date());
             jobDao.save(job);
             
@@ -199,7 +201,7 @@ public class MeandreJobScheduler implements JobScheduler {
                jobQueue.remove();
             } catch (ExecutionException e) {
                job.setSubmitTimestamp(null);
-               job.setStatusCode(Job.JobStatus.UNKNOWN.getCode());
+               job.setJobStatus(JobStatus.UNKNOWN);
                
                e.printStackTrace();
             }

@@ -256,6 +256,9 @@ public class Job implements Serializable {
 	public JobStatus getJobStatus() {
 	      return JobStatus.toJobStatus(statusCode);
 	}
+	public void setJobStatus(JobStatus status) {
+		this.statusCode = status.getCode();
+	}
 	@JoinColumn(name="id")
 	@OneToMany(mappedBy="job")
 	public Set<JobResult> getResults() {
@@ -276,7 +279,9 @@ public class Job implements Serializable {
 	public void setNumTries(Integer numTries) {
 		this.numTries = numTries;
 	}
-	
+	public void incrementNumTries() {
+		numTries++;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
