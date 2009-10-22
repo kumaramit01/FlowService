@@ -119,7 +119,11 @@ public class MeandreJobScheduler implements JobScheduler {
     */
    public void abortJob(Job job) {
       MeandreServer executingServer = findExecutingServer(job);
-      executingServer.abortJob(job);
+      try {
+		executingServer.abortJob(job);
+	} catch (ServerException e) {
+		e.printStackTrace();
+	}
    }
 
    /**
@@ -179,7 +183,8 @@ public class MeandreJobScheduler implements JobScheduler {
 
             Job job = jobQueue.peek();
             
-            if(job.getNumTries()>=MAX_EXECUTION_TRIES) {
+            // MOVE TO CATCH BLOCK BELOW??
+            if(job.getNumTries()==MAX_EXECUTION_TRIES) {
             	job.setJobStatus(JobStatus.FAILED);
             	jobDao.save(job);
             	jobQueue.remove();
@@ -199,7 +204,7 @@ public class MeandreJobScheduler implements JobScheduler {
                
                jobDao.save(job);
                jobQueue.remove();
-            } catch (ExecutionException e) {
+            } catch (ServerException e) {
                job.setSubmitTimestamp(null);
                job.setJobStatus(JobStatus.UNKNOWN);
                

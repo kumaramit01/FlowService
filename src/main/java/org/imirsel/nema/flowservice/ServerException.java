@@ -5,18 +5,18 @@ package org.imirsel.nema.flowservice;
  * 
  * @author shirk
  */
-public class ExecutionException extends Exception {
+public class ServerException extends Exception {
 
 	/**
 	 * Version of this class.
 	 */
 	private static final long serialVersionUID = 8688902997652020452L;
 
-	public ExecutionException(String message) {
+	public ServerException(String message) {
 		super(message);
 	}
 	
-	public ExecutionException(String message, Throwable cause) {
+	public ServerException(String message, Throwable cause) {
 		super(message,cause);
 	}
 }

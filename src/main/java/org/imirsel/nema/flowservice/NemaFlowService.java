@@ -3,6 +3,7 @@ package org.imirsel.nema.flowservice;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 
@@ -26,6 +27,9 @@ import org.springframework.orm.ObjectRetrievalFailureException;
  */
 public class NemaFlowService implements FlowService {
 
+	public static final Logger logger = 
+		Logger.getLogger(NemaFlowService.class.getName());
+	
 	private JobScheduler jobScheduler;
 	
 	private JobStatusMonitor jobStatusMonitor;
@@ -45,7 +49,7 @@ public class NemaFlowService implements FlowService {
 	
 	@PostConstruct
 	public void init() {
-       System.out.println("Initializing NEMA Flow Service...");
+       logger.info("Initializing NEMA Flow Service...");
        notificationCreator = new NotificationCreator(notificationDao);
 	}
 	

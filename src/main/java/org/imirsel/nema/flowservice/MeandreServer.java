@@ -72,27 +72,42 @@ public class MeandreServer implements JobStatusUpdateHandler {
 		this.jobStatusMonitor = jobStatusMonitor;
 	}
 
-	public void executeJob(Job job) throws ExecutionException {
-		if(runningJobs.size()==maxConcurrentJobs) {
-			// do something else here...throw exception?
-			return;
+	public void executeJob(Job job) throws ServerException {
+		if(isBusy()) {
+			throw new IllegalStateException("Could not execute job " + 
+					job.getId() + " because server " + getServerString() + " is busy.");
 		}
-		System.out.println("Server " + host + ":" + port + " executing job.");
+		System.out.println("Server " + getServerString() + " executing job.");
 		try {
 			meandreClient.runFlow(job.getFlow().getUrl(), false);
 		} catch (TransmissionException e) {
-			throw new ExecutionException("Job " + job.getId() + " failed to execute.",e);
+			throw new ServerException("A problem occurred while " +
+					"communicating with server " +  getServerString() + 
+					" in order to execute job " + job.getId() + ".",e);
 		}
 		runningJobs.add(job);
 		jobStatusMonitor.monitor(job, this);
 	}
 	
-	public void abortJob(Job job) {
-		// make sure an abort isn't already pending
-		// submit abort request to server via client
-		// then executor thread needs to run to check database for status change (which is made by the  probe) and decrement the running counter.
+	public void abortJob(Job job) throws ServerException {
+		if(abortPending.contains(job)) {
+			throw new IllegalStateException("An abort request has already " +
+					"been made for job " + job.getId() + ".");
+		}
+		// THE INT ARGUMENT NEEDS TO BE A PORT NUMBER
+		try {
+			meandreClient.abortFlow(0);
+		} catch (TransmissionException e) {
+			throw new ServerException("Could not abort job " + 
+					job.getId() + ".",e);
+		}
+		abortPending.add(job);
 	}
 
+	public String getServerString() {
+		return host + ":" + port;
+	}
+	
 	@Override
 	public void jobStatusUpdate(Job job) {
 		if(!job.isRunning()) {
