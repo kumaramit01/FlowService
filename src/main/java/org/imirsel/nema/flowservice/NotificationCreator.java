@@ -27,11 +27,15 @@ public class NotificationCreator implements JobStatusUpdateHandler {
 		  case STARTED:
 			  messageBuilder.append("was started: " + job.getStartTimestamp().toString() + ".");
 			  break;
-		  case ENDED:
-			  messageBuilder.append("has ended: " + job.getStartTimestamp().toString() + ".");
+		  case FINISHED:
+			  messageBuilder.append("has finished: " + job.getEndTimestamp().toString() + ".");
 			  break;
-			  
-	      // ADD THE REST OF THE STATUS CODES HERE
+		  case FAILED:
+			  messageBuilder.append("has failed: " + job.getEndTimestamp().toString() + ".");
+			  break;
+		  case ABORTED:
+			  messageBuilder.append("was aborted: " + job.getEndTimestamp().toString() + ".");
+			  break;
 		}
 		notification.setMessage(messageBuilder.toString());
 		notificationDao.save(notification);

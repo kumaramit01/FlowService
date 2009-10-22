@@ -114,8 +114,6 @@ public class NemaFlowService implements FlowService {
 		job.setOwnerId(userId);
 		job.setOwnerEmail(userEmail);
 		
-		// remove this job.setSubmitTimestamp(new Date());
-		
 		jobDao.save(job);
 		jobScheduler.scheduleJob(job);
 		jobStatusMonitor.monitor(job,notificationCreator);

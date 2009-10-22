@@ -7,8 +7,10 @@ import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.model.Job;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -31,10 +33,9 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    /** TODO: Description of field {@link PollingJobStatusMonitor#jobDao}. */
    private JobDao jobDao;
 
-   /** MAYBE THE VALUE IN THIS K/V PAIR SHOULD BE A SET? */
    @GuardedBy("jobsLock")
-   private final Map<Job, JobStatusUpdateHandler> jobs =
-      new HashMap<Job, JobStatusUpdateHandler>();
+   private final Map<Job, Set<JobStatusUpdateHandler>> jobs =
+      new HashMap<Job, Set<JobStatusUpdateHandler>>();
 
    /** Concurrency lock for the jobs list. */
    private final Lock jobsLock = new ReentrantLock();
@@ -73,7 +74,14 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    public void monitor(Job job, JobStatusUpdateHandler updateHandler) {
       jobsLock.lock();
       try {
-         jobs.put(job, updateHandler);
+    	 if(jobs.containsKey(job)) {
+             jobs.get(job).add(updateHandler);
+    	 } else {
+    		 Set<JobStatusUpdateHandler> handlerSet = 
+    			 new HashSet<JobStatusUpdateHandler>();
+    		 handlerSet.add(updateHandler);
+    		 jobs.put(job,handlerSet);
+    	 }
       } finally {
          jobsLock.unlock();
       }
@@ -102,16 +110,23 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
          try {
         	Iterator<Job> jobIterator = jobs.keySet().iterator();
             while (jobIterator.hasNext()) {
-               Job staleJob = jobIterator.next();
-               Job freshJob = jobDao.get(staleJob.getId());
-               // SYNC ALL PROPERTIES HERE
-               Integer oldStatus = staleJob.getStatusCode();
-               Integer newStatus = freshJob.getStatusCode();
+               Job cachedJob = jobIterator.next();
+               Job persistedJob = jobDao.get(cachedJob.getId());
+               Integer oldStatus = cachedJob.getStatusCode();
+               Integer newStatus = persistedJob.getStatusCode();
                if (!oldStatus.equals(newStatus)) {
-                  staleJob.setStatusCode(freshJob.getStatusCode());
-                  // Invoke the update handler for this job
-                  jobs.get(staleJob).jobStatusUpdate(staleJob);
-                  if(!staleJob.isRunning()) {
+                  cachedJob.setStatusCode(persistedJob.getStatusCode());
+                  cachedJob.setUpdateTimestamp(persistedJob.getUpdateTimestamp());
+                  cachedJob.setSubmitTimestamp(persistedJob.getStartTimestamp());
+                  cachedJob.setStartTimestamp(persistedJob.getStartTimestamp());
+                  cachedJob.setEndTimestamp(persistedJob.getEndTimestamp());
+                  // Invoke the update handlers for this job
+                  Set<JobStatusUpdateHandler> handlers = jobs.get(cachedJob);
+                  for(JobStatusUpdateHandler handler:handlers) {
+                	  handler.jobStatusUpdate(cachedJob);
+                  }
+                  // Stop monitoring this job if it is finished
+                  if(!cachedJob.isRunning()) {
                 	  jobIterator.remove();
                   }
                }
