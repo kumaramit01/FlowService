@@ -73,7 +73,7 @@ public class MeandreServer implements JobStatusUpdateHandler {
 	}
 
 	public void executeJob(Job job) throws ExecutionException {
-		if(runningJobs.size()>=maxConcurrentJobs) {
+		if(runningJobs.size()==maxConcurrentJobs) {
 			// do something else here...throw exception?
 			return;
 		}
