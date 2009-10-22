@@ -126,6 +126,7 @@ public class Job implements Serializable {
 	private String description;
 	private String host;
 	private Integer port;
+	private Integer execPort;
 	private Date submitTimestamp;
 	private Date startTimestamp;
 	private Date endTimestamp;
@@ -282,6 +283,13 @@ public class Job implements Serializable {
 	public void incrementNumTries() {
 		numTries++;
 	}
+	@Column(name="execPort")
+	public Integer getExecPort() {
+		return execPort;
+	}
+	public void setExecPort(Integer execPort) {
+		this.execPort = execPort;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -290,6 +298,8 @@ public class Job implements Serializable {
 				+ ((description == null) ? 0 : description.hashCode());
 		result = prime * result
 				+ ((endTimestamp == null) ? 0 : endTimestamp.hashCode());
+		result = prime * result
+				+ ((execPort == null) ? 0 : execPort.hashCode());
 		result = prime
 				* result
 				+ ((executionInstanceId == null) ? 0 : executionInstanceId
@@ -298,6 +308,8 @@ public class Job implements Serializable {
 		result = prime * result + ((host == null) ? 0 : host.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result
+				+ ((numTries == null) ? 0 : numTries.hashCode());
 		result = prime * result
 				+ ((ownerEmail == null) ? 0 : ownerEmail.hashCode());
 		result = prime * result + ((ownerId == null) ? 0 : ownerId.hashCode());
@@ -333,6 +345,11 @@ public class Job implements Serializable {
 				return false;
 		} else if (!endTimestamp.equals(other.endTimestamp))
 			return false;
+		if (execPort == null) {
+			if (other.execPort != null)
+				return false;
+		} else if (!execPort.equals(other.execPort))
+			return false;
 		if (executionInstanceId == null) {
 			if (other.executionInstanceId != null)
 				return false;
@@ -357,6 +374,11 @@ public class Job implements Serializable {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
+			return false;
+		if (numTries == null) {
+			if (other.numTries != null)
+				return false;
+		} else if (!numTries.equals(other.numTries))
 			return false;
 		if (ownerEmail == null) {
 			if (other.ownerEmail != null)
@@ -404,6 +426,6 @@ public class Job implements Serializable {
 		} else if (!updateTimestamp.equals(other.updateTimestamp))
 			return false;
 		return true;
-	}
+	}	
 	
 }

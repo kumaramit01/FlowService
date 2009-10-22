@@ -12,7 +12,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author shirk
  */
 public class FlowServiceApp {
-	public static final Logger logger = 
+	private static final Logger logger = 
 		Logger.getLogger(FlowServiceApp.class.getName());
 	
 	/**

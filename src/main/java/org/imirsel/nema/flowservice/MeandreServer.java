@@ -2,6 +2,7 @@ package org.imirsel.nema.flowservice;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
 import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
@@ -12,6 +13,9 @@ import org.meandre.client.TransmissionException;
 // Make thread safe
 public class MeandreServer implements JobStatusUpdateHandler { 
 
+	private static final Logger logger = 
+		Logger.getLogger(MeandreServer.class.getName());
+	
 	private String host;
 	private int port;
 	private JobStatusMonitor jobStatusMonitor;
@@ -26,6 +30,8 @@ public class MeandreServer implements JobStatusUpdateHandler {
 		this.port = port;
 		this.maxConcurrentJobs = maxConcurrentJobs;
 		this.meandreClient = new MeandreClient(host,port);
+		this.meandreClient.setLogger(logger);
+		this.meandreClient.setCredentials("admin", "admin");
 	}
 
 	public MeandreServer() {
@@ -77,16 +83,16 @@ public class MeandreServer implements JobStatusUpdateHandler {
 			throw new IllegalStateException("Could not execute job " + 
 					job.getId() + " because server " + getServerString() + " is busy.");
 		}
-		System.out.println("Server " + getServerString() + " executing job.");
+		logger.fine("Server " + getServerString() + " executing job " + job.getId() + ".");
 		try {
-			meandreClient.runFlow(job.getFlow().getUrl(), false);
+			meandreClient.runAsyncFlow(job.getFlow().getUrl(), false);
 		} catch (TransmissionException e) {
 			throw new ServerException("A problem occurred while " +
 					"communicating with server " +  getServerString() + 
 					" in order to execute job " + job.getId() + ".",e);
 		}
 		runningJobs.add(job);
-		jobStatusMonitor.monitor(job, this);
+		jobStatusMonitor.start(job, this);
 	}
 	
 	public void abortJob(Job job) throws ServerException {

@@ -32,6 +32,10 @@
 			<id>monk</id>
 			<url>http://www.monkproject.org/maven2</url>
 		</repository>
+      <repository>
+         <id>snapshot</id>
+         <url>http://monk.lis.uiuc.edu/snapshot/</url>
+      </repository>
 	</repositories>
 
 	<dependencies>
@@ -45,11 +49,6 @@
 			<groupId>net.jcip</groupId>
 			<artifactId>jcip-annotations</artifactId>
 			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.meandre</groupId>
-			<artifactId>meandre-server</artifactId>
-			<version>${meandre-server.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -110,6 +109,11 @@
          <groupId>org.imirsel</groupId>
          <artifactId>nema-core</artifactId>
          <version>1.0.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+         <groupId>org.imirsel</groupId>
+         <artifactId>imirsel-meandre-client</artifactId>
+         <version>1.0.2-SNAPSHOT</version>
       </dependency>
 	</dependencies>
 	<properties>
