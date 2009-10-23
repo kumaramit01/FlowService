@@ -58,7 +58,7 @@
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
 
-   <bean id="jobResultDao" class="org.imirsel.nema.dao.impl.JobResultDao">
+   <bean id="jobResultDao" class="org.imirsel.nema.dao.impl.JobResultDaoImpl">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    
