@@ -51,19 +51,19 @@
 		</property>
 	</bean>
    
-   <bean id="jobDao" class="org.imirsel.nema.dao.hibernate.JobDaoHibernate">
+   <bean id="jobDao" class="org.imirsel.nema.dao.JobDaoHibernate">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
 
-   <bean id="jobResultDao" class="org.imirsel.nema.dao.hibernate.JobResultDaoHibernate">
+   <bean id="jobResultDao" class="org.imirsel.nema.dao.JobResultDaoHibernate">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    
-   <bean id="flowDao" class="org.imirsel.nema.dao.hibernate.FlowDaoHibernate">
+   <bean id="flowDao" class="org.imirsel.nema.dao.FlowDaoHibernate">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    
-   <bean id="notificationDao" class="org.imirsel.nema.dao.hibernate.NotificationDaoHibernate">
+   <bean id="notificationDao" class="org.imirsel.nema.dao.NotificationDaoHibernate">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    
