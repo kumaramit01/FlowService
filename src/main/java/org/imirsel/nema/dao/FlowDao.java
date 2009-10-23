@@ -4,26 +4,14 @@ import java.util.Collection;
 
 import org.imirsel.nema.model.Flow;
 
-public class FlowDao {
+public interface FlowDao {
 
-	public void remove(Long id) {
-		// TODO Auto-generated method stub
-		
-	}
+	public abstract void remove(Long id);
 
-	public Flow get(long flowInstanceId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract Flow get(long flowInstanceId);
 
-	public Collection<? extends Flow> getFlowTemplates() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract Collection<? extends Flow> getFlowTemplates();
 
-	public void save(Flow instance) {
-		// TODO Auto-generated method stub
-		
-	}
+	public abstract void save(Flow instance);
 
 }

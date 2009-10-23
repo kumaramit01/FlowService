@@ -47,23 +47,26 @@
 				<prop key="hibernate.dialect">
 					org.hibernate.dialect.MySQLDialect
 				</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="format_sql">true</prop>
 			</props>
 		</property>
 	</bean>
    
-   <bean id="jobDao" class="org.imirsel.nema.dao.JobDaoHibernate">
+   <bean id="jobDao" class="org.imirsel.nema.dao.impl.JobDaoImpl">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
 
-   <bean id="jobResultDao" class="org.imirsel.nema.dao.JobResultDaoHibernate">
+   <bean id="jobResultDao" class="org.imirsel.nema.dao.impl.JobResultDaoImpl">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    
-   <bean id="flowDao" class="org.imirsel.nema.dao.FlowDaoHibernate">
+   <bean id="flowDao" class="org.imirsel.nema.dao.impl.FlowDaoImpl">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    
-   <bean id="notificationDao" class="org.imirsel.nema.dao.NotificationDaoHibernate">
+   <bean id="notificationDao" class="org.imirsel.nema.dao.impl.NotificationDaoImpl">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    

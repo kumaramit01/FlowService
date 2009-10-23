@@ -4,26 +4,14 @@ import java.util.List;
 
 import org.imirsel.nema.model.Job;
 
-public class JobDao {
+public interface JobDao {
 
-	public Job get(long jobId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract Job get(long jobId);
 
-	public void remove(long jobId) {
-		// TODO Auto-generated method stub
-		
-	}
+	public abstract void remove(long jobId);
 
-	public void save(Job job) {
-		// TODO Auto-generated method stub
-		
-	}
+	public abstract void save(Job job);
 
-	public List<Job> getJobsByOwnerId(long userId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract List<Job> getJobsByOwnerId(long userId);
 
 }

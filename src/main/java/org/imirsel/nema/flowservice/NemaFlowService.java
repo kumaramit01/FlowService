@@ -12,10 +12,12 @@ import org.imirsel.nema.model.Flow;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.JobResult;
 import org.imirsel.nema.model.Notification;
-import org.imirsel.nema.dao.FlowDao;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.dao.JobResultDao;
 import org.imirsel.nema.dao.NotificationDao;
+import org.imirsel.nema.dao.impl.FlowDao;
+import org.imirsel.nema.dao.impl.JobResultDaoImpl;
+import org.imirsel.nema.dao.impl.NotificationDaoImpl;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
 import org.springframework.orm.ObjectRetrievalFailureException;
 
@@ -38,9 +40,9 @@ public class NemaFlowService implements FlowService {
 	
 	private JobDao jobDao;
 	
-	private JobResultDao resultDao;
+	private JobResultDaoImpl resultDao;
 	
-	private NotificationDao notificationDao;
+	private NotificationDaoImpl notificationDao;
 	
 	private NotificationCreator notificationCreator;
 	
@@ -214,7 +216,7 @@ public class NemaFlowService implements FlowService {
 		return resultDao;
 	}
 	
-	public void setJobResultDao(JobResultDao resultDao) {
+	public void setJobResultDao(JobResultDaoImpl resultDao) {
 		this.resultDao = resultDao;
 	}
 	
@@ -222,7 +224,7 @@ public class NemaFlowService implements FlowService {
 		return notificationDao;
 	}
 	
-	public void setNotificationDao(NotificationDao notificationDao) {
+	public void setNotificationDao(NotificationDaoImpl notificationDao) {
 		this.notificationDao = notificationDao;
 	}
 
@@ -240,7 +242,7 @@ public class NemaFlowService implements FlowService {
 		return resultDao;
 	}
 
-	public void setResultDao(JobResultDao resultDao) {
+	public void setResultDao(JobResultDaoImpl resultDao) {
 		this.resultDao = resultDao;
 	}
 
