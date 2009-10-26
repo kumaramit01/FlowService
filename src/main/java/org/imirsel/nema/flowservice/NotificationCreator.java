@@ -1,7 +1,6 @@
 package org.imirsel.nema.flowservice;
 
 import org.imirsel.nema.dao.NotificationDao;
-import org.imirsel.nema.dao.impl.NotificationDaoImpl;
 import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.Notification;
@@ -17,13 +16,13 @@ public class NotificationCreator implements JobStatusUpdateHandler {
 	private final NotificationDao notificationDao;
 	
 	/**
-	 * Create a new instance with the specified {@link NotificationDaoImpl}.
+	 * Create a new instance with the specified {@link NotificationDao}.
 	 * 
-	 * @param notificationDao2 The {@link NotificationDaoImpl} to use to store
+	 * @param notificaitonDao The {@link NotificationDao} to use to store
 	 * {@link Notification}s persistently.
 	 */
-	public NotificationCreator(NotificationDao notificationDao) {
-		this.notificationDao = notificationDao;
+	public NotificationCreator(NotificationDao notificaitonDao) {
+		this.notificationDao = notificaitonDao;
 	}
 	
 	/**

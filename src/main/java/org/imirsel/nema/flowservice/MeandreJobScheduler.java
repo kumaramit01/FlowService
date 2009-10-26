@@ -6,7 +6,6 @@ import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
 import org.imirsel.nema.dao.JobDao;
-import org.imirsel.nema.dao.impl.JobDaoImpl;
 import org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig;
 import org.imirsel.nema.model.Job;
 
@@ -305,18 +304,18 @@ public class MeandreJobScheduler implements JobScheduler {
    }
 
    /**
-    * Set the {@link JobDaoImpl} to use.
+    * Set the {@link JobDao} to use.
     * 
-    * @param jobDao The {@link JobDaoImpl} implementation to use.
+    * @param jobDao The {@link JobDao} implementation to use.
     */
    public void setJobDao(JobDao jobDao) {
 	   this.jobDao = jobDao;
    }
    
    /**
-    * Return the {@link JobDaoImpl} implementation currently in use.
+    * Return the {@link JobDao} implementation currently in use.
     * 
-    * @return {@link JobDaoImpl} implementation currently in use.
+    * @return {@link JobDao} implementation currently in use.
     */
    public JobDao getJobDao() {
 	   return jobDao;

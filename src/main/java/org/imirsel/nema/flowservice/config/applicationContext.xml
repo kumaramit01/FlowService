@@ -5,13 +5,13 @@
 	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:mqc="http://activemq.apache.org/schema/core"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
-         http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
          http://www.springframework.org/schema/aop 
-         http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+         http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
          http://www.springframework.org/schema/context 
          http://www.springframework.org/schema/context/spring-context-2.5.xsd
          http://www.springframework.org/schema/tx 
-         http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+         http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<context:annotation-config/>
 	
@@ -47,26 +47,23 @@
 				<prop key="hibernate.dialect">
 					org.hibernate.dialect.MySQLDialect
 				</prop>
-				<prop key="hibernate.hbm2ddl.auto">update</prop>
-				<prop key="hibernate.show_sql">true</prop>
-				<prop key="format_sql">true</prop>
 			</props>
 		</property>
 	</bean>
    
-   <bean id="jobDao" class="org.imirsel.nema.dao.impl.JobDaoImpl">
+   <bean id="jobDao" class="org.imirsel.nema.dao.hibernate.JobDaoHibernate">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
 
-   <bean id="jobResultDao" class="org.imirsel.nema.dao.impl.JobResultDaoImpl">
+   <bean id="jobResultDao" class="org.imirsel.nema.dao.hibernate.JobResultDaoHibernate">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    
-   <bean id="flowDao" class="org.imirsel.nema.dao.impl.FlowDaoImpl">
+   <bean id="flowDao" class="org.imirsel.nema.dao.hibernate.FlowDaoHibernate">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    
-   <bean id="notificationDao" class="org.imirsel.nema.dao.impl.NotificationDaoImpl">
+   <bean id="notificationDao" class="org.imirsel.nema.dao.hibernate.NotificationDaoHibernate">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    

@@ -4,7 +4,6 @@ import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
 import org.imirsel.nema.dao.JobDao;
-import org.imirsel.nema.dao.impl.JobDaoImpl;
 import org.imirsel.nema.model.Job;
 
 import java.util.HashMap;
@@ -66,9 +65,9 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    //~ Constructors ------------------------------------------------------------
 
    /**
-    * Create a new instance with the specified {@link JobDaoImpl}.
+    * Create a new instance with the specified {@link JobDao}.
     *
-    * @param jobDao The {@link JobDaoImpl} to use to access job info.
+    * @param jobDao The {@link JobDao} to use to access job info.
     */
    public PollingJobStatusMonitor() {  }
 
@@ -160,16 +159,16 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    }
 
    /**
-    * Return the {@link JobDaoImpl} currently in use.
-    * @return The {@link JobDaoImpl} currently in use.
+    * Return the {@link JobDao} currently in use.
+    * @return The {@link JobDao} currently in use.
     */
 public JobDao getJobDao() {
 	return jobDao;
 }
 
 /**
- * Set the {@link JobDaoImpl} to use.
- * @param jobDao The {@link JobDaoImpl} to use.
+ * Set the {@link JobDao} to use.
+ * @param jobDao The {@link JobDao} to use.
  */
 public void setJobDao(JobDao jobDao) {
 	this.jobDao = jobDao;
