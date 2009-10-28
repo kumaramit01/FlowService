@@ -117,6 +117,7 @@ public class NemaFlowService implements FlowService {
 		job.setFlow(flowInstance);
 		job.setOwnerId(userId);
 		job.setOwnerEmail(userEmail);
+		job.setNumTries(0);
 		
 		jobDao.save(job);
 		jobScheduler.scheduleJob(job);

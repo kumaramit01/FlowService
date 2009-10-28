@@ -5,6 +5,7 @@ import static org.imirsel.nema.model.Job.JobStatus;
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
+import org.imirsel.meandre.client.ExecResponse;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig;
 import org.imirsel.nema.model.Job;
@@ -194,13 +195,13 @@ public class MeandreJobScheduler implements JobScheduler {
             jobDao.save(job);
             
             try {
-               // TODO this will return an exec response, which will contain
-            	// the port number. put port number in job bean before save
-               server.executeJob(job);
+
+               ExecResponse response = server.executeJob(job);
                
                job.setHost(server.getHost());
                job.setPort(server.getPort());
-               //job.setExecPort(execResponse.getPort());
+               job.setExecPort(response.getPort());
+               job.setExecutionInstanceId(response.getUri());
                
                jobDao.save(job);
                jobQueue.remove();

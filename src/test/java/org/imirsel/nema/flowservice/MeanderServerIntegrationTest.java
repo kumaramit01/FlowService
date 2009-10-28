@@ -3,6 +3,8 @@ package org.imirsel.nema.flowservice;
 import java.beans.PropertyVetoException;
 import java.util.Date;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.imirsel.nema.dao.JobDao;
@@ -53,22 +55,28 @@ public class MeanderServerIntegrationTest {
         flow.setKeyWords("test flow");
         flow.setTemplate(false);
         
+
         flowDao.save(flow);
         
-		Job job = new Job();
-		job.setToken(String.valueOf(System.currentTimeMillis()));
-		job.setName("Test " + new Date());
-		job.setDescription("A test job.");
-		job.setFlow(flow);
-		job.setOwnerId(200L);
-		job.setOwnerEmail("nobody@loopback.net");
-		job.setNumTries(0);
+        
+
+//
+//		Job job = new Job();
+//		job.setToken(String.valueOf(System.currentTimeMillis()));
+//		job.setName("Test " + new Date());
+//		job.setDescription("A test job.");
+//		job.setFlow(flow);
+//		job.setOwnerId(200L);
+//		job.setOwnerEmail("nobody@loopback.net");
+//		job.setNumTries(0);
+//		
+//		jobDao.save(job);
+//		
+//
+//		
+//		server.executeJob(job);
 		
-		jobDao.save(job);
-		
-		server.executeJob(job);
-		
-		flowDao.remove(flow.getId());
+
         
 	}
 }

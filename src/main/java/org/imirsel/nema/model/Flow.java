@@ -35,7 +35,7 @@ public class Flow implements Serializable {
     private Boolean template;
     private String url;
     private Long creatorId;
-    private Flow instanceOf;
+    private Flow instanceOf = null;
     
     
     @Id
@@ -96,7 +96,7 @@ public class Flow implements Serializable {
 	public void setCreatorId(Long creatorId) {
 		this.creatorId = creatorId;
 	}
-	@JoinColumn(name = "flowInstanceId")
+	@JoinColumn(name = "instanceOf", nullable=true)
 	@ManyToOne(fetch=FetchType.EAGER)
 	public Flow getInstanceOf() {
 		return instanceOf;

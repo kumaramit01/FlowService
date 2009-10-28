@@ -47,6 +47,8 @@
 				<prop key="hibernate.dialect">
 					org.hibernate.dialect.MySQLDialect
 				</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">true</prop> 
 			</props>
 		</property>
 	</bean>
@@ -72,13 +74,15 @@
    </bean>
    
    <bean id="headServer" class="org.imirsel.nema.flowservice.MeandreServer">
-       <property name="host" value="http://localhost"/>
-       <property name="port" value="1000"/>
+       <property name="host" value="http://128.174.154.145"/>
+       <property name="port" value="1709"/>
+       <property name="maxConcurrentJobs" value="1"/>
    </bean>
 
    <bean id="worker1" class="org.imirsel.nema.flowservice.MeandreServer">
        <property name="host" value="http://128.174.154.145"/>
        <property name="port" value="1714"/>
+       <property name="maxConcurrentJobs" value="1"/>
        <property name="jobStatusMonitor" ref="jobStatusMonitor"/>
    </bean>
    
