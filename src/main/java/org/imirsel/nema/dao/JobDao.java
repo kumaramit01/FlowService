@@ -4,13 +4,7 @@ import java.util.List;
 
 import org.imirsel.nema.model.Job;
 
-public interface JobDao {
-
-	public abstract Job get(long jobId);
-
-	public abstract void remove(long jobId);
-
-	public abstract void save(Job job);
+public interface JobDao extends GenericDao<Job, Long>{
 
 	public abstract List<Job> getJobsByOwnerId(long userId);
 

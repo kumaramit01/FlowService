@@ -1,23 +1,13 @@
 package org.imirsel.nema.dao.impl;
 
 import org.imirsel.nema.dao.JobResultDao;
-import org.springframework.orm.toplink.SessionFactory;
+import org.imirsel.nema.model.JobResult;
 
-public class JobResultDaoImpl implements JobResultDao {
+public class JobResultDaoImpl extends GenericDaoImpl<JobResult, Long>implements JobResultDao {
+
+	public JobResultDaoImpl() {
+		super(JobResult.class);
+	}
 	
-	private SessionFactory sessionFactory;
-
-	public void remove(Long id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
 
 }

@@ -1,55 +1,26 @@
 package org.imirsel.nema.dao.impl;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.imirsel.nema.dao.FlowDao;
 import org.imirsel.nema.model.Flow;
-import org.springframework.orm.toplink.SessionFactory;
 
-public class FlowDaoImpl implements FlowDao {
+public class FlowDaoImpl extends GenericDaoImpl<Flow,Long> implements FlowDao {
 	
-	 private SessionFactory sessionFactory;
-
-	
-
-	/* (non-Javadoc)
-	 * @see org.imirsel.nema.dao.impl.FlowDao#remove(java.lang.Long)
-	 */
-	public void remove(Long id) {
-		// TODO Auto-generated method stub
-		
+	public FlowDaoImpl() {
+		super(Flow.class);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.imirsel.nema.dao.impl.FlowDao#get(long)
-	 */
-	public Flow get(long flowInstanceId) {
+	@Override
+	public List<Flow> getFlowTemplates() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.imirsel.nema.dao.impl.FlowDao#getFlowTemplates()
-	 */
-	public Collection<? extends Flow> getFlowTemplates() {
+	@Override
+	public List<Flow> getFlowsByCreatorId(Long userId) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.imirsel.nema.dao.impl.FlowDao#save(org.imirsel.nema.model.Flow)
-	 */
-	public void save(Flow instance) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
 	}
 
 }

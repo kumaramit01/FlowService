@@ -1,5 +1,7 @@
 package org.imirsel.nema.dao;
 
-public interface JobResultDao {
+import org.imirsel.nema.model.JobResult;
+
+public interface JobResultDao extends GenericDao<JobResult, Long>{
 
 }

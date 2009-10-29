@@ -4,29 +4,17 @@ import java.util.List;
 
 import org.imirsel.nema.dao.NotificationDao;
 import org.imirsel.nema.model.Notification;
-import org.springframework.orm.toplink.SessionFactory;
 
-public class NotificationDaoImpl implements NotificationDao {
+public class NotificationDaoImpl extends GenericDaoImpl<Notification, Long>implements NotificationDao {
 	
-	
-	private SessionFactory sessionFactory;
+	public NotificationDaoImpl() {
+		super(Notification.class);
+	}
 
-	public List<Notification> getNotificationsByRecipientId(long userId) {
+	@Override
+	public List<Notification> getNotificationsByRecipientId(Long userId) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	public void save(Notification notification) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
 	}
 
 }

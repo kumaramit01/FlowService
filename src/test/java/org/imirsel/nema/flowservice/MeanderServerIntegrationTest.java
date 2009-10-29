@@ -1,25 +1,20 @@
 package org.imirsel.nema.flowservice;
 
-import java.beans.PropertyVetoException;
 import java.util.Date;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.hibernate.cfg.Configuration;
-import org.imirsel.nema.dao.JobDao;
-import org.imirsel.nema.dao.hibernate.FlowDaoHibernate;
-import org.imirsel.nema.dao.hibernate.JobDaoHibernate;
+import org.imirsel.nema.dao.impl.FlowDaoImpl;
+import org.imirsel.nema.dao.impl.JobDaoImpl;
 import org.imirsel.nema.model.Flow;
-import org.imirsel.nema.model.Job;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class MeanderServerIntegrationTest {
 
-	static JobDaoHibernate jobDao = new org.imirsel.nema.dao.hibernate.JobDaoHibernate();
-	static FlowDaoHibernate flowDao = new org.imirsel.nema.dao.hibernate.FlowDaoHibernate();
+	static JobDaoImpl jobDao = new org.imirsel.nema.dao.impl.JobDaoImpl();
+	static FlowDaoImpl flowDao = new org.imirsel.nema.dao.impl.FlowDaoImpl();
+	static SessionFactory sessionFactory;
 	static {
 		
 		AnnotationConfiguration cfg = new AnnotationConfiguration()
@@ -33,10 +28,9 @@ public class MeanderServerIntegrationTest {
         .setProperty("hibernate.hbm2ddl.auto", "update")
 	    .setProperty("hibernate.connection.password", "root");
 		
-		HibernateTemplate template = new HibernateTemplate(cfg.buildSessionFactory(),true);
-
-		jobDao.setHibernateTemplate(template);
-		flowDao.setHibernateTemplate(template);
+		sessionFactory = cfg.buildSessionFactory();
+		jobDao.setSessionFactory(sessionFactory);
+		flowDao.setSessionFactory(sessionFactory);
 	}
 	
 	public static void main(String[] args) throws ServerException {
@@ -54,11 +48,16 @@ public class MeanderServerIntegrationTest {
         flow.setDescription("bite me");
         flow.setKeyWords("test flow");
         flow.setTemplate(false);
-        
 
-        flowDao.save(flow);
+
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.saveOrUpdate(flow);
+        transaction.commit();
+        //flowDao.save(flow);
         
-        
+       // flowDao.getHibernateTemplate().save(flow);
+
 
 //
 //		Job job = new Job();
