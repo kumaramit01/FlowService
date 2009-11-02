@@ -9,6 +9,7 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.imirsel.nema.dao.impl.FlowDaoImpl;
 import org.imirsel.nema.dao.impl.JobDaoImpl;
 import org.imirsel.nema.model.Flow;
+import org.springframework.orm.hibernate3.HibernateTransactionManager;
 
 public class MeanderServerIntegrationTest {
 
@@ -16,7 +17,8 @@ public class MeanderServerIntegrationTest {
 	static FlowDaoImpl flowDao = new org.imirsel.nema.dao.impl.FlowDaoImpl();
 	static SessionFactory sessionFactory;
 	static {
-		
+		HibernateTransactionManager transactionManager = new HibernateTransactionManager();
+
 		AnnotationConfiguration cfg = new AnnotationConfiguration()
 	    .addAnnotatedClass(org.imirsel.nema.model.JobResult.class)
 	    .addAnnotatedClass(org.imirsel.nema.model.Job.class)
@@ -29,6 +31,8 @@ public class MeanderServerIntegrationTest {
 	    .setProperty("hibernate.connection.password", "root");
 		
 		sessionFactory = cfg.buildSessionFactory();
+		transactionManager.setSessionFactory(sessionFactory);
+		
 		jobDao.setSessionFactory(sessionFactory);
 		flowDao.setSessionFactory(sessionFactory);
 	}
@@ -52,9 +56,9 @@ public class MeanderServerIntegrationTest {
 
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        session.saveOrUpdate(flow);
+        flowDao.save(flow);
         transaction.commit();
-        //flowDao.save(flow);
+
         
        // flowDao.getHibernateTemplate().save(flow);
 
