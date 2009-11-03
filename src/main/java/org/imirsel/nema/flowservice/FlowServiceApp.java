@@ -13,7 +13,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class FlowServiceApp {
 	private static final Logger logger = 
-		Logger.getLogger(FlowServiceApp.class.getName());
+		Logger.getLogger(NemaFlowServiceTest.class.getName());
 	
 	/**
 	 * Main method for executing the application.

@@ -127,7 +127,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
         	Iterator<Job> jobIterator = jobs.keySet().iterator();
             while (jobIterator.hasNext()) {
                Job cachedJob = jobIterator.next();
-               Job persistedJob = jobDao.get(cachedJob.getId());
+               Job persistedJob = jobDao.findById(cachedJob.getId(),false);
                Integer oldStatus = cachedJob.getStatusCode();
                Integer newStatus = persistedJob.getStatusCode();
                if (!oldStatus.equals(newStatus)) {

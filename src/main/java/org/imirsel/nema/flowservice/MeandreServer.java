@@ -127,7 +127,7 @@ public class MeandreServer implements JobStatusUpdateHandler {
 		this.jobStatusMonitor = jobStatusMonitor;
 	}
 
-	public ExecResponse executeJob(Job job) throws ServerException {
+	public ExecResponse executeJob(Job job) throws MeandreServerException {
 
 		if(isBusy()) {
 			throw new IllegalStateException("Could not execute job " + 
@@ -146,7 +146,7 @@ public class MeandreServer implements JobStatusUpdateHandler {
 			meandreClient.runAsyncFlow(job.getFlow().getUrl(), job.getToken(), probes);
 			response = meandreClient.getFlowExecutionInstanceId(job.getToken());
 		} catch (TransmissionException e) {
-			throw new ServerException("A problem occurred while " +
+			throw new MeandreServerException("A problem occurred while " +
 					"communicating with server " +  getServerString() + 
 					" in order to execute job " + job.getId() + ".",e);
 		}
@@ -160,7 +160,7 @@ public class MeandreServer implements JobStatusUpdateHandler {
 		return response;
 	}
 	
-	public void abortJob(Job job) throws ServerException {
+	public void abortJob(Job job) throws MeandreServerException {
 		if(abortPending.contains(job)) {
 			throw new IllegalStateException("An abort request has already " +
 					"been made for job " + job.getId() + ".");
@@ -169,7 +169,7 @@ public class MeandreServer implements JobStatusUpdateHandler {
 		try {
 			meandreClient.abortFlow(job.getExecPort());
 		} catch (TransmissionException e) {
-			throw new ServerException("Could not abort job " + 
+			throw new MeandreServerException("Could not abort job " + 
 					job.getId() + ".",e);
 		}
 		abortPending.add(job);

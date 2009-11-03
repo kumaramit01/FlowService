@@ -8,7 +8,6 @@ import org.imirsel.nema.model.Job;
 public class JobDaoImpl extends GenericDaoImpl<Job, Long>implements JobDao {
 
 	public JobDaoImpl() {
-		super(Job.class);
 	}
 
 	@Override

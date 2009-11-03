@@ -6,10 +6,12 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.context.ManagedSessionContext;
 import org.imirsel.nema.dao.impl.FlowDaoImpl;
 import org.imirsel.nema.dao.impl.JobDaoImpl;
 import org.imirsel.nema.model.Flow;
-import org.springframework.orm.hibernate3.HibernateTransactionManager;
+import org.imirsel.nema.model.Job;
+import org.imirsel.nema.flowservice.MeandreServerException;
 
 public class MeanderServerIntegrationTest {
 
@@ -17,8 +19,6 @@ public class MeanderServerIntegrationTest {
 	static FlowDaoImpl flowDao = new org.imirsel.nema.dao.impl.FlowDaoImpl();
 	static SessionFactory sessionFactory;
 	static {
-		HibernateTransactionManager transactionManager = new HibernateTransactionManager();
-
 		AnnotationConfiguration cfg = new AnnotationConfiguration()
 	    .addAnnotatedClass(org.imirsel.nema.model.JobResult.class)
 	    .addAnnotatedClass(org.imirsel.nema.model.Job.class)
@@ -28,16 +28,18 @@ public class MeanderServerIntegrationTest {
 	    .setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver")
 	    .setProperty("hibernate.connection.username", "root")
         .setProperty("hibernate.hbm2ddl.auto", "update")
-	    .setProperty("hibernate.connection.password", "root");
+	    .setProperty("hibernate.connection.password", "root")
+	    .setProperty("hibernate.current_session_context_class", "managed");
 		
 		sessionFactory = cfg.buildSessionFactory();
-		transactionManager.setSessionFactory(sessionFactory);
+
+		ManagedSessionContext.bind(sessionFactory.openSession());
 		
 		jobDao.setSessionFactory(sessionFactory);
 		flowDao.setSessionFactory(sessionFactory);
 	}
 	
-	public static void main(String[] args) throws ServerException {
+	public static void main(String[] args) throws MeandreServerException {
         MeandreServer server = new MeandreServer();
         server.setHost("128.174.154.145");
         server.setPort(1714);
@@ -53,33 +55,32 @@ public class MeanderServerIntegrationTest {
         flow.setKeyWords("test flow");
         flow.setTemplate(false);
 
-
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        flowDao.save(flow);
+        Session currentSession = sessionFactory.getCurrentSession();
+        Transaction transaction = currentSession.beginTransaction();
+        flowDao.makePersistent(flow);
         transaction.commit();
-
         
-       // flowDao.getHibernateTemplate().save(flow);
+        
+        transaction = currentSession.beginTransaction();
 
 
-//
-//		Job job = new Job();
-//		job.setToken(String.valueOf(System.currentTimeMillis()));
-//		job.setName("Test " + new Date());
-//		job.setDescription("A test job.");
-//		job.setFlow(flow);
-//		job.setOwnerId(200L);
-//		job.setOwnerEmail("nobody@loopback.net");
-//		job.setNumTries(0);
-//		
-//		jobDao.save(job);
-//		
-//
-//		
-//		server.executeJob(job);
+		Job job = new Job();
+		job.setToken(String.valueOf(System.currentTimeMillis()));
+		job.setName("Test " + new Date());
+		job.setDescription("A test job.");
+		job.setFlow(flow);
+		job.setOwnerId(200L);
+		job.setOwnerEmail("nobody@loopback.net");
+		job.setNumTries(0);
 		
-
+		jobDao.makePersistent(job);
+		
+		transaction.commit();
+		
+		server.executeJob(job);
+		
+		
+		ManagedSessionContext.unbind(sessionFactory);
         
 	}
 }

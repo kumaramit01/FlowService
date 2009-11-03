@@ -135,7 +135,7 @@ public class Job implements Serializable {
 	private Long ownerId;
 	private String ownerEmail;
 	private Flow flow;
-	private Integer numTries;
+	private Integer numTries = 0;
 	private String executionInstanceId;
 	private Set<JobResult> results;
 	
@@ -155,21 +155,21 @@ public class Job implements Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	@Column(name="host", nullable=false)
+	@Column(name="host")
 	public String getHost() {
 		return host;
 	}
 	public void setHost(String host) {
 		this.host = host;
 	}
-	@Column(name="port", nullable=false)
+	@Column(name="port")
 	public Integer getPort() {
 		return port;
 	}
 	public void setPort(Integer port) {
 		this.port = port;
 	}
-	@Column(name="submitTimestamp", nullable=false)
+	@Column(name="submitTimestamp")
 	public Date getSubmitTimestamp() {
 		return submitTimestamp;
 	}
@@ -246,7 +246,7 @@ public class Job implements Serializable {
 	public void setFlow(Flow flow) {
 		this.flow = flow;
 	}
-	@Column(name="executionInstanceId",nullable=false,length=20000000)
+	@Column(name="executionInstanceId",length=20000000)
 	public String getExecutionInstanceId() {
 		return executionInstanceId;
 	}

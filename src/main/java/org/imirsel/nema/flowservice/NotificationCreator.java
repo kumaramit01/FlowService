@@ -53,7 +53,7 @@ public class NotificationCreator implements JobStatusUpdateHandler {
 			  break;
 		}
 		notification.setMessage(messageBuilder.toString());
-		notificationDao.save(notification);
+		notificationDao.makePersistent(notification);
 	}
 
 }

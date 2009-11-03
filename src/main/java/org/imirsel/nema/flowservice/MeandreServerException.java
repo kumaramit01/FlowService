@@ -7,7 +7,7 @@ package org.imirsel.nema.flowservice;
  * @author shirk
  * @since 1.0
  */
-public class ServerException extends Exception {
+public class MeandreServerException extends Exception {
 
 	/**
 	 * Version of this class.
@@ -19,7 +19,7 @@ public class ServerException extends Exception {
 	 * 
 	 * @param message Message describing what went wrong.
 	 */
-	public ServerException(String message) {
+	public MeandreServerException(String message) {
 		super(message);
 	}
 	
@@ -29,7 +29,7 @@ public class ServerException extends Exception {
 	 * @param message Message describing what went wrong.
 	 * @param cause Underlying cause of this exception.
 	 */
-	public ServerException(String message, Throwable cause) {
+	public MeandreServerException(String message, Throwable cause) {
 		super(message,cause);
 	}
 }

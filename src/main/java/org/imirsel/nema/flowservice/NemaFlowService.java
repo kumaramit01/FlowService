@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 
+import org.hibernate.HibernateException;
 import org.imirsel.nema.NoSuchEntityException;
 import org.imirsel.nema.model.Flow;
 import org.imirsel.nema.model.Job;
@@ -17,7 +18,9 @@ import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.dao.JobResultDao;
 import org.imirsel.nema.dao.NotificationDao;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.orm.ObjectRetrievalFailureException;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 /**
  * A {@link FlowService} implementation for the NEMA project.
@@ -60,7 +63,7 @@ public class NemaFlowService implements FlowService {
 	public void abortJob(long jobId) throws IllegalStateException {
 		Job job;
 		try {
-			job = jobDao.get(jobId);
+			job = jobDao.findById(jobId, false);
 		} catch (ObjectRetrievalFailureException e) {
 			throw new NoSuchEntityException("Job " + jobId + " does not exist.");
 		}
@@ -79,7 +82,7 @@ public class NemaFlowService implements FlowService {
 	public void deleteJob(long jobId) throws IllegalStateException {
 		Job job;
 		try {
-			job = jobDao.get(jobId);
+			job = jobDao.findById(jobId,false);
 		} catch (ObjectRetrievalFailureException e) {
 			throw new NoSuchEntityException("Job " + jobId + " does not exist.");
 		}
@@ -89,10 +92,10 @@ public class NemaFlowService implements FlowService {
 					" because it is still running.");
 		}
 		for(JobResult result : job.getResults()) {
-			resultDao.remove(result.getId());
+			resultDao.makeTransient(result);
 		}
-		jobDao.remove(jobId);
-		flowDao.remove(job.getFlow().getId());
+		jobDao.makeTransient(job);
+		flowDao.makeTransient(job.getFlow());
 		// delete the results from disk?
 	}
 
@@ -102,12 +105,12 @@ public class NemaFlowService implements FlowService {
 	@Override
 	public Job executeJob(String token, String name, String description, long flowInstanceId, long userId,
 			String userEmail) {
-		Flow flowInstance;
+		Flow flowInstance = null;
 		try {
-			flowInstance = flowDao.get(flowInstanceId);
-		} catch (Exception e) {
-			throw new NoSuchEntityException("Flow instance " + 
-					flowInstanceId + " does not exist.");
+			flowInstance = flowDao.findById(flowInstanceId,false);
+		} catch (DataAccessException e) {
+			logger.throwing(NemaFlowService.class.getName(),"executeJob",e);
+			throw e;
 		}
 		
 		Job job = new Job();
@@ -117,9 +120,14 @@ public class NemaFlowService implements FlowService {
 		job.setFlow(flowInstance);
 		job.setOwnerId(userId);
 		job.setOwnerEmail(userEmail);
-		job.setNumTries(0);
 		
-		jobDao.save(job);
+		try {
+		   jobDao.makePersistent(job);
+	    } catch (DataAccessException e) {
+		   logger.throwing(NemaFlowService.class.getName(),"executeJob",e);
+		   throw e;
+	    }
+	    
 		jobScheduler.scheduleJob(job);
 		jobStatusMonitor.start(job,notificationCreator);
 		
@@ -143,7 +151,7 @@ public class NemaFlowService implements FlowService {
 	public Job getJob(long jobId) {
 		Job job;
 		try {
-			job = jobDao.get(jobId);
+			job = jobDao.findById(jobId,false);
 		} catch (ObjectRetrievalFailureException e) {
 			throw new NoSuchEntityException("Job " + jobId + " does not exist.");
 		}
@@ -171,7 +179,7 @@ public class NemaFlowService implements FlowService {
 	 */
 	@Override
 	public Long storeFlowInstance(Flow instance) {
-		flowDao.save(instance);
+		flowDao.makePersistent(instance);
 		// store the flow on disk
 		return instance.getId();
 	}

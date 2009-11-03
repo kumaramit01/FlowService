@@ -32,7 +32,7 @@ public class Flow implements Serializable {
     private String description;
     private Date dateCreated;
     private String keyWords;
-    private Boolean template;
+    private Boolean template = false;
     private String url;
     private Long creatorId;
     private Flow instanceOf = null;

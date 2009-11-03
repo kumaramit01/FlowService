@@ -126,7 +126,7 @@ public class MeandreJobScheduler implements JobScheduler {
       MeandreServer executingServer = findExecutingServer(job);
       try {
 		executingServer.abortJob(job);
-	} catch (ServerException e) {
+	} catch (MeandreServerException e) {
 		// TODO Perhaps do something more intelligent here
 		throw new RuntimeException(e);
 	}
@@ -192,7 +192,8 @@ public class MeandreJobScheduler implements JobScheduler {
             job.incrementNumTries();
             job.setJobStatus(JobStatus.SUBMITTED);
             job.setSubmitTimestamp(new Date());
-            jobDao.save(job);
+            // Start transaction here
+            jobDao.makePersistent(job);
             
             try {
 
@@ -203,9 +204,9 @@ public class MeandreJobScheduler implements JobScheduler {
                job.setExecPort(response.getPort());
                job.setExecutionInstanceId(response.getUri());
                
-               jobDao.save(job);
+               jobDao.makePersistent(job);
                jobQueue.remove();
-            } catch (ServerException e) {
+            } catch (MeandreServerException e) {
                e.printStackTrace();
                job.setSubmitTimestamp(null);
                job.setJobStatus(JobStatus.UNKNOWN);
@@ -217,7 +218,7 @@ public class MeandreJobScheduler implements JobScheduler {
                	 jobQueue.remove();
                }
                
-               jobDao.save(job);
+               jobDao.makePersistent(job);
             }
          }
       } finally {

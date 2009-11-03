@@ -8,7 +8,6 @@ import org.imirsel.nema.model.Notification;
 public class NotificationDaoImpl extends GenericDaoImpl<Notification, Long>implements NotificationDao {
 	
 	public NotificationDaoImpl() {
-		super(Notification.class);
 	}
 
 	@Override

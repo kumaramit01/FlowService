@@ -6,7 +6,6 @@ import org.imirsel.nema.model.JobResult;
 public class JobResultDaoImpl extends GenericDaoImpl<JobResult, Long>implements JobResultDao {
 
 	public JobResultDaoImpl() {
-		super(JobResult.class);
 	}
 	
 

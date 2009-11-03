@@ -1,118 +1,144 @@
 package org.imirsel.nema.dao.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.LockMode;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Example;
+
 import org.imirsel.nema.dao.GenericDao;
-import org.springframework.orm.ObjectRetrievalFailureException;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+
+import org.springframework.dao.DataAccessException;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
+
+import java.lang.reflect.ParameterizedType;
+
 import java.util.List;
-import java.util.Map;
+
 
 /**
- * This class serves as the Base class for all other DAOs.
+ * Implements the generic CRUD data access operations using Hibernate APIs.
  *
- * @author shirk
- * @since 1.0
- * @param <T> a type variable
- * @param <PK> the primary key for that type
+ * <p>To write a DAO, subclass and parameterize this class with your persistent
+ * class. Of course, assuming that you have a traditional 1:1 appraoch for
+ * Entity:DAO design.</p>
+ *
+ * <p>You have to inject a current Hibernate <tt>Session</tt> to use a DAO.
+ * Otherwise, this generic implementation will use <tt>
+ * HibernateUtil.getSessionFactory()</tt> to obtain the curren <tt>Session</tt>.
+ * </p>
+ *
+ * @author Christian Bauer
+ * @see HibernateDAOFactory
  */
-public class GenericDaoImpl<T, PK extends Serializable> extends HibernateDaoSupport implements GenericDao<T, PK> {
-    /**
-     * Log variable for all child classes. Uses LogFactory.getLog(getClass()) from Commons Logging
-     */
-    protected final Log log = LogFactory.getLog(getClass());
-    private final Class<T> persistentClass;
+abstract public class GenericDaoImpl<T, ID extends Serializable>
+      implements GenericDao<T, ID> {
 
-    /**
-     * Constructor that takes in a class to see which type of entity to persist
-     * @param persistentClass the class type you'd like to persist
-     */
-    public GenericDaoImpl(final Class<T> persistentClass) {
-        this.persistentClass = persistentClass;
-    }
+   private final Class<T> persistentClass;
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    public List<T> getAll() {
-        return super.getHibernateTemplate().loadAll(this.persistentClass);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    public List<T> getAllDistinct() {
-        Collection result = new LinkedHashSet(getAll());
-        return new ArrayList(result);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    public T get(PK id) {
-        T entity = (T) super.getHibernateTemplate().get(this.persistentClass, id);
+   private SessionFactory sessionFactory;
 
-        if (entity == null) {
-            log.warn("Uh oh, '" + this.persistentClass + "' object with id '" + id + "' not found...");
-            throw new ObjectRetrievalFailureException(this.persistentClass, id);
-        }
+   //~ Constructors ------------------------------------------------------------
 
-        return entity;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    public boolean exists(PK id) {
-        T entity = (T) super.getHibernateTemplate().get(this.persistentClass, id);
-        return entity != null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    public T save(T object) {
-        return (T) super.getHibernateTemplate().merge(object);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void remove(PK id) {
-        super.getHibernateTemplate().delete(this.get(id));
-    }
-    
-   /** 
-    * {@inheritDoc}
+   /**
+    * TODO: Creates a new {@link GenericDaoImpl} object.
     */
    @SuppressWarnings("unchecked")
-   public List<T> findByNamedQuery(
-       String queryName, 
-       Map<String, Object> queryParams) {
-       String []params = new String[queryParams.size()];
-       Object []values = new Object[queryParams.size()];
-       int index = 0;
-       Iterator<String> i = queryParams.keySet().iterator();
-       while (i.hasNext()) {
-           String key = i.next();
-           params[index] = key;
-           values[index++] = queryParams.get(key);
-       }
-       return getHibernateTemplate().findByNamedQueryAndNamedParam(
-           queryName, 
-           params, 
-           values);
+   public GenericDaoImpl() {
+      this.persistentClass =
+         (Class<T>)
+         ((ParameterizedType) getClass().getGenericSuperclass())
+         .getActualTypeArguments()[0];
    }
-}
 
+   //~ Methods -----------------------------------------------------------------
+
+   public void setSessionFactory(SessionFactory s) { this.sessionFactory = s; }
+
+   protected Session getSession() { return sessionFactory.getCurrentSession(); }
+
+   public Class<T> getPersistentClass() { return persistentClass; }
+
+   @SuppressWarnings("unchecked")
+   public T findById(ID id, boolean lock) throws DataAccessException {
+      T entity;
+
+      try {
+         if (lock) {
+            entity =
+               (T) getSession().load(
+                  getPersistentClass(), id, LockMode.UPGRADE);
+         } else {
+            entity = (T) getSession().load(getPersistentClass(), id);
+         }
+      } catch (HibernateException e) {
+         throw SessionFactoryUtils.convertHibernateAccessException(e);
+      }
+
+      return entity;
+   }
+
+   public List<T> findAll() throws DataAccessException {
+      return findByCriteria();
+   }
+
+   @SuppressWarnings("unchecked")
+   public List<T> findByExample(T exampleInstance, String... excludeProperty)
+         throws DataAccessException {
+      try {
+         Criteria crit = getSession().createCriteria(getPersistentClass());
+         Example example = Example.create(exampleInstance);
+         for (String exclude : excludeProperty) {
+            example.excludeProperty(exclude);
+         }
+         crit.add(example);
+         return crit.list();
+      } catch (HibernateException e) {
+         throw SessionFactoryUtils.convertHibernateAccessException(e);
+      }
+   }
+
+   public T makePersistent(T entity) throws DataAccessException {
+      try {
+         getSession().saveOrUpdate(entity);
+      } catch (HibernateException e) {
+         throw SessionFactoryUtils.convertHibernateAccessException(e);
+      }
+      return entity;
+   }
+
+   public void makeTransient(T entity) throws DataAccessException {
+      getSession().delete(entity);
+   }
+
+   public void flush() { getSession().flush(); }
+
+   public void clear() { getSession().clear(); }
+
+   /**
+    * Use this inside subclasses as a convenience method.
+    *
+    * @param criterion TODO: Description of parameter criterion.
+    * @return use this inside subclasses as a convenience method.
+    * @throws DataAccessException TODO: Description of exception {@link
+    * DataAccessException}.
+    */
+   @SuppressWarnings("unchecked")
+   protected List<T> findByCriteria(Criterion... criterion)
+         throws DataAccessException {
+      try {
+         Criteria crit = getSession().createCriteria(getPersistentClass());
+         for (Criterion c : criterion) {
+            crit.add(c);
+         }
+         return crit.list();
+      } catch (HibernateException e) {
+         throw SessionFactoryUtils.convertHibernateAccessException(e);
+      }
+   }
+
+}
