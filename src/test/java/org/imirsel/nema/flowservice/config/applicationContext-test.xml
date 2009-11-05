@@ -28,7 +28,7 @@
    
    <aop:config>
       <aop:advisor id="flowServiceTx" advice-ref="flowServiceTxAdvice" pointcut="execution(* *..flowservice.FlowService.*(..))" order="0"/>
-      <aop:advisor id="jobSchedulerTx" advice-ref="jobSchedulerTxAdvice" pointcut="execution(* *..flowservice.MeandreJobScheduler.*(..))" order="1"/>   
+      <aop:advisor id="jobSchedulerTx" advice-ref="jobSchedulerTxAdvice" pointcut="execution(* *..flowservice.MeandreJobScheduler$RunQueuedJobs.*(..))" order="0"/>   
    </aop:config>
 
    <tx:advice id="flowServiceTxAdvice">
@@ -39,7 +39,7 @@
     
    <tx:advice id="jobSchedulerTxAdvice">
       <tx:attributes>
-         <tx:method name="runJobs" rollback-for="DataAccessException"/>
+         <tx:method name="run" rollback-for="DataAccessException"/>
       </tx:attributes>
    </tx:advice>
    

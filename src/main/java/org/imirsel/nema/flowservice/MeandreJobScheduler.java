@@ -160,25 +160,30 @@ public class MeandreJobScheduler implements JobScheduler {
     */
    public void scheduleJob(Job job) {
       queueLock.lock();
+      logger.fine("Queue lock acquired.");
       try {
          jobQueue.offer(job);
       } finally {
          queueLock.unlock();
+         logger.fine("Queue lock released.");
       }
    }
 
    /**
     * Attempt to run any queued jobs.
     */
-   private void runJobs() {
+   public void runJobs() {
       queueLock.lock();
+      logger.fine("Queue lock acquired.");
       workersLock.lock();
+      logger.fine("Worker lock acquired.");
       try {
          if (jobQueue.size() < 1) {
             logger.fine("> No queued jobs.");
             return;
          }
          while (!jobQueue.isEmpty()) {
+            logger.fine("Job found in queue.");
             MeandreServer server = loadBalancer.nextAvailableServer();
             if (server == null) {
                logger.info(
@@ -186,18 +191,26 @@ public class MeandreJobScheduler implements JobScheduler {
                   " jobs are queued but all servers are busy.");
                return;
             }
-
+            logger.fine("Server " + server + " is available for processing.");
+            
             Job job = jobQueue.peek();
             
             job.incrementNumTries();
             job.setJobStatus(JobStatus.SUBMITTED);
             job.setSubmitTimestamp(new Date());
-            // Start transaction here
-            jobDao.makePersistent(job);
+            
+            logger.fine("Preparing to update job " + job.getId() + ".");
+            try {
+				jobDao.makePersistent(job);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			logger.fine("Job " + job.getId() + " updated.");
             
             try {
-
+               logger.fine("Attempting to contact server " + server + " to execute job.");
                ExecResponse response = server.executeJob(job);
+               logger.fine("Execution response received.");
                
                job.setHost(server.getHost());
                job.setPort(server.getPort());
@@ -222,8 +235,11 @@ public class MeandreJobScheduler implements JobScheduler {
             }
          }
       } finally {
-         queueLock.unlock();
          workersLock.unlock();
+         logger.fine("Worker lock released.");
+         queueLock.unlock();
+         logger.fine("Queue lock released.");
+
       }
    }
 
