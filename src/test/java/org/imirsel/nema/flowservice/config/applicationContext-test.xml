@@ -17,8 +17,25 @@
    
    <context:property-placeholder location="jdbc.properties,mail.properties" />
 
-   <tx:annotation-driven transaction-manager="txManager"/>
+   <!-- Enable @Configured support -->
+   <context:spring-configured/>
    
+   <!-- Enable @Transactional support -->
+   <tx:annotation-driven/>
+    
+   <!-- Enable @AspectJ support -->
+   <aop:aspectj-autoproxy/>
+   
+   <aop:config>
+      <aop:advisor id="flowServiceTx" advice-ref="flowServiceTxAdvice" pointcut="execution(* *..service.FlowService.*(..))" order="0"/>        
+   </aop:config>
+
+   <tx:advice id="flowServiceTxAdvice">
+      <tx:attributes>
+         <tx:method name="executeJob" rollback-for="DataAccessException"/>
+      </tx:attributes>
+   </tx:advice>
+    
    <!-- Local C3P0 DataSource that works in any environment -->
    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
       destroy-method="close">
@@ -28,11 +45,11 @@
       <property name="password" value="${jdbc.password}" />
    </bean>
 
-   <bean id="txManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-      <property name="sessionFactory" ref="sessionFactory"/>
+   <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+      <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
-
-   <bean id="sessionFactory"
+   
+   <bean id="hibernateSessionFactory"
       class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
       <property name="dataSource" ref="dataSource" />
       <property name="annotatedClasses">
@@ -49,25 +66,25 @@
                org.hibernate.dialect.MySQLDialect
             </prop>
             <prop key="hibernate.hbm2ddl.auto">update</prop>
-            <prop key="hibernate.show_sql">true</prop> 
+            <prop key="hibernate.show_sql">true</prop>
          </props>
       </property>
    </bean>
    
    <bean id="jobDao" class="org.imirsel.nema.dao.impl.JobDaoImpl">
-       <property name="sessionFactory" ref="sessionFactory"/>
+       <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
 
    <bean id="jobResultDao" class="org.imirsel.nema.dao.impl.JobResultDaoImpl">
-       <property name="sessionFactory" ref="sessionFactory"/>
+       <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    
    <bean id="flowDao" class="org.imirsel.nema.dao.impl.FlowDaoImpl">
-       <property name="sessionFactory" ref="sessionFactory"/>
+       <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    
    <bean id="notificationDao" class="org.imirsel.nema.dao.impl.NotificationDaoImpl">
-       <property name="sessionFactory" ref="sessionFactory"/>
+       <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    
    <bean id="jobStatusMonitor" class="org.imirsel.nema.flowservice.monitor.PollingJobStatusMonitor">
