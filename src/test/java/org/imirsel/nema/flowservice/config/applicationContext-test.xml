@@ -27,7 +27,8 @@
    <aop:aspectj-autoproxy/>
    
    <aop:config>
-      <aop:advisor id="flowServiceTx" advice-ref="flowServiceTxAdvice" pointcut="execution(* *..service.FlowService.*(..))" order="0"/>        
+      <aop:advisor id="flowServiceTx" advice-ref="flowServiceTxAdvice" pointcut="execution(* *..flowservice.FlowService.*(..))" order="0"/>
+      <aop:advisor id="flowDaoTx" advice-ref="flowDaoTxAdvice" pointcut="execution(* *..dao.FlowDao.*(..))" order="1"/>   
    </aop:config>
 
    <tx:advice id="flowServiceTxAdvice">
@@ -36,6 +37,12 @@
       </tx:attributes>
    </tx:advice>
     
+   <tx:advice id="flowDaoTxAdvice">
+      <tx:attributes>
+         <tx:method name="makePersistent" rollback-for="DataAccessException"/>
+      </tx:attributes>
+   </tx:advice>
+   
    <!-- Local C3P0 DataSource that works in any environment -->
    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
       destroy-method="close">

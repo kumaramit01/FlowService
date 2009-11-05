@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import org.imirsel.nema.dao.FlowDao;
+import org.imirsel.nema.model.Flow;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -25,10 +27,21 @@ public class NemaFlowServiceTest {
 		ApplicationContext ctx  =  null;
 	    ctx = new ClassPathXmlApplicationContext("org/imirsel/nema/flowservice/config/applicationContext-test.xml");
 		
+//	    FlowDao flowDao = (FlowDao) ctx.getBean("flowDao");
+//	    Flow flow = new Flow();
+//		flow.setCreatorId(100L);
+//		flow.setDateCreated(new Date());
+//        flow.setUrl("http://test.org/helloworld/");
+//        flow.setName("Bugger off");
+//        flow.setDescription("bite me");
+//        flow.setKeyWords("test flow");
+//        flow.setTemplate(false);
+//        flowDao.makePersistent(flow);
+	    
 		FlowService flowService = (FlowService)ctx.getBean("flowService");
 		flowService.executeJob(UUID.randomUUID().toString(), 
 				"Test: " + new Date().toString(), "A test job", 
-				4, 1L, "shirk@uiuc.edu");
+				1, 1L, "shirk@uiuc.edu");
 	}
 
 }

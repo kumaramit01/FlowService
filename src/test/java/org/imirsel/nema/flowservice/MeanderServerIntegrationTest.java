@@ -23,12 +23,12 @@ public class MeanderServerIntegrationTest {
 	    .addAnnotatedClass(org.imirsel.nema.model.JobResult.class)
 	    .addAnnotatedClass(org.imirsel.nema.model.Job.class)
 	    .addAnnotatedClass(org.imirsel.nema.model.Flow.class)
-	    .setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/flowservice?autoReconnect=true")
+	    .setProperty("hibernate.connection.url", "jdbc:mysql://128.174.154.145:3306/flowservice?autoReconnect=true")
 	    .setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
 	    .setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver")
-	    .setProperty("hibernate.connection.username", "root")
+	    .setProperty("hibernate.connection.username", "nema_user")
         .setProperty("hibernate.hbm2ddl.auto", "update")
-	    .setProperty("hibernate.connection.password", "root")
+	    .setProperty("hibernate.connection.password", "reduxer101")
 	    .setProperty("hibernate.current_session_context_class", "managed");
 		
 		sessionFactory = cfg.buildSessionFactory();

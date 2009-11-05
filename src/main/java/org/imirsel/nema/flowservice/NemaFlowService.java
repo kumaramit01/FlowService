@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 
-import org.hibernate.HibernateException;
 import org.imirsel.nema.NoSuchEntityException;
 import org.imirsel.nema.model.Flow;
 import org.imirsel.nema.model.Job;
@@ -20,7 +19,6 @@ import org.imirsel.nema.dao.NotificationDao;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.ObjectRetrievalFailureException;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 /**
  * A {@link FlowService} implementation for the NEMA project.
