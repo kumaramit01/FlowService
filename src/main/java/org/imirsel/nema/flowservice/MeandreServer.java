@@ -165,7 +165,6 @@ public class MeandreServer implements JobStatusUpdateHandler {
 			throw new IllegalStateException("An abort request has already " +
 					"been made for job " + job.getId() + ".");
 		}
-		// THE INT ARGUMENT NEEDS TO BE A PORT NUMBER
 		try {
 			meandreClient.abortFlow(job.getExecPort());
 		} catch (TransmissionException e) {

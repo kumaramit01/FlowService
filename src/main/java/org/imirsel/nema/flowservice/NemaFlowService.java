@@ -12,12 +12,11 @@ import org.imirsel.nema.model.Flow;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.JobResult;
 import org.imirsel.nema.model.Notification;
+import org.imirsel.nema.dao.DaoFactory;
 import org.imirsel.nema.dao.FlowDao;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.dao.JobResultDao;
-import org.imirsel.nema.dao.NotificationDao;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
-import org.springframework.dao.DataAccessException;
 import org.springframework.orm.ObjectRetrievalFailureException;
 
 /**
@@ -35,13 +34,7 @@ public class NemaFlowService implements FlowService {
 	
 	private JobStatusMonitor jobStatusMonitor;
 	
-	private FlowDao flowDao;
-	
-	private JobDao jobDao;
-	
-	private JobResultDao resultDao;
-	
-	private NotificationDao notificationDao;
+	private DaoFactory daoFactory;
 	
 	private NotificationCreator notificationCreator;
 	
@@ -51,7 +44,9 @@ public class NemaFlowService implements FlowService {
 	@PostConstruct
 	public void init() {
        logger.info("Initializing NEMA Flow Service...");
-       notificationCreator = new NotificationCreator(notificationDao);
+       
+       notificationCreator = 
+    	   new NotificationCreator(daoFactory.getNotificationDao());
 	}
 	
 	/**
@@ -59,13 +54,7 @@ public class NemaFlowService implements FlowService {
 	 */
 	@Override
 	public void abortJob(long jobId) throws IllegalStateException {
-		Job job;
-		try {
-			job = jobDao.findById(jobId, false);
-		} catch (ObjectRetrievalFailureException e) {
-			throw new NoSuchEntityException("Job " + jobId + " does not exist.");
-		}
-        // Job must be running to be aborted.
+		Job job = daoFactory.getJobDao().findById(jobId, false);
 		if(!job.isRunning()) {
 			throw new IllegalStateException("Cannot abort job " + jobId + 
 					" because it has already completed.");
@@ -78,12 +67,11 @@ public class NemaFlowService implements FlowService {
 	 */
 	@Override
 	public void deleteJob(long jobId) throws IllegalStateException {
-		Job job;
-		try {
-			job = jobDao.findById(jobId,false);
-		} catch (ObjectRetrievalFailureException e) {
-			throw new NoSuchEntityException("Job " + jobId + " does not exist.");
-		}
+		JobDao jobDao = daoFactory.getJobDao();
+		JobResultDao resultDao = daoFactory.getJobResultDao();
+		FlowDao flowDao = daoFactory.getFlowDao();
+		
+		Job job = jobDao.findById(jobId,false);
 		// Job must be finished to be deleted.
 		if(job.isRunning()) {
 			throw new IllegalArgumentException("Cannot delete job " + jobId + 
@@ -103,13 +91,10 @@ public class NemaFlowService implements FlowService {
 	@Override
 	public Job executeJob(String token, String name, String description, long flowInstanceId, long userId,
 			String userEmail) {
-		Flow flowInstance = null;
-		try {
-			flowInstance = flowDao.findById(flowInstanceId,false);
-		} catch (DataAccessException e) {
-			logger.throwing(NemaFlowService.class.getName(),"executeJob",e);
-			throw e;
-		}
+		FlowDao flowDao = daoFactory.getFlowDao();
+		JobDao jobDao = daoFactory.getJobDao();
+		
+		Flow flowInstance = flowDao.findById(flowInstanceId,false);
 		
 		Job job = new Job();
 		job.setToken(token);
@@ -119,13 +104,7 @@ public class NemaFlowService implements FlowService {
 		job.setOwnerId(userId);
 		job.setOwnerEmail(userEmail);
 		
-		try {
-		   jobDao.makePersistent(job);
-	    } catch (DataAccessException e) {
-		   logger.throwing(NemaFlowService.class.getName(),"executeJob",e);
-		   throw e;
-	    }
-	    
+		jobDao.makePersistent(job);
 		jobScheduler.scheduleJob(job);
 		jobStatusMonitor.start(job,notificationCreator);
 		
@@ -137,6 +116,8 @@ public class NemaFlowService implements FlowService {
 	 */
 	@Override
 	public Set<Flow> getFlowTemplates() {
+		FlowDao flowDao = daoFactory.getFlowDao();
+		
 		Set<Flow> flowSet = new HashSet<Flow>();
 		flowSet.addAll(flowDao.getFlowTemplates());
 		return flowSet;
@@ -147,6 +128,8 @@ public class NemaFlowService implements FlowService {
 	 */
 	@Override
 	public Job getJob(long jobId) {
+		JobDao jobDao = daoFactory.getJobDao();
+		
 		Job job;
 		try {
 			job = jobDao.findById(jobId,false);
@@ -161,7 +144,7 @@ public class NemaFlowService implements FlowService {
 	 */
 	@Override
 	public List<Job> getUserJobs(long userId) {
-		return jobDao.getJobsByOwnerId(userId);
+		return daoFactory.getJobDao().getJobsByOwnerId(userId);
 	}
 
 	/**
@@ -169,7 +152,7 @@ public class NemaFlowService implements FlowService {
 	 */
 	@Override
 	public List<Notification> getUserNotifications(long userId) {
-		return notificationDao.getNotificationsByRecipientId(userId);
+		return daoFactory.getNotificationDao().getNotificationsByRecipientId(userId);
 	}
 
 	/**
@@ -177,6 +160,7 @@ public class NemaFlowService implements FlowService {
 	 */
 	@Override
 	public Long storeFlowInstance(Flow instance) {
+		FlowDao flowDao = daoFactory.getFlowDao();
 		flowDao.makePersistent(instance);
 		// store the flow on disk
 		return instance.getId();
@@ -201,39 +185,14 @@ public class NemaFlowService implements FlowService {
 		this.jobScheduler = jobScheduler;
 	}
 	
-	public FlowDao getFlowDao() {
-		return flowDao;
-	}
-	
-	public void setFlowDao(FlowDao flowDao) {
-		this.flowDao = flowDao;
-	}
-	
-	public JobDao getJobDao() {
-		return jobDao;
-	}
-	
-	public void setJobDao(JobDao jobDao) {
-		this.jobDao = jobDao;
-	}
-	
-	public JobResultDao getJobResultDao() {
-		return resultDao;
-	}
-	
-	public void setJobResultDao(JobResultDao resultDao) {
-		this.resultDao = resultDao;
-	}
-	
-	public NotificationDao getNotificationDao() {
-		return notificationDao;
-	}
-	
-	public void setNotificationDao(NotificationDao notificationDao) {
-		this.notificationDao = notificationDao;
-	}
+    public void setDaoFactory(DaoFactory daoFactory) {
+    	this.daoFactory = daoFactory;
+    }
 
-	
+	public DaoFactory getDaoFactory() {
+		return daoFactory;
+	}
+    
 	public JobStatusMonitor getJobStatusMonitor() {
 		return jobStatusMonitor;
 	}
@@ -241,14 +200,5 @@ public class NemaFlowService implements FlowService {
 	public void setJobStatusMonitor(JobStatusMonitor jobStatusMonitor) {
 		this.jobStatusMonitor = jobStatusMonitor;
 	}
-
 	
-	public JobResultDao getResultDao() {
-		return resultDao;
-	}
-
-	public void setResultDao(JobResultDao resultDao) {
-		this.resultDao = resultDao;
-	}
-
 }

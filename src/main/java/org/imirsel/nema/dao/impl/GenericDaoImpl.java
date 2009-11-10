@@ -41,6 +41,8 @@ abstract public class GenericDaoImpl<T, ID extends Serializable>
    private final Class<T> persistentClass;
 
    private SessionFactory sessionFactory;
+   
+   private Session managedSession;
 
    //~ Constructors ------------------------------------------------------------
 
@@ -58,8 +60,16 @@ abstract public class GenericDaoImpl<T, ID extends Serializable>
    //~ Methods -----------------------------------------------------------------
 
    public void setSessionFactory(SessionFactory s) { this.sessionFactory = s; }
+   
+   public SessionFactory getSessionFactory() { return sessionFactory;}
 
-   protected Session getSession() { return sessionFactory.getCurrentSession(); }
+   protected Session getSession() { 
+	   if(managedSession!=null){
+		   return managedSession;
+	   }  else {
+		   return sessionFactory.getCurrentSession();
+	   }
+   }
 
    public Class<T> getPersistentClass() { return persistentClass; }
 
@@ -140,5 +150,11 @@ abstract public class GenericDaoImpl<T, ID extends Serializable>
          throw SessionFactoryUtils.convertHibernateAccessException(e);
       }
    }
-
+   
+   public void startManagedSession(Session session) {
+	   this.managedSession = session;
+   }
+   public void endManagedSession() {
+	   managedSession=null;
+   }
 }

@@ -1,11 +1,5 @@
 package org.imirsel.nema.flowservice.monitor;
 
-import net.jcip.annotations.GuardedBy;
-import net.jcip.annotations.ThreadSafe;
-
-import org.imirsel.nema.dao.JobDao;
-import org.imirsel.nema.model.Job;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,6 +12,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
+
+import net.jcip.annotations.GuardedBy;
+import net.jcip.annotations.ThreadSafe;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.imirsel.nema.dao.DaoFactory;
+import org.imirsel.nema.dao.JobDao;
+import org.imirsel.nema.model.Job;
+import org.springframework.dao.DataAccessException;
 
 
 /**
@@ -35,7 +40,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    //~ Instance fields ---------------------------------------------------------
 
    /** Used to access jobs in the data store. */
-   private JobDao jobDao;
+   private DaoFactory daoFactory;
 
    /**
     * Maps jobs that are being monitored to objects that are waiting to be
@@ -65,9 +70,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    //~ Constructors ------------------------------------------------------------
 
    /**
-    * Create a new instance with the specified {@link JobDao}.
-    *
-    * @param jobDao The {@link JobDao} to use to access job info.
+    * Create a new instance.
     */
    public PollingJobStatusMonitor() {  }
 
@@ -124,10 +127,38 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
          logger.fine("> Checking for job status updates.");
          jobsLock.lock();
          try {
+        	JobDao jobDao = daoFactory.getJobDao();
         	Iterator<Job> jobIterator = jobs.keySet().iterator();
             while (jobIterator.hasNext()) {
                Job cachedJob = jobIterator.next();
-               Job persistedJob = jobDao.findById(cachedJob.getId(),false);
+               
+               Session session = jobDao.getSessionFactory()
+                  .openSession();
+               logger.fine("Session opened.");
+               jobDao.startManagedSession(session);
+               logger.fine("Managed session started.");
+
+               Transaction transaction = session.beginTransaction();
+               transaction.begin();
+
+               Job persistedJob = null;
+               try {
+                  persistedJob = jobDao.findById(cachedJob.getId(), false);
+               } catch (HibernateException e) {
+                  logger.warning("Data access exception: " + e.getMessage());
+               } catch (DataAccessException e) {
+                  logger.warning("Data access exception: " + e.getMessage());
+               } catch (Exception e) {
+                  logger.warning(e.getMessage());
+               } finally {
+            	   jobDao.endManagedSession();
+            	   session.close();
+               }
+   			
+               if(persistedJob==null) {
+            	   return;
+               }
+               
                Integer oldStatus = cachedJob.getStatusCode();
                Integer newStatus = persistedJob.getStatusCode();
                if (!oldStatus.equals(newStatus)) {
@@ -159,19 +190,19 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    }
 
    /**
-    * Return the {@link JobDao} currently in use.
-    * @return The {@link JobDao} currently in use.
+    * Return the {@link DaoFactory} currently in use.
+    * @return The {@link DaoFactory} currently in use.
     */
-public JobDao getJobDao() {
-	return jobDao;
+public DaoFactory getDaoFactory() {
+	return daoFactory;
 }
 
 /**
- * Set the {@link JobDao} to use.
- * @param jobDao The {@link JobDao} to use.
+ * Set the {@link DaoFactory} to use.
+ * @param jobDao The {@link DaoFactory} to use.
  */
-public void setJobDao(JobDao jobDao) {
-	this.jobDao = jobDao;
+public void setDaoFactory(DaoFactory daoFactory) {
+	this.daoFactory = daoFactory;
 }
 
 

@@ -32,7 +32,10 @@
 
    <tx:advice id="flowServiceTxAdvice">
       <tx:attributes>
-         <tx:method name="save*" rollback-for="UserExistsException"/>
+         <tx:method name="abortJob" read-only="true"/>
+         <tx:method name="deleteJob" rollback-for="DataAccessException"/>
+         <tx:method name="executeJob" rollback-for="DataAccessException"/>
+         <tx:method name="getJob" read-only="true"/>
       </tx:attributes>
    </tx:advice>
     
@@ -71,24 +74,12 @@
 		</property>
 	</bean>
    
-   <bean id="jobDao" class="org.imirsel.nema.dao.impl.JobDaoImpl">
-       <property name="sessionFactory" ref="hibernateSessionFactory"/>
-   </bean>
-
-   <bean id="jobResultDao" class="org.imirsel.nema.dao.impl.JobResultDaoImpl">
-       <property name="sessionFactory" ref="hibernateSessionFactory"/>
-   </bean>
-   
-   <bean id="flowDao" class="org.imirsel.nema.dao.impl.FlowDaoImpl">
-       <property name="sessionFactory" ref="hibernateSessionFactory"/>
-   </bean>
-   
-   <bean id="notificationDao" class="org.imirsel.nema.dao.impl.NotificationDaoImpl">
+   <bean id="daoFactory" class="org.imirsel.nema.dao.impl.DaoFactoryImpl">
        <property name="sessionFactory" ref="hibernateSessionFactory"/>
    </bean>
    
    <bean id="jobStatusMonitor" class="org.imirsel.nema.flowservice.monitor.PollingJobStatusMonitor">
-        <property name="jobDao" ref="jobDao"/>
+        <property name="daoFactory" ref="daoFactory"/>
    </bean>
    
    <bean id="headServer" class="org.imirsel.nema.flowservice.MeandreServer">
@@ -116,17 +107,14 @@
 	<bean id="loadBalancer" class="org.imirsel.nema.flowservice.RoundRobinLoadBalancer" />
    <bean id="jobScheduler" class="org.imirsel.nema.flowservice.MeandreJobScheduler">
       <property name="loadBalancer" ref="loadBalancer" />
-      <property name="jobDao" ref="jobDao"/>
+      <property name="daoFactory" ref="daoFactory"/>
       <property name="meandreJobSchedulerConfig" ref="jobSchedulerConfig" />
    </bean>
    
 	<bean id="flowService" class="org.imirsel.nema.flowservice.NemaFlowService">
 		<property name="jobScheduler" ref="jobScheduler" />
 		<property name="jobStatusMonitor" ref="jobStatusMonitor"/>
-		<property name="jobDao" ref="jobDao"/>
-		<property name="jobResultDao" ref="jobResultDao"/>
-		<property name="flowDao" ref="flowDao"/>
-		<property name="notificationDao" ref="notificationDao" />
+		<property name="daoFactory" ref="daoFactory"/>
 	</bean>
 
 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">

@@ -1,17 +1,5 @@
 package org.imirsel.nema.flowservice;
 
-import static org.imirsel.nema.model.Job.JobStatus;
-
-import net.jcip.annotations.GuardedBy;
-import net.jcip.annotations.ThreadSafe;
-
-import org.imirsel.meandre.client.ExecResponse;
-import org.imirsel.nema.dao.JobDao;
-import org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig;
-import org.imirsel.nema.model.Job;
-
-import javax.annotation.PostConstruct;
-
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -23,6 +11,22 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
+
+import javax.annotation.PostConstruct;
+
+import net.jcip.annotations.GuardedBy;
+import net.jcip.annotations.ThreadSafe;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.imirsel.meandre.client.ExecResponse;
+import org.imirsel.nema.dao.DaoFactory;
+import org.imirsel.nema.dao.JobDao;
+import org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig;
+import org.imirsel.nema.model.Job;
+import org.imirsel.nema.model.Job.JobStatus;
+import org.springframework.dao.DataAccessException;
 
 
 /**
@@ -64,7 +68,7 @@ public class MeandreJobScheduler implements JobScheduler {
    @GuardedBy("workersLock")
    private Set<MeandreServer> workers;
 
-   private JobDao jobDao;
+   private DaoFactory daoFactory;
    
    /**
     * Lock for both the set of workers and the load balancer which contains
@@ -177,9 +181,11 @@ public class MeandreJobScheduler implements JobScheduler {
       logger.fine("Queue lock acquired.");
       workersLock.lock();
       logger.fine("Worker lock acquired.");
+      JobDao jobDao = daoFactory.getJobDao();
+      Session session = null;
       try {
          if (jobQueue.size() < 1) {
-            logger.fine("> No queued jobs.");
+            logger.fine("No queued jobs found.");
             return;
          }
          while (!jobQueue.isEmpty()) {
@@ -199,39 +205,87 @@ public class MeandreJobScheduler implements JobScheduler {
             job.setJobStatus(JobStatus.SUBMITTED);
             job.setSubmitTimestamp(new Date());
             
-            logger.fine("Preparing to update job " + job.getId() + ".");
+            logger.fine("Preparing to update job " + job.getId() + " as submitted.");
+            
+            session = jobDao.getSessionFactory().openSession();
+            logger.fine("Session opened.");
+            jobDao.startManagedSession(session);
+            logger.fine("Managed session started.");
+            Transaction transaction = session.beginTransaction();
+        	transaction.begin();
             try {
 				jobDao.makePersistent(job);
+				transaction.commit();
+				logger.fine("Job " + job.getId() + " updated.");
+			} catch (HibernateException e) {
+				logger.warning("Data access exception: "  + e.getMessage());
+				rollback(transaction);
+			} catch (DataAccessException e) {
+				logger.warning("Data access exception: "  + e.getMessage());
+				rollback(transaction);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.warning(e.getMessage());
+				rollback(transaction);
 			}
-			logger.fine("Job " + job.getId() + " updated.");
             
             try {
-               logger.fine("Attempting to contact server " + server + " to execute job.");
+               logger.fine(
+                  "Attempting to contact server " + server +
+                  " to execute job.");
+
                ExecResponse response = server.executeJob(job);
                logger.fine("Execution response received.");
-               
+
+               logger.fine("Attempting to record job execution response.");
                job.setHost(server.getHost());
                job.setPort(server.getPort());
                job.setExecPort(response.getPort());
                job.setExecutionInstanceId(response.getUri());
-               
-               jobDao.makePersistent(job);
-               jobQueue.remove();
-            } catch (MeandreServerException e) {
-               e.printStackTrace();
+
+               transaction = session.beginTransaction();
+               transaction.begin();
+               try {
+                  jobDao.makePersistent(job);
+                  transaction.commit();
+                  logger.fine("Job execution response recorded in database.");
+                  jobQueue.remove();
+   			   } catch (HibernateException e) {
+				  logger.warning("Data access exception: "  + e.getMessage());
+				  rollback(transaction);
+			   } catch (DataAccessException e) {
+				  logger.warning("Data access exception: "  + e.getMessage());
+				  rollback(transaction);
+			   } catch (Exception e) {
+				  logger.warning(e.getMessage());
+				  rollback(transaction);
+			   }
+            } catch (MeandreServerException serverException) {
+               logger.warning(serverException.getMessage());
                job.setSubmitTimestamp(null);
                job.setJobStatus(JobStatus.UNKNOWN);
 
-               if(job.getNumTries()==MAX_EXECUTION_TRIES) {
-               	 job.setJobStatus(JobStatus.FAILED);
-               	 job.setEndTimestamp(new Date());
-               	 job.setUpdateTimestamp(new Date());
-               	 jobQueue.remove();
+               if (job.getNumTries() == MAX_EXECUTION_TRIES) {
+                  job.setJobStatus(JobStatus.FAILED);
+                  job.setEndTimestamp(new Date());
+                  job.setUpdateTimestamp(new Date());
+                  jobQueue.remove();
                }
                
-               jobDao.makePersistent(job);
+               transaction = session.beginTransaction();
+               transaction.begin();
+               try {
+                  jobDao.makePersistent(job);
+                  transaction.commit();
+   			   } catch (HibernateException e) {
+				  logger.warning("Data access exception: "  + e.getMessage());
+			      rollback(transaction);
+			   } catch (DataAccessException e) {
+				  logger.warning("Data access exception: "  + e.getMessage());
+				  rollback(transaction);
+			   } catch (Exception e) {
+				  logger.warning(e.getMessage());
+				  rollback(transaction);
+			   }
             }
          }
       } finally {
@@ -239,7 +293,30 @@ public class MeandreJobScheduler implements JobScheduler {
          logger.fine("Worker lock released.");
          queueLock.unlock();
          logger.fine("Queue lock released.");
+         if(session!=null) {
+            try {
+               jobDao.endManagedSession();
+               logger.fine("Managed session ended.");
+               session.close();
+               logger.fine("Session closed.");
+            } catch (HibernateException e) {
+               logger.warning(e.getMessage());
+            }
+         }
+      }
+   }
 
+   /**
+    * TODO: Description of method {@link $class.name$#rollback}.
+    *
+    * @param transaction TODO: Description of parameter transaction.
+    */
+   private void rollback(Transaction transaction) {
+      try {
+         logger.fine("Rolling back.");
+         transaction.rollback();
+      } catch (HibernateException e2) {
+         logger.warning(e2.getMessage());
       }
    }
 
@@ -322,21 +399,21 @@ public class MeandreJobScheduler implements JobScheduler {
    }
 
    /**
-    * Set the {@link JobDao} to use.
+    * Set the {@link DaoFactory} to use.
     * 
-    * @param jobDao The {@link JobDao} implementation to use.
+    * @param jobDao The {@link DaoFactory} implementation to use.
     */
-   public void setJobDao(JobDao jobDao) {
-	   this.jobDao = jobDao;
+   public void setDaoFactory(DaoFactory daoFactory) {
+	   this.daoFactory = daoFactory;
    }
    
    /**
-    * Return the {@link JobDao} implementation currently in use.
+    * Return the {@link DaoFactory} implementation currently in use.
     * 
-    * @return {@link JobDao} implementation currently in use.
+    * @return {@link DaoFactory} implementation currently in use.
     */
-   public JobDao getJobDao() {
-	   return jobDao;
+   public DaoFactory getDaoFactory() {
+	   return daoFactory;
    }
    
    //~ Inner Classes -----------------------------------------------------------

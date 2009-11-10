@@ -25,18 +25,7 @@ public class NemaFlowServiceTest {
 	 */
 	public static void main(String[] args) {
 		ApplicationContext ctx  =  null;
-	    ctx = new ClassPathXmlApplicationContext("org/imirsel/nema/flowservice/config/applicationContext-test.xml");
-		
-//	    FlowDao flowDao = (FlowDao) ctx.getBean("flowDao");
-//	    Flow flow = new Flow();
-//		flow.setCreatorId(100L);
-//		flow.setDateCreated(new Date());
-//        flow.setUrl("http://test.org/helloworld/");
-//        flow.setName("Bugger off");
-//        flow.setDescription("bite me");
-//        flow.setKeyWords("test flow");
-//        flow.setTemplate(false);
-//        flowDao.makePersistent(flow);
+	    ctx = new ClassPathXmlApplicationContext("org/imirsel/nema/flowservice/config/applicationContext.xml");
 	    
 		FlowService flowService = (FlowService)ctx.getBean("flowService");
 		flowService.executeJob(UUID.randomUUID().toString(), 

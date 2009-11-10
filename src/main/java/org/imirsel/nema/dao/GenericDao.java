@@ -3,6 +3,9 @@ package org.imirsel.nema.dao;
 import java.util.List;
 import java.io.Serializable;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
 /**
  * An interface shared by all business data access objects.
  * <p>
@@ -36,5 +39,13 @@ public interface GenericDao<T, ID extends Serializable> {
      * Affects every managed instance in the current persistence context!
      */
     void clear();
+    
+    void setSessionFactory(SessionFactory sessionFactory);
+    
+    SessionFactory getSessionFactory();
+    
+    void startManagedSession(Session session);
+    
+    void endManagedSession();
 
 }
