@@ -180,6 +180,7 @@ public class MeandreServer implements JobStatusUpdateHandler {
 	
 	@Override
 	public void jobStatusUpdate(Job job) {
+		logger.fine("Status update received for job " + job.getId() + ".");
 		if(!job.isRunning()) {
 	       runningJobs.remove(job);
 	       abortPending.remove(job);

@@ -86,10 +86,12 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
       try {
     	 if(jobs.containsKey(job)) {
              jobs.get(job).add(updateHandler);
+             logger.fine("Adding a handler for job " + job.getId() + " to an existing handler set.");
     	 } else {
     		 Set<JobStatusUpdateHandler> handlerSet = 
     			 new HashSet<JobStatusUpdateHandler>();
     		 handlerSet.add(updateHandler);
+    		 logger.fine("Created a handler set for job " + job.getId() + ".");
     		 jobs.put(job,handlerSet);
     	 }
       } finally {
@@ -124,23 +126,19 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
     */
    private class StatusUpdateDetector implements Runnable {
       public void run() {
-         logger.fine("> Checking for job status updates.");
+         logger.fine("Checking for job status updates...");
          jobsLock.lock();
+         JobDao jobDao = null;
          try {
-        	JobDao jobDao = daoFactory.getJobDao();
+
         	Iterator<Job> jobIterator = jobs.keySet().iterator();
+        	
+        	jobDao = daoFactory.getJobDao();
+            Session session = jobDao.getSessionFactory().openSession();
+            jobDao.startManagedSession(session);
+            
             while (jobIterator.hasNext()) {
                Job cachedJob = jobIterator.next();
-               
-               Session session = jobDao.getSessionFactory()
-                  .openSession();
-               logger.fine("Session opened.");
-               jobDao.startManagedSession(session);
-               logger.fine("Managed session started.");
-
-               Transaction transaction = session.beginTransaction();
-               transaction.begin();
-
                Job persistedJob = null;
                try {
                   persistedJob = jobDao.findById(cachedJob.getId(), false);
@@ -150,9 +148,6 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
                   logger.warning("Data access exception: " + e.getMessage());
                } catch (Exception e) {
                   logger.warning(e.getMessage());
-               } finally {
-            	   jobDao.endManagedSession();
-            	   session.close();
                }
    			
                if(persistedJob==null) {
@@ -162,29 +157,41 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
                Integer oldStatus = cachedJob.getStatusCode();
                Integer newStatus = persistedJob.getStatusCode();
                if (!oldStatus.equals(newStatus)) {
-            	  logger.fine("Status update for job " + cachedJob.getId() + 
-            			  "occurred: was " + cachedJob.getJobStatus() + 
-            			  ", now " + persistedJob.getJobStatus() + ".");
-                  cachedJob.setStatusCode(persistedJob.getStatusCode());
-                  cachedJob.setUpdateTimestamp(persistedJob.getUpdateTimestamp());
-                  cachedJob.setSubmitTimestamp(persistedJob.getStartTimestamp());
-                  cachedJob.setStartTimestamp(persistedJob.getStartTimestamp());
-                  cachedJob.setEndTimestamp(persistedJob.getEndTimestamp());
-                  // Invoke the update handlers for this job
-                  Set<JobStatusUpdateHandler> handlers = jobs.get(cachedJob);
-                  for(JobStatusUpdateHandler handler:handlers) {
-                	  handler.jobStatusUpdate(cachedJob);
-                  }
-                  // Stop monitoring this job if it is finished
-                  if(!cachedJob.isRunning()) {
-                	  logger.fine("Job " + cachedJob.getId() + 
-                			  " has ended. Removing it from the status monitor.");
-                	  jobIterator.remove();
-                  }
+            	  try {
+					logger.fine("Status update for job " + cachedJob.getId() + 
+							  " occurred: was " + cachedJob.getJobStatus() + 
+							  ", now " + persistedJob.getJobStatus() + ".");
+					  cachedJob.setStatusCode(persistedJob.getStatusCode());
+					  cachedJob.setUpdateTimestamp(persistedJob.getUpdateTimestamp());
+					  cachedJob.setSubmitTimestamp(persistedJob.getStartTimestamp());
+					  cachedJob.setStartTimestamp(persistedJob.getStartTimestamp());
+					  cachedJob.setEndTimestamp(persistedJob.getEndTimestamp());
+					  // Invoke the update handlers for this job
+					  Set<JobStatusUpdateHandler> handlers = jobs.get(cachedJob);
+					  if(handlers==null) {
+						  logger.fine("No handlers registered for job " + cachedJob.getId() + ".");
+						  return;
+					  } else {
+					      for(JobStatusUpdateHandler handler:handlers) {
+						     logger.fine("Dispatching a job status update for job " + cachedJob.getId() + " to handler " + handler + ".");
+						     handler.jobStatusUpdate(cachedJob);
+					      }
+					  }
+					  // Stop monitoring this job if it is finished
+					  if(!cachedJob.isRunning()) {
+						  logger.fine("Job " + cachedJob.getId() + 
+								  " has ended. Removing it from the status monitor.");
+						  jobIterator.remove();
+					  }
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
                }
             }
          } finally {
             jobsLock.unlock();
+            jobDao.endManagedSession();
          }
       }
    }

@@ -420,7 +420,7 @@ public class MeandreJobScheduler implements JobScheduler {
 
    private class RunQueuedJobs implements Runnable {
       public void run() {
-         logger.fine("> Checking for queued jobs.");
+         logger.fine("Checking for queued jobs...");
          runJobs();
       }
    }

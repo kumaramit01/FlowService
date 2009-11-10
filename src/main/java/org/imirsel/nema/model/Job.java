@@ -426,6 +426,8 @@ public class Job implements Serializable {
 		} else if (!updateTimestamp.equals(other.updateTimestamp))
 			return false;
 		return true;
-	}	
+	}
+
+	
 	
 }

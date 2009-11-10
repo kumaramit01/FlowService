@@ -46,7 +46,7 @@ public class NemaFlowService implements FlowService {
        logger.info("Initializing NEMA Flow Service...");
        
        notificationCreator = 
-    	   new NotificationCreator(daoFactory.getNotificationDao());
+    	   new NotificationCreator(daoFactory);
 	}
 	
 	/**
