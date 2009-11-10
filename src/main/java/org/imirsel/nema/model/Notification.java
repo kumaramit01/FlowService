@@ -27,9 +27,9 @@ public class Notification implements Serializable {
 	private Long id;
 	private Long recipientId;
 	private String recipientEmail;
-	private Date dateCreated;
+	private Date dateCreated = new Date();
 	private String message;
-	private Boolean sent;
+	private Boolean sent = false;
 	
 	@Id
 	@Column(name="id")

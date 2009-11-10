@@ -193,8 +193,8 @@ public class MeandreJobScheduler implements JobScheduler {
             MeandreServer server = loadBalancer.nextAvailableServer();
             if (server == null) {
                logger.info(
-                  "> " + jobQueue.size() +
-                  " jobs are queued but all servers are busy.");
+                  "Found " + jobQueue.size() +
+                  " queued jobs but all servers are busy.");
                return;
             }
             logger.fine("Server " + server + " is available for processing.");

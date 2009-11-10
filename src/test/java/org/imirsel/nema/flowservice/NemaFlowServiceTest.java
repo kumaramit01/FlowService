@@ -32,7 +32,7 @@ public class NemaFlowServiceTest {
 				"Test: " + new Date().toString(), "A test job", 
 				1, 1L, "shirk@uiuc.edu");
 		try {
-			Thread.currentThread().sleep(5000);
+			Thread.currentThread().sleep(100);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -41,6 +41,18 @@ public class NemaFlowServiceTest {
 		flowService.executeJob(UUID.randomUUID().toString(), 
 				"Test: " + new Date().toString(), "Another test job", 
 				1, 1L, "shirk@uiuc.edu");
+		
+		try {
+			Thread.currentThread().sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		flowService.executeJob(UUID.randomUUID().toString(), 
+				"Test: " + new Date().toString(), "Yet another test job", 
+				1, 1L, "shirk@uiuc.edu");
+		
 	}
 
 }

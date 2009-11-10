@@ -294,36 +294,7 @@ public class Job implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((description == null) ? 0 : description.hashCode());
-		result = prime * result
-				+ ((endTimestamp == null) ? 0 : endTimestamp.hashCode());
-		result = prime * result
-				+ ((execPort == null) ? 0 : execPort.hashCode());
-		result = prime
-				* result
-				+ ((executionInstanceId == null) ? 0 : executionInstanceId
-						.hashCode());
-		result = prime * result + ((flow == null) ? 0 : flow.hashCode());
-		result = prime * result + ((host == null) ? 0 : host.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
-				+ ((numTries == null) ? 0 : numTries.hashCode());
-		result = prime * result
-				+ ((ownerEmail == null) ? 0 : ownerEmail.hashCode());
-		result = prime * result + ((ownerId == null) ? 0 : ownerId.hashCode());
-		result = prime * result + ((port == null) ? 0 : port.hashCode());
-		result = prime * result + ((results == null) ? 0 : results.hashCode());
-		result = prime * result
-				+ ((startTimestamp == null) ? 0 : startTimestamp.hashCode());
-		result = prime * result
-				+ ((statusCode == null) ? 0 : statusCode.hashCode());
-		result = prime * result
-				+ ((submitTimestamp == null) ? 0 : submitTimestamp.hashCode());
-		result = prime * result + ((token == null) ? 0 : token.hashCode());
-		result = prime * result
-				+ ((updateTimestamp == null) ? 0 : updateTimestamp.hashCode());
 		return result;
 	}
 	@Override
@@ -335,99 +306,14 @@ public class Job implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Job other = (Job) obj;
-		if (description == null) {
-			if (other.description != null)
-				return false;
-		} else if (!description.equals(other.description))
-			return false;
-		if (endTimestamp == null) {
-			if (other.endTimestamp != null)
-				return false;
-		} else if (!endTimestamp.equals(other.endTimestamp))
-			return false;
-		if (execPort == null) {
-			if (other.execPort != null)
-				return false;
-		} else if (!execPort.equals(other.execPort))
-			return false;
-		if (executionInstanceId == null) {
-			if (other.executionInstanceId != null)
-				return false;
-		} else if (!executionInstanceId.equals(other.executionInstanceId))
-			return false;
-		if (flow == null) {
-			if (other.flow != null)
-				return false;
-		} else if (!flow.equals(other.flow))
-			return false;
-		if (host == null) {
-			if (other.host != null)
-				return false;
-		} else if (!host.equals(other.host))
-			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (numTries == null) {
-			if (other.numTries != null)
-				return false;
-		} else if (!numTries.equals(other.numTries))
-			return false;
-		if (ownerEmail == null) {
-			if (other.ownerEmail != null)
-				return false;
-		} else if (!ownerEmail.equals(other.ownerEmail))
-			return false;
-		if (ownerId == null) {
-			if (other.ownerId != null)
-				return false;
-		} else if (!ownerId.equals(other.ownerId))
-			return false;
-		if (port == null) {
-			if (other.port != null)
-				return false;
-		} else if (!port.equals(other.port))
-			return false;
-		if (results == null) {
-			if (other.results != null)
-				return false;
-		} else if (!results.equals(other.results))
-			return false;
-		if (startTimestamp == null) {
-			if (other.startTimestamp != null)
-				return false;
-		} else if (!startTimestamp.equals(other.startTimestamp))
-			return false;
-		if (statusCode == null) {
-			if (other.statusCode != null)
-				return false;
-		} else if (!statusCode.equals(other.statusCode))
-			return false;
-		if (submitTimestamp == null) {
-			if (other.submitTimestamp != null)
-				return false;
-		} else if (!submitTimestamp.equals(other.submitTimestamp))
-			return false;
-		if (token == null) {
-			if (other.token != null)
-				return false;
-		} else if (!token.equals(other.token))
-			return false;
-		if (updateTimestamp == null) {
-			if (other.updateTimestamp != null)
-				return false;
-		} else if (!updateTimestamp.equals(other.updateTimestamp))
-			return false;
 		return true;
 	}
 
-	
+
 	
 }

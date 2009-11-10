@@ -126,7 +126,10 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
     */
    private class StatusUpdateDetector implements Runnable {
       public void run() {
-         logger.fine("Checking for job status updates...");
+    	 if(jobs.size()==0) {
+    		 return;
+    	 }
+         logger.fine("Checking for job status updates for " + jobs.size() + " jobs.");
          jobsLock.lock();
          JobDao jobDao = null;
          try {
