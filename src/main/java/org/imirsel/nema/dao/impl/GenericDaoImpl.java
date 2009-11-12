@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 
 /**
@@ -38,6 +39,8 @@ import java.util.List;
 abstract public class GenericDaoImpl<T, ID extends Serializable>
       implements GenericDao<T, ID> {
 
+   private final Logger logger = Logger.getLogger(this.getClass().getName());
+   
    private final Class<T> persistentClass;
 
    private SessionFactory sessionFactory;

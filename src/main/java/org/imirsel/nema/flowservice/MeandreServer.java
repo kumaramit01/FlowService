@@ -232,6 +232,9 @@ public class MeandreServer implements JobStatusUpdateHandler {
 		return true;
 	}
 	
-
+    @Override
+	public String toString() {
+    	return host+":"+port;
+    }
 
 }

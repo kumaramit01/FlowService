@@ -66,11 +66,11 @@ public class NotificationCreator implements JobStatusUpdateHandler {
         notificationDao.startManagedSession(session);
         Transaction transaction = session.beginTransaction();
 
-		logger.fine("Preparing to persist a status update for job " + job.getId() + ".");
+		logger.fine("Preparing to persist a status change notification for job " + job.getId() + ".");
         notificationDao.makePersistent(notification);
         
         transaction.commit();
-		logger.fine("Job status update for job " + job.getId() + " was successfully persisted.");
+		logger.fine("Job status update notification for job " + job.getId() + " was successfully persisted.");
         notificationDao.endManagedSession();
         session.close();
 	}

@@ -1,5 +1,7 @@
 package org.imirsel.nema.flowservice;
 
+import java.util.logging.Logger;
+
 import net.jcip.annotations.ThreadSafe;
 
 
@@ -13,6 +15,9 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
 
+   private static final Logger logger = 
+	   Logger.getLogger(RoundRobinLoadBalancer.class.getName());
+	
    //~ Instance fields ---------------------------------------------------------
 
    /** Pointer to the current node the load balancer is on. */
@@ -51,6 +56,7 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
          node.setPrev(curr);
          curr.setNext(node);
       }
+      logger.fine("Added server " + server + " to load balancer");
       size++;
    }
 
@@ -128,13 +134,17 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
 
       assert curr != null : "Current node should not be null";
 
+      logger.fine("Finding the next available server.");
+      
       Node headNode = curr.getNext();
       Node iterNode = headNode;
 
       do {
          if (!iterNode.getServer().isBusy()) {
             curr = iterNode;
-            return iterNode.getServer();
+        	MeandreServer server = iterNode.getServer();
+        	logger.fine("Next available server: " + server);
+            return server;
          }
          iterNode = iterNode.getNext();
 

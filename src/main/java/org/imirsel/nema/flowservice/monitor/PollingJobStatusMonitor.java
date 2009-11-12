@@ -18,7 +18,6 @@ import net.jcip.annotations.ThreadSafe;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.imirsel.nema.dao.DaoFactory;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.model.Job;
@@ -126,20 +125,25 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
     */
    private class StatusUpdateDetector implements Runnable {
       public void run() {
-    	 if(jobs.size()==0) {
-    		 return;
-    	 }
-         logger.fine("Checking for job status updates for " + jobs.size() + " jobs.");
+         if (jobs.size() == 0) {
+            return;
+         }
+         logger.fine(
+            "Checking for job status updates for " + jobs.size() + " jobs.");
          jobsLock.lock();
+
          JobDao jobDao = null;
          try {
 
-        	Iterator<Job> jobIterator = jobs.keySet().iterator();
-        	
-        	jobDao = daoFactory.getJobDao();
-            Session session = jobDao.getSessionFactory().openSession();
+            Iterator<Job> jobIterator = jobs.keySet()
+               .iterator();
+
+            jobDao = daoFactory.getJobDao();
+
+            Session session = jobDao.getSessionFactory()
+               .openSession();
             jobDao.startManagedSession(session);
-            
+
             while (jobIterator.hasNext()) {
                Job cachedJob = jobIterator.next();
                Job persistedJob = null;
@@ -152,51 +156,62 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
                } catch (Exception e) {
                   logger.warning(e.getMessage());
                }
-   			
-               if(persistedJob==null) {
-            	   return;
+
+               if (persistedJob == null) {
+                  return;
                }
-               
+
                Integer oldStatus = cachedJob.getStatusCode();
                Integer newStatus = persistedJob.getStatusCode();
                if (!oldStatus.equals(newStatus)) {
-            	  try {
-					logger.fine("Status update for job " + cachedJob.getId() + 
-							  " occurred: was " + cachedJob.getJobStatus() + 
-							  ", now " + persistedJob.getJobStatus() + ".");
-					  cachedJob.setStatusCode(persistedJob.getStatusCode());
-					  cachedJob.setUpdateTimestamp(persistedJob.getUpdateTimestamp());
-					  cachedJob.setSubmitTimestamp(persistedJob.getStartTimestamp());
-					  cachedJob.setStartTimestamp(persistedJob.getStartTimestamp());
-					  cachedJob.setEndTimestamp(persistedJob.getEndTimestamp());
-					  // Invoke the update handlers for this job
-					  Set<JobStatusUpdateHandler> handlers = jobs.get(cachedJob);
-					  if(handlers==null) {
-						  logger.fine("No handlers registered for job " + cachedJob.getId() + ".");
-						  return;
-					  } else {
-					      for(JobStatusUpdateHandler handler:handlers) {
-						     logger.fine("Dispatching a job status update for job " + cachedJob.getId() + " to handler " + handler + ".");
-						     handler.jobStatusUpdate(cachedJob);
-					      }
-					  }
-					  // Stop monitoring this job if it is finished
-					  if(!cachedJob.isRunning()) {
-						  logger.fine("Job " + cachedJob.getId() + 
-								  " has ended. Removing it from the status monitor.");
-						  jobIterator.remove();
-					  }
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-               }
-            }
+                  try {
+                     logger.fine(
+                        "Status update for job " + cachedJob.getId() +
+                        " occurred: was " + cachedJob.getJobStatus() +
+                        ", now " + persistedJob.getJobStatus() + ".");
+                     cachedJob.setStatusCode(persistedJob.getStatusCode());
+                     cachedJob.setUpdateTimestamp(
+                        persistedJob.getUpdateTimestamp());
+                     cachedJob.setSubmitTimestamp(
+                        persistedJob.getStartTimestamp());
+                     cachedJob.setStartTimestamp(
+                        persistedJob.getStartTimestamp());
+                     cachedJob.setEndTimestamp(persistedJob.getEndTimestamp());
+
+                     // Invoke the update handlers for this job
+                     Set<JobStatusUpdateHandler> handlers = jobs.get(cachedJob);
+                     if (handlers == null) {
+                        logger.fine(
+                           "No handlers registered for job " +
+                           cachedJob.getId() + ".");
+                        return;
+                     } else {
+                        for (JobStatusUpdateHandler handler : handlers) {
+                           logger.fine(
+                              "Dispatching a job status update for job " +
+                              cachedJob.getId() + " to handler " + handler +
+                              ".");
+                           handler.jobStatusUpdate(cachedJob);
+                        }
+                     }
+
+                     // Stop monitoring this job if it is finished
+                     if (!cachedJob.isRunning()) {
+                        logger.fine(
+                           "Job " + cachedJob.getId() +
+                           " has ended. Removing it from the status monitor.");
+                        jobIterator.remove();
+                     }
+                  } catch (Exception e) {
+                     e.printStackTrace();
+                  } // end try-catch
+               } // end if
+            } // end while
          } finally {
             jobsLock.unlock();
             jobDao.endManagedSession();
-         }
-      }
+         } // end try-finally
+      } // end method run
    }
 
    /**

@@ -28,30 +28,18 @@ public class NemaFlowServiceTest {
 	    ctx = new ClassPathXmlApplicationContext("org/imirsel/nema/flowservice/config/applicationContext.xml");
 	    
 		FlowService flowService = (FlowService)ctx.getBean("flowService");
-		flowService.executeJob(UUID.randomUUID().toString(), 
-				"Test: " + new Date().toString(), "A test job", 
-				1, 1L, "shirk@uiuc.edu");
-		try {
-			Thread.currentThread().sleep(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		for(int i=0; i<10; i++) {
+			try {
+				Thread.currentThread().sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			flowService.executeJob(UUID.randomUUID().toString(), 
+					"Test: " + new Date().toString(), "Test job " + i, 
+					1, 1L, "shirk@uiuc.edu");
 		}
-		
-		flowService.executeJob(UUID.randomUUID().toString(), 
-				"Test: " + new Date().toString(), "Another test job", 
-				1, 1L, "shirk@uiuc.edu");
-		
-		try {
-			Thread.currentThread().sleep(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		flowService.executeJob(UUID.randomUUID().toString(), 
-				"Test: " + new Date().toString(), "Yet another test job", 
-				1, 1L, "shirk@uiuc.edu");
 		
 	}
 

@@ -39,7 +39,9 @@ import org.springframework.dao.DataAccessException;
 @ThreadSafe
 public class MeandreJobScheduler implements JobScheduler {
 
-   private static final Logger logger = 
+   private static final int POLL_PERIOD = 5;
+
+private static final Logger logger = 
 		Logger.getLogger(MeandreJobScheduler.class.getName());
 	
    private static final int MAX_EXECUTION_TRIES = 5;
@@ -83,7 +85,7 @@ public class MeandreJobScheduler implements JobScheduler {
          .newSingleThreadScheduledExecutor();
 
       runJobsFuture = executor.scheduleAtFixedRate(
-         new RunQueuedJobs(), 10, 5, TimeUnit.SECONDS);
+         new RunQueuedJobs(), 15, POLL_PERIOD, TimeUnit.SECONDS);
    }
 
    //~ Constructors ------------------------------------------------------------
@@ -185,16 +187,15 @@ public class MeandreJobScheduler implements JobScheduler {
       Session session = null;
       try {
          if (jobQueue.size() < 1) {
-            logger.fine("No queued jobs found.");
+            logger.fine("No queued jobs.");
             return;
          }
          while (!jobQueue.isEmpty()) {
-            logger.fine("Job found in queue.");
+            logger.fine("Found " + jobQueue.size() + " queued jobs.");
             MeandreServer server = loadBalancer.nextAvailableServer();
             if (server == null) {
                logger.info(
-                  "Found " + jobQueue.size() +
-                  " queued jobs but all servers are busy.");
+                  "All servers are busy. Will try again in " + POLL_PERIOD + " seconds.");
                return;
             }
             logger.fine("Server " + server + " is available for processing.");
