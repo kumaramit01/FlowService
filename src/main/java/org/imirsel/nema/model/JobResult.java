@@ -48,7 +48,7 @@ public class JobResult implements Serializable {
 	public void setJob(Job job) {
 		this.job = job;
 	}
-	@Column(name="url",nullable=false)
+	@Column(name="url",nullable=false,length=20000000)
 	public String getUrl() {
 		return url;
 	}
