@@ -34,7 +34,7 @@ public class Job implements Serializable {
 	private static final long serialVersionUID = 3383935885803288343L;
 	
 	static public enum JobStatus {
-      UNKNOWN(-1), SUBMITTED(0), STARTED(1), FINISHED(2), FAILED(3), ABORTED(4);
+      UNKNOWN(-1), QUEUED(0), SUBMITTED(1), STARTED(2), FINISHED(3), FAILED(4), ABORTED(5);
 
     private final int code;
 
@@ -51,28 +51,33 @@ public class Job implements Serializable {
                name = "Unknown";
                break;
             }
-
+         
             case 0: {
-               name = "Submitted";
+               name = "Queued";
                break;
             }
 
             case 1: {
-               name = "Started";
+               name = "Submitted";
                break;
             }
 
             case 2: {
+               name = "Started";
+               break;
+            }
+
+            case 3: {
                name = "Ended";
                break;
             }
             
-            case 3: {
+            case 4: {
                 name = "Ended";
                 break;
              }
 
-            case 4: {
+            case 5: {
                 name = "Aborted";
                 break;
              }
@@ -91,26 +96,31 @@ public class Job implements Serializable {
             }
 
             case 0: {
+                status = JobStatus.QUEUED;
+                break;
+             }
+            
+            case 1: {
                status = JobStatus.SUBMITTED;
                break;
             }
 
-            case 1: {
+            case 2: {
                status = JobStatus.STARTED;
                break;
             }
 
-            case 2: {
+            case 3: {
                status = JobStatus.FINISHED;
                break;
             }
             
-            case 3: {
+            case 4: {
                 status = JobStatus.FAILED;
                 break;
              }
             
-            case 4: {
+            case 5: {
                 status = JobStatus.ABORTED;
                 break;
              }
