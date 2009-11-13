@@ -34,7 +34,7 @@ public class Job implements Serializable {
 	private static final long serialVersionUID = 3383935885803288343L;
 	
 	static public enum JobStatus {
-      UNKNOWN(-1), QUEUED(0), SUBMITTED(1), STARTED(2), FINISHED(3), FAILED(4), ABORTED(5);
+      UNKNOWN(-1), SCHEDULED(0), SUBMITTED(1), STARTED(2), FINISHED(3), FAILED(4), ABORTED(5);
 
     private final int code;
 
@@ -53,7 +53,7 @@ public class Job implements Serializable {
             }
          
             case 0: {
-               name = "Queued";
+               name = "Scheduled";
                break;
             }
 
@@ -96,7 +96,7 @@ public class Job implements Serializable {
             }
 
             case 0: {
-                status = JobStatus.QUEUED;
+                status = JobStatus.SCHEDULED;
                 break;
              }
             
