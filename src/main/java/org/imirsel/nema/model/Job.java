@@ -96,8 +96,8 @@ public class Job implements Serializable {
             }
 
             case 0: {
-                status = JobStatus.SCHEDULED;
-                break;
+               status = JobStatus.SCHEDULED;
+               break;
              }
             
             case 1: {
@@ -116,13 +116,13 @@ public class Job implements Serializable {
             }
             
             case 4: {
-                status = JobStatus.FAILED;
-                break;
+               status = JobStatus.FAILED;
+               break;
              }
             
             case 5: {
-                status = JobStatus.ABORTED;
-                break;
+               status = JobStatus.ABORTED;
+               break;
              }
             
          }

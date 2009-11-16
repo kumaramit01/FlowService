@@ -84,7 +84,7 @@ private static final Logger logger =
       ScheduledExecutorService executor = Executors
          .newSingleThreadScheduledExecutor();
 
-      runJobsFuture = executor.scheduleAtFixedRate(
+      runJobsFuture = executor.scheduleWithFixedDelay(
          new RunQueuedJobs(), 15, POLL_PERIOD, TimeUnit.SECONDS);
    }
 
@@ -166,12 +166,10 @@ private static final Logger logger =
     */
    public void scheduleJob(Job job) {
       queueLock.lock();
-      logger.fine("Queue lock acquired.");
       try {
          jobQueue.offer(job);
       } finally {
          queueLock.unlock();
-         logger.fine("Queue lock released.");
       }
    }
 
@@ -180,9 +178,7 @@ private static final Logger logger =
     */
    public void runJobs() {
       queueLock.lock();
-      logger.fine("Queue lock acquired.");
       workersLock.lock();
-      logger.fine("Worker lock acquired.");
       JobDao jobDao = daoFactory.getJobDao();
       Session session = null;
       try {
@@ -209,9 +205,7 @@ private static final Logger logger =
             logger.fine("Preparing to update job " + job.getId() + " as submitted.");
             
             session = jobDao.getSessionFactory().openSession();
-            logger.fine("Session opened.");
             jobDao.startManagedSession(session);
-            logger.fine("Managed session started.");
             Transaction transaction = session.beginTransaction();
         	transaction.begin();
             try {
@@ -287,19 +281,19 @@ private static final Logger logger =
 				  logger.warning(e.getMessage());
 				  rollback(transaction);
 			   }
+            } catch (Exception e) {
+            	e.printStackTrace();
             }
          }
+      } catch (Exception e) {
+    	  e.printStackTrace();
       } finally {
          workersLock.unlock();
-         logger.fine("Worker lock released.");
          queueLock.unlock();
-         logger.fine("Queue lock released.");
          if(session!=null) {
             try {
                jobDao.endManagedSession();
-               logger.fine("Managed session ended.");
                session.close();
-               logger.fine("Session closed.");
             } catch (HibernateException e) {
                logger.warning(e.getMessage());
             }

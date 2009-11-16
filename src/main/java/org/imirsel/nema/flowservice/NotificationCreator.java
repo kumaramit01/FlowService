@@ -44,6 +44,9 @@ public class NotificationCreator implements JobStatusUpdateHandler {
 		StringBuilder messageBuilder = new StringBuilder();
 		messageBuilder.append("Job " + job.getId() + " (" + job.getName() + ")" + " ");
 		switch(job.getJobStatus()) {
+		  case UNKNOWN:
+			  messageBuilder.append("was queued: " + job.getSubmitTimestamp().toString() + ".");
+			  break;
 		  case SUBMITTED:
 			  messageBuilder.append("was submitted: " + job.getSubmitTimestamp().toString() + ".");
 			  break;

@@ -76,7 +76,7 @@
 					org.hibernate.dialect.MySQLDialect
 				</prop>
 				<prop key="hibernate.hbm2ddl.auto">update</prop>
-				<prop key="hibernate.show_sql">true</prop> 
+				<prop key="hibernate.show_sql">false</prop> 
 			</props>
 		</property>
 	</bean>
@@ -136,6 +136,7 @@
    </bean>
 
 	<bean id="loadBalancer" class="org.imirsel.nema.flowservice.RoundRobinLoadBalancer" />
+	
    <bean id="jobScheduler" class="org.imirsel.nema.flowservice.MeandreJobScheduler">
       <property name="loadBalancer" ref="loadBalancer" />
       <property name="daoFactory" ref="daoFactory"/>
