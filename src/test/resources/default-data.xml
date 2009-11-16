@@ -57,7 +57,7 @@
       <value><![CDATA[2009-11-13 00:00:00.0]]></value>
       <value>tokenDD-1258168876882</value>
       <value><![CDATA[2009-11-13 21:21:40.0]]></value>
-      <value>0</value>
+      <value>1</value>
     </row>
     <row>
       <value>2</value>
@@ -78,25 +78,6 @@
       <null/>
       <value>1</value>
     </row>
-    <row>
-      <value>5</value>
-      <value><![CDATA[Test job 3]]></value>
-      <null/>
-      <null/>
-      <null/>
-      <null/>
-      <value><![CDATA[Test: Fri Nov 13 21:53:45 CST 2009]]></value>
-      <value>0</value>
-      <value>shirk@uiuc.edu</value>
-      <value>1</value>
-      <null/>
-      <null/>
-      <value>-1</value>
-      <null/>
-      <value>394d58fe-35b4-402d-b19d-3544e57c9826</value>
-      <null/>
-      <value>1</value>
-    </row>
   </table>
   <table name="jobResult">
     <column>id</column>
@@ -107,18 +88,6 @@
       <value>1</value>
       <value>dir</value>
       <value>/home/meandre/apps/Meandre-Infrastructure-1.4.8/./published_resources/nema/http__test.org_helloworld_80AE9A4A2DBD_1258168878136_1299097301_tokenDD-1258168876882_/results</value>
-      <value>1</value>
-    </row>
-    <row>
-      <value>2</value>
-      <value>file</value>
-      <value>result2.txt</value>
-      <value>1</value>
-    </row>
-    <row>
-      <value>3</value>
-      <value>file</value>
-      <value>result1.txt</value>
       <value>1</value>
     </row>
   </table>

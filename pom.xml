@@ -176,6 +176,43 @@
                     </dependency>
                 </dependencies>
              </plugin>
+             
+                 <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <version>2.0-alpha-2</version>
+                <configuration>
+                    <components>
+                        <component>
+                            <name>hbm2ddl</name>
+                            <implementation>annotationconfiguration</implementation>
+                        </component>
+                    </components>
+                    <componentProperties>
+                        <drop>true</drop>
+                        <jdk5>true</jdk5>
+                        <propertyfile>target/test-classes/jdbc.properties</propertyfile>
+                        <configurationfile>/src/test/resources/hibernate.cfg.xml</configurationfile>
+                        <skip>${maven.test.skip}</skip>
+                    </componentProperties>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>hbm2ddl</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>                                                                                                                                                                     
+                    <dependency>                                                                                                                                                                   
+                        <groupId>${jdbc.groupId}</groupId>                                                                                                                                         
+                        <artifactId>${jdbc.artifactId}</artifactId>                                                                                                                                
+                        <version>${jdbc.version}</version>                                                                                                                                         
+                    </dependency>                                                                                                                                                                  
+                </dependencies>                                                                                                                                                                    
+            </plugin>                
+             
 		</plugins>
 	</build>
 </project>
