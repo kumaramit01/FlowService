@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mqc="http://activemq.apache.org/schema/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+         http://www.springframework.org/schema/aop 
+         http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+         http://www.springframework.org/schema/context 
+         http://www.springframework.org/schema/context/spring-context-2.5.xsd
+         http://www.springframework.org/schema/tx 
+         http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+	<context:annotation-config/>
+	
+	<context:property-placeholder location="jdbc.properties,mail.properties" />
+
+   <!-- Enable @Configured support -->
+   <context:spring-configured/>
+   
+   <!-- Enable @Transactional support -->
+   <tx:annotation-driven/>
+    
+   <!-- Enable @AspectJ support -->
+   <aop:aspectj-autoproxy/>
+   
+   
+      
+	<!-- Local C3P0 DataSource that works in any environment -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="${jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+   <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+      <property name="sessionFactory" ref="hibernateSessionFactory"/>
+   </bean>
+   
+	<bean id="hibernateSessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="annotatedClasses">
+			<list>
+				<value>org.imirsel.nema.model.Flow</value>
+				<value>org.imirsel.nema.model.Job</value>
+				<value>org.imirsel.nema.model.JobResult</value>
+				<value>org.imirsel.nema.model.Notification</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">false</prop> 
+			</props>
+		</property>
+	</bean>
+   
+   <bean id="daoFactory" class="org.imirsel.nema.dao.impl.DaoFactoryImpl">
+       <property name="sessionFactory" ref="hibernateSessionFactory"/>
+   </bean>
+   
+   <bean id="jobDao" class="org.imirsel.nema.dao.impl.JobDaoImpl">
+        <property name="sessionFactory" ref="hibernateSessionFactory"/>
+    </bean>
+   
+   
+
+</beans>

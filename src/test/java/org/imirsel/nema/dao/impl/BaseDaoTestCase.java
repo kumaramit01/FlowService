@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.orm.toplink.SessionFactory;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
@@ -22,10 +23,9 @@ public abstract class BaseDaoTestCase extends AbstractTransactionalDataSourceSpr
 
     protected String[] getConfigLocations() {
         setAutowireMode(AUTOWIRE_BY_NAME);
-        return new String [] {"classpath*:/**/dao/applicationContext-*.xml",
-                              "classpath*:META-INF/applicationContext-*.xml"};
+        return new String [] {"classpath*:/**/applicationContext-dao-test.xml"};
     }
-    
+ 
     public BaseDaoTestCase() {
         // Since a ResourceBundle is not required for each class, just
         // do a simple check to see if one exists

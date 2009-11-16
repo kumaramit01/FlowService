@@ -12,7 +12,7 @@ public class JobDaoTest extends BaseDaoTestCase {
 	@Test
 	public void testGetJob(){
         // query with jdbc template to get expected value
-        String query = "select id from nema_job where id=1";
+        String query = "select id from job where id=1";
         String id  = (String)this.jdbcTemplate.queryForObject(query, String.class);
         assertNotNull("Job of id 1 was not found", id);
         Job job = this.jobDao.findById(1L,false);
