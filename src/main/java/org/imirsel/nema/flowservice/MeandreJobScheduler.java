@@ -260,6 +260,9 @@ private static final Logger logger =
                job.setJobStatus(JobStatus.UNKNOWN);
 
                if (job.getNumTries() == MAX_EXECUTION_TRIES) {
+            	  logger.info("Unsuccessfully tried " + MAX_EXECUTION_TRIES + 
+            			  " times to execute job " + 
+            			  job.getId() + ". Will mark as failed.");
                   job.setJobStatus(JobStatus.FAILED);
                   job.setEndTimestamp(new Date());
                   job.setUpdateTimestamp(new Date());
