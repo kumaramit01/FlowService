@@ -158,7 +158,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>test-compile</phase>
+                        <phase>testCompile</phase>
                         <goals>
                             <goal>operation</goal>
                         </goals>
