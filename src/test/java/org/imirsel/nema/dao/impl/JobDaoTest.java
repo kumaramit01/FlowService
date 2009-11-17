@@ -1,5 +1,7 @@
 package org.imirsel.nema.dao.impl;
 
+import java.util.List;
+
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.model.Job;
 import org.junit.Test;
@@ -8,7 +10,8 @@ public class JobDaoTest extends BaseDaoTestCase {
 	
 	
 	private JobDao jobDao;
-	
+
+
 	@Test
 	public void testGetJob(){
         // query with jdbc template to get expected value
@@ -18,6 +21,14 @@ public class JobDaoTest extends BaseDaoTestCase {
         Job job = this.jobDao.findById(1L,false);
         assertNotNull("Job of id 1 was not found by service", job);
 	}
+	
+	@Test
+	public void testJobDaoGet(){
+		List<Job> jobList=this.getJobDao().getJobsByOwnerId(1l);
+		System.out.println(jobList.size());
+		assertTrue(jobList.size()>1);
+	}
+	
 	
 	public JobDao getJobDao() {
 		return jobDao;

@@ -27,6 +27,7 @@ public abstract class BaseDaoTestCase extends AbstractTransactionalDataSourceSpr
     }
  
     public BaseDaoTestCase() {
+    	super();
         // Since a ResourceBundle is not required for each class, just
         // do a simple check to see if one exists
         String className = this.getClass().getName();

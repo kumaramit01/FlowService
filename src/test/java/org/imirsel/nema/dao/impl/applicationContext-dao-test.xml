@@ -70,6 +70,11 @@
    <bean id="jobDao" class="org.imirsel.nema.dao.impl.JobDaoImpl">
         <property name="sessionFactory" ref="hibernateSessionFactory"/>
     </bean>
+    
+    <bean id="flowDao" class="org.imirsel.nema.dao.impl.FlowDaoImpl">
+        <property name="sessionFactory" ref="hibernateSessionFactory"/>
+    </bean>
+   
    
    
 

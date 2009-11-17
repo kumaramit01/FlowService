@@ -21,6 +21,18 @@
       <value>http://test.org/helloworld/</value>
       <null/>
     </row>
+        <row>
+      <value>2</value>
+      <value>101</value>
+      <value><![CDATA[2009-11-10 21:23:27.0]]></value>
+      <value><![CDATA[bite me one]]></value>
+      <value><![CDATA[test flow two]]></value>
+      <value><![CDATA[Bugger off two]]></value>
+      <value>true</value>
+      <value>http://test.org/helloworld/</value>
+      <null/>
+    </row>
+    
   </table>
   <table name="job">
     <column>id</column>
