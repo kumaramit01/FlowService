@@ -1,5 +1,7 @@
 package org.imirsel.nema.flowservice;
 
+import static org.imirsel.nema.model.Job.JobStatus;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -103,10 +105,12 @@ public class NemaFlowService implements FlowService {
 		job.setFlow(flowInstance);
 		job.setOwnerId(userId);
 		job.setOwnerEmail(userEmail);
-
-		jobScheduler.scheduleJob(job);
-		job.setJobStatus(Job.JobStatus.SCHEDULED);
 		jobDao.makePersistent(job);
+		
+		jobScheduler.scheduleJob(job);
+		job.setJobStatus(JobStatus.SCHEDULED);
+		jobDao.makePersistent(job);
+		
 		jobStatusMonitor.start(job,notificationCreator);
 		
 		return job;
