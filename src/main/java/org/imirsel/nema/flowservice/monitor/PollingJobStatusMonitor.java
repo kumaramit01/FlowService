@@ -41,7 +41,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
 
    private static final int POLL_PERIOD = 10;
 
-/** Logger for this class. */
+   /** Logger for this class. */
    static private final Logger logger = Logger.getLogger(
       PollingJobStatusMonitor.class.getName());
 
@@ -72,7 +72,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
          .newSingleThreadScheduledExecutor();
 
       updateDetectorFuture = executor.scheduleWithFixedDelay(
-         new StatusUpdateDetector(), 10, POLL_PERIOD, TimeUnit.SECONDS);
+         new StatusUpdateDetector(), 5, POLL_PERIOD, TimeUnit.SECONDS);
    }
 
    //~ Constructors ------------------------------------------------------------
@@ -105,7 +105,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
                new HashSet<JobStatusUpdateHandler>();
             handlerSet.add(updateHandler);
             logger.fine("Created a handler set for job " + job.getId() + ".");
-            jobs.put(job, handlerSet);
+            jobs.put(job.clone(), handlerSet);
          }
       } finally {
          jobsLock.unlock();
@@ -164,7 +164,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
          jobsLock.lock();
          logger.fine(
             "Checking for job status updates for " + jobs.size() + " jobs.");
-
+         Session session = null;
          JobDao jobDao = null;
          try {
 
@@ -177,7 +177,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
 
             jobDao = daoFactory.getJobDao();
 
-            Session session = jobDao.getSessionFactory()
+            session = jobDao.getSessionFactory()
                .openSession();
             jobDao.startManagedSession(session);
 
@@ -193,6 +193,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
                } catch (DataAccessException e) {
                   logger.warning("Data access exception: " + e.getMessage());
                } catch (Exception e) {
+            	   e.printStackTrace();
                   logger.warning(e.getMessage());
                }
 
@@ -212,7 +213,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
                      cachedJob.setUpdateTimestamp(
                         persistedJob.getUpdateTimestamp());
                      cachedJob.setSubmitTimestamp(
-                        persistedJob.getStartTimestamp());
+                        persistedJob.getSubmitTimestamp());
                      cachedJob.setStartTimestamp(
                         persistedJob.getStartTimestamp());
                      cachedJob.setEndTimestamp(persistedJob.getEndTimestamp());
@@ -236,13 +237,14 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
                            try {
                               handler.jobStatusUpdate(cachedJob);
                            } catch (Exception e) {
+                        	   e.printStackTrace();
                               logger.warning(e.getMessage());
                            }
                         }
                      }
 
                      // Stop monitoring this job if it is finished
-                     if (!cachedJob.isRunning()) {
+                     if (cachedJob.isDone()) {
                         logger.fine("Job " + cachedJob.getId() +
                            " has ended. Removing it from the status monitor.");
                         jobIterator.remove();
@@ -255,9 +257,9 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
          } catch (Exception e){
         	 e.printStackTrace();
          }finally {
-
             jobsLock.unlock();
             jobDao.endManagedSession();
+            session.close();
          } // end try-finally
       } // end method run
    }
