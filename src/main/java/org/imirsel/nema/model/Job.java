@@ -26,7 +26,7 @@ import org.hibernate.annotations.GenerationTime;
  */
 @Entity
 @Table(name="job")
-public class Job implements Serializable {
+public class Job implements Serializable, Cloneable {
 
 	/**
 	 * Version of this class.
@@ -68,12 +68,12 @@ public class Job implements Serializable {
             }
 
             case 3: {
-               name = "Ended";
+               name = "Finished";
                break;
             }
             
             case 4: {
-                name = "Ended";
+                name = "Failed";
                 break;
              }
 
@@ -282,6 +282,15 @@ public class Job implements Serializable {
 	public boolean isRunning() {
 	    return getJobStatus() == JobStatus.STARTED;
 	}
+	@Transient
+	public boolean isDone() {
+		if (statusCode == JobStatus.FINISHED.getCode() || 
+				statusCode == JobStatus.FAILED.getCode() || 
+				statusCode == JobStatus.ABORTED.getCode()) {
+		return true;
+		}
+		return false;
+	}
 	
 	@Column(name="numTries",nullable=false)
 	public Integer getNumTries() {
@@ -323,7 +332,29 @@ public class Job implements Serializable {
 			return false;
 		return true;
 	}
-
-
 	
+	@Override
+	public Job clone() {
+		Job clone = new Job();
+		clone.setId(this.getId());
+		clone.setName(this.getName());
+		clone.setDescription(this.getDescription());
+		clone.setSubmitTimestamp(this.getSubmitTimestamp());
+		clone.setStartTimestamp(this.getStartTimestamp());
+		clone.setEndTimestamp(this.getEndTimestamp());
+		clone.setUpdateTimestamp(this.getUpdateTimestamp());
+		clone.setHost(this.getHost());
+		clone.setPort(this.getPort());
+		clone.setFlow(this.getFlow());
+        clone.setExecPort(this.getExecPort());
+        clone.setExecutionInstanceId(this.getExecutionInstanceId());
+        clone.setStatusCode(this.getStatusCode());
+        clone.setNumTries(this.getNumTries());
+        clone.setOwnerEmail(this.getOwnerEmail());
+        clone.setOwnerId(this.getOwnerId());
+        clone.setResults(this.getResults());
+        clone.setToken(this.getToken());
+        return clone;
+	}
+
 }
