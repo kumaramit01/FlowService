@@ -257,12 +257,12 @@ private static final Logger logger =
             } catch (MeandreServerException serverException) {
                logger.warning(serverException.getMessage());
                job.setSubmitTimestamp(null);
-               job.setJobStatus(JobStatus.UNKNOWN);
+               job.setJobStatus(JobStatus.SCHEDULED);
 
                if (job.getNumTries() == MAX_EXECUTION_TRIES) {
             	  logger.info("Unsuccessfully tried " + MAX_EXECUTION_TRIES + 
             			  " times to execute job " + 
-            			  job.getId() + ". Will mark as failed.");
+            			  job.getId() + ". Will mark job as failed.");
                   job.setJobStatus(JobStatus.FAILED);
                   job.setEndTimestamp(new Date());
                   job.setUpdateTimestamp(new Date());
@@ -284,8 +284,7 @@ private static final Logger logger =
 				  logger.warning(e.getMessage());
 				  rollback(transaction);
 			   }
-            } catch (Exception e) {
-            	e.printStackTrace();
+			   return;
             }
          }
       } catch (Exception e) {
