@@ -29,18 +29,16 @@ public class NemaFlowServiceTest {
 	    
 		FlowService flowService = (FlowService)ctx.getBean("flowService");
 		
-		for(int i=0; i<10; i++) {
+		for(int i=0; i<20; i++) {
 			try {
-				Thread.currentThread().sleep(100);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			logger.info("Before executeJob: "+ i);
+			
 			flowService.executeJob(UUID.randomUUID().toString(), 
 					"Test: " + new Date().toString(), "Test job " + i, 
 					1, 1L, "shirk@uiuc.edu");
-
-			logger.info("After executeJob: "+ i);
 		}
 		
 	}
