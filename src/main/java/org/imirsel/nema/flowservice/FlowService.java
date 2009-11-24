@@ -91,5 +91,11 @@ public interface FlowService {
 	 * @return The flow instance ID.
 	 */
    public Long storeFlowInstance(Flow instance);
+   
+   /**
+    * Returns {@link Flow} with the id
+    * @param flowId flowId of the flow to be returned
+    */
+   public Flow getFlow(long flowId);
 
 }

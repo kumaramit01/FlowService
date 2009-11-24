@@ -170,6 +170,17 @@ public class NemaFlowService implements FlowService {
 		// store the flow on disk
 		return instance.getId();
 	}
+	
+	
+	/**
+	 * @see org.imirsel.nema.flowservice.FlowService#getFlow(long)
+	 */
+	@Override
+	public Flow getFlow(long flowId) {
+		FlowDao flowDao = daoFactory.getFlowDao();
+		return flowDao.findById(flowId, false);
+	}
+	
 
 	
 	/**
@@ -205,5 +216,6 @@ public class NemaFlowService implements FlowService {
 	public void setJobStatusMonitor(JobStatusMonitor jobStatusMonitor) {
 		this.jobStatusMonitor = jobStatusMonitor;
 	}
-	
+
+
 }
