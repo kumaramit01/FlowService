@@ -29,7 +29,7 @@ public class NemaFlowServiceTest {
 	    
 		FlowService flowService = (FlowService)ctx.getBean("flowService");
 		
-		for(int i=0; i<20; i++) {
+		for(int i=0; i<5; i++) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {

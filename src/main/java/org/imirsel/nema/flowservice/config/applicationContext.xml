@@ -13,39 +13,42 @@
          http://www.springframework.org/schema/tx 
          http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
-	<context:annotation-config/>
-	
+	<context:annotation-config />
+
 	<context:property-placeholder location="jdbc.properties,mail.properties" />
 
-   <!-- Enable @Configured support -->
-   <context:spring-configured/>
-   
-   <!-- Enable @Transactional support -->
-   <tx:annotation-driven/>
-    
-   <!-- Enable @AspectJ support -->
-   <aop:aspectj-autoproxy/>
-   
-   <aop:config>
-      <aop:advisor id="flowServiceTx" advice-ref="flowServiceTxAdvice" pointcut="execution(* *..flowservice.FlowService.*(..))" order="0"/>        
-      <aop:advisor id="notificationCreatorTx" advice-ref="notificationCreatorTxAdvice" pointcut="execution(* *..flowservice.NotificationCreator.*(..))" order="0"/> 
-   </aop:config>
+	<!-- Enable @Configured support -->
+	<context:spring-configured />
 
-   <tx:advice id="flowServiceTxAdvice">
-      <tx:attributes>
-         <tx:method name="abortJob" read-only="true"/>
-         <tx:method name="deleteJob" rollback-for="DataAccessException"/>
-         <tx:method name="executeJob" rollback-for="DataAccessException"/>
-         <tx:method name="getJob" read-only="true"/>
-      </tx:attributes>
-   </tx:advice>
+	<!-- Enable @Transactional support -->
+	<tx:annotation-driven />
 
-   <tx:advice id="notificationCreatorTxAdvice">
-      <tx:attributes>
-         <tx:method name="jobStatusUpdate" rollback-for="DataAccessException"/>
-      </tx:attributes>
-   </tx:advice>
-      
+	<!-- Enable @AspectJ support -->
+	<aop:aspectj-autoproxy />
+
+	<aop:config>
+		<aop:advisor id="flowServiceTx" advice-ref="flowServiceTxAdvice"
+			pointcut="execution(* *..flowservice.FlowService.*(..))" order="0" />
+		<aop:advisor id="notificationCreatorTx" advice-ref="notificationCreatorTxAdvice"
+			pointcut="execution(* *..flowservice.NotificationCreator.*(..))"
+			order="0" />
+	</aop:config>
+
+	<tx:advice id="flowServiceTxAdvice">
+		<tx:attributes>
+			<tx:method name="abortJob" read-only="true" />
+			<tx:method name="deleteJob" rollback-for="DataAccessException" />
+			<tx:method name="executeJob" rollback-for="DataAccessException" />
+			<tx:method name="getJob" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+
+	<tx:advice id="notificationCreatorTxAdvice">
+		<tx:attributes>
+			<tx:method name="jobStatusUpdate" rollback-for="DataAccessException" />
+		</tx:attributes>
+	</tx:advice>
+
 	<!-- Local C3P0 DataSource that works in any environment -->
 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
@@ -55,19 +58,23 @@
 		<property name="password" value="${jdbc.password}" />
 	</bean>
 
-   <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-      <property name="sessionFactory" ref="hibernateSessionFactory"/>
-   </bean>
-   
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+
 	<bean id="hibernateSessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 		<property name="annotatedClasses">
 			<list>
-				<value>org.imirsel.nema.model.Flow</value>
+				<value>org.imirsel.nema.model.Flow
+				</value>
 				<value>org.imirsel.nema.model.Job</value>
-				<value>org.imirsel.nema.model.JobResult</value>
-				<value>org.imirsel.nema.model.Notification</value>
+				<value>org.imirsel.nema.model.JobResult
+				</value>
+				<value>org.imirsel.nema.model.Notification
+				</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -76,77 +83,79 @@
 					org.hibernate.dialect.MySQLDialect
 				</prop>
 				<prop key="hibernate.hbm2ddl.auto">update</prop>
-				<prop key="hibernate.show_sql">false</prop> 
+				<prop key="hibernate.show_sql">false</prop>
 			</props>
 		</property>
 	</bean>
-   
-   <bean id="daoFactory" class="org.imirsel.nema.dao.impl.DaoFactoryImpl">
-       <property name="sessionFactory" ref="hibernateSessionFactory"/>
-   </bean>
-   
-   <bean id="jobStatusMonitor" class="org.imirsel.nema.flowservice.monitor.PollingJobStatusMonitor">
-        <property name="daoFactory" ref="daoFactory"/>
-   </bean>
-   
-   <bean id="headServer" class="org.imirsel.nema.flowservice.MeandreServer">
-       <property name="host" value="128.174.154.145"/>
-       <property name="port" value="11709"/>
-       <property name="maxConcurrentJobs" value="1"/>
-   </bean>
 
-   <bean id="worker1" class="org.imirsel.nema.flowservice.MeandreServer">
-       <property name="host" value="128.174.154.145"/>
-       <property name="port" value="11714"/>
-       <property name="maxConcurrentJobs" value="1"/>
-       <property name="jobStatusMonitor" ref="jobStatusMonitor"/>
-   </bean>
-   
-   <bean id="worker2" class="org.imirsel.nema.flowservice.MeandreServer">
-       <property name="host" value="128.174.154.145"/>
-       <property name="port" value="11614"/>
-       <property name="maxConcurrentJobs" value="1"/>
-       <property name="jobStatusMonitor" ref="jobStatusMonitor"/>
-   </bean>
-   
-   <bean id="worker3" class="org.imirsel.nema.flowservice.MeandreServer">
-       <property name="host" value="128.174.154.145"/>
-       <property name="port" value="11514"/>
-       <property name="maxConcurrentJobs" value="1"/>
-       <property name="jobStatusMonitor" ref="jobStatusMonitor"/>
-   </bean>
+	<bean id="daoFactory" class="org.imirsel.nema.dao.impl.DaoFactoryImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
 
-   <bean id="worker4" class="org.imirsel.nema.flowservice.MeandreServer">
-       <property name="host" value="128.174.154.145"/>
-       <property name="port" value="11414"/>
-       <property name="maxConcurrentJobs" value="1"/>
-       <property name="jobStatusMonitor" ref="jobStatusMonitor"/>
-   </bean>
-   
-   <bean id="jobSchedulerConfig" class="org.imirsel.nema.flowservice.config.SimpleMeandreJobSchedulerConfig">
-       <property name="head" ref="headServer"/>
-       <property name="servers">
-          <set>
-             <ref bean="worker1"/>
-             <ref bean="worker2"/>
-             <ref bean="worker3"/>
-             <ref bean="worker4"/>
-          </set>
-       </property>
-   </bean>
+	<bean id="jobStatusMonitor"
+		class="org.imirsel.nema.flowservice.monitor.PollingJobStatusMonitor">
+		<property name="daoFactory" ref="daoFactory" />
+	</bean>
+
+	<bean id="headServer" class="org.imirsel.nema.flowservice.MeandreServer">
+		<property name="host" value="128.174.154.145" />
+		<property name="port" value="11709" />
+		<property name="maxConcurrentJobs" value="1" />
+	</bean>
+
+	<bean id="worker1" class="org.imirsel.nema.flowservice.MeandreServer">
+		<property name="host" value="128.174.154.145" />
+		<property name="port" value="11714" />
+		<property name="maxConcurrentJobs" value="1" />
+		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
+	</bean>
+
+	<bean id="worker2" class="org.imirsel.nema.flowservice.MeandreServer">
+		<property name="host" value="128.174.154.145" />
+		<property name="port" value="11614" />
+		<property name="maxConcurrentJobs" value="1" />
+		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
+	</bean>
+
+	<bean id="worker3" class="org.imirsel.nema.flowservice.MeandreServer">
+		<property name="host" value="128.174.154.145" />
+		<property name="port" value="11514" />
+		<property name="maxConcurrentJobs" value="1" />
+		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
+	</bean>
+
+	<bean id="worker4" class="org.imirsel.nema.flowservice.MeandreServer">
+		<property name="host" value="128.174.154.145" />
+		<property name="port" value="11414" />
+		<property name="maxConcurrentJobs" value="1" />
+		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
+	</bean>
+
+	<bean id="jobSchedulerConfig"
+		class="org.imirsel.nema.flowservice.config.SimpleMeandreJobSchedulerConfig">
+		<property name="head" ref="headServer" />
+		<property name="servers">
+			<set>
+				<ref bean="worker1" />
+				<ref bean="worker2" />
+				<ref bean="worker3" />
+				<ref bean="worker4" />
+			</set>
+		</property>
+	</bean>
 
 	<bean id="loadBalancer" class="org.imirsel.nema.flowservice.RoundRobinLoadBalancer" />
-	
-   <bean id="jobScheduler" class="org.imirsel.nema.flowservice.MeandreJobScheduler">
-      <property name="loadBalancer" ref="loadBalancer" />
-      <property name="daoFactory" ref="daoFactory"/>
-      <property name="meandreJobSchedulerConfig" ref="jobSchedulerConfig" />
-   </bean>
-   
+
+	<bean id="jobScheduler" class="org.imirsel.nema.flowservice.MeandreJobScheduler">
+		<property name="loadBalancer" ref="loadBalancer" />
+		<property name="daoFactory" ref="daoFactory" />
+		<property name="meandreJobSchedulerConfig" ref="jobSchedulerConfig" />
+	</bean>
+
 	<bean id="flowService" class="org.imirsel.nema.flowservice.NemaFlowService">
 		<property name="jobScheduler" ref="jobScheduler" />
-		<property name="jobStatusMonitor" ref="jobStatusMonitor"/>
-		<property name="daoFactory" ref="daoFactory"/>
+		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
+		<property name="daoFactory" ref="daoFactory" />
 	</bean>
 
 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
