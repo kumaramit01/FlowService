@@ -186,7 +186,7 @@ public class Job implements Serializable, Cloneable {
 	public void setSubmitTimestamp(Date submitTimestamp) {
 		this.submitTimestamp = submitTimestamp;
 	}
-	@Column(name="startTimestamp")
+	@Column(name="startTimestamp",updatable=false,insertable=false)
 	public Date getStartTimestamp() {
 		return startTimestamp;
 	}
