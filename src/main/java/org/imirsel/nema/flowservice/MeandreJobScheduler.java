@@ -41,7 +41,7 @@ public class MeandreJobScheduler implements JobScheduler {
 
    private static final int POLL_PERIOD = 5;
 
-private static final Logger logger = 
+   private static final Logger logger = 
 		Logger.getLogger(MeandreJobScheduler.class.getName());
 	
    private static final int MAX_EXECUTION_TRIES = 5;
