@@ -37,6 +37,24 @@
 			<url>http://monk.lis.uiuc.edu/snapshot/</url>
 		</repository>
 	</repositories>
+      <distributionManagement>
+        <!-- use the following if you're not using a snapshot version. -->
+          <repository>
+            <id>MonkRepository</id>
+            <name>Monk Repository</name>
+            <url>scp://monk.lis.uiuc.edu/content/web/root/maven2</url>
+          </repository>
+        <!-- use the following if you ARE using a snapshot version. -->
+          <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>MonkSnapshotRepository</id>
+            <name>Monk Snapshot Repository</name>
+            <url>scp://monk.lis.illinois.edu/content/web/root/snapshot</url>
+           </snapshotRepository>
+           <downloadUrl>http://www.monkproject.org/maven2</downloadUrl>
+       </distributionManagement>
+
+
 
 	<dependencies>
 		<dependency>
