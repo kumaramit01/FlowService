@@ -3,7 +3,6 @@ package org.imirsel.nema.flowservice;
 import java.util.logging.Logger;
 
 import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -22,8 +21,16 @@ public class FlowServiceApp {
 	 */
 	public static void main(String[] args) {
 		try {
-			ApplicationContext ctx = 
-				new ClassPathXmlApplicationContext("org/imirsel/nema/flowservice/config/applicationContext.xml");
+			try {
+		            java.rmi.registry.LocateRegistry.createRegistry(1099);
+			 	   System.out.println("RMI registry ready.");
+		    } catch (Exception e) {
+				   System.out.println("Exception starting RMI registry:");
+				   e.printStackTrace();
+		    } 
+				   
+			logger.info("Nema Flow Service starting up...");
+			new ClassPathXmlApplicationContext("applicationContext.xml");
 		} catch (BeansException e) {
 			e.printStackTrace();
 		}
