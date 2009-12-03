@@ -40,6 +40,7 @@
 			<tx:method name="deleteJob" rollback-for="DataAccessException" />
 			<tx:method name="executeJob" rollback-for="DataAccessException" />
 			<tx:method name="getJob" read-only="true" />
+			<tx:method name="getFlowTemplates" read-only="true"/>
 		</tx:attributes>
 	</tx:advice>
 
