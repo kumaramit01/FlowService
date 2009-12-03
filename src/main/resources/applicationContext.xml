@@ -39,8 +39,12 @@
 			<tx:method name="abortJob" read-only="true" />
 			<tx:method name="deleteJob" rollback-for="DataAccessException" />
 			<tx:method name="executeJob" rollback-for="DataAccessException" />
+			<tx:method name="storeFlowInstance" rollback-for="DataAccessException"/>
+			<tx:method name="getUserJobs" read-only="true" />
 			<tx:method name="getJob" read-only="true" />
 			<tx:method name="getFlowTemplates" read-only="true"/>
+			<tx:method name="getFlow" read-only="true"/>
+            <tx:method name="getUserNotifications" read-only="true"/>
 		</tx:attributes>
 	</tx:advice>
 
