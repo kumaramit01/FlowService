@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Proxy;
+
 /**
  * Represents an output resulting from a job execution.
  * 
@@ -20,6 +22,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="jobResult")
+@Proxy(lazy=false)
 public class JobResult implements Serializable {
 
 	/**

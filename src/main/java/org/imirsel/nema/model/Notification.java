@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Column;
 
+import org.hibernate.annotations.Proxy;
+
 /**
  * Represents a notification to be sent to an end user.
  * 
@@ -18,6 +20,7 @@ import javax.persistence.Column;
  */
 @Entity
 @Table(name="notification")
+@Proxy(lazy=false)
 public class Notification implements Serializable {
 	/**
 	 * Version of this class.

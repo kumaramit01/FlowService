@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.Proxy;
 
 /**
  * Represents a NEMA DIY job.
@@ -26,6 +27,7 @@ import org.hibernate.annotations.GenerationTime;
  */
 @Entity
 @Table(name="job")
+@Proxy(lazy=false)
 public class Job implements Serializable, Cloneable {
 
 	/**
@@ -206,6 +208,12 @@ public class Job implements Serializable, Cloneable {
 	}
 	
 	public void setStatusCode(Integer statusCode) {
+		// This is a nasty hack to work around the race condition that exists
+		// when the Meandre server updates the job as started, and then the
+		// flow service writes it as submitted.
+		if(this.statusCode==2 && statusCode < 2) {
+			return;
+		}
 		if(!this.statusCode.equals(statusCode)) {
 		  setUpdateTimestamp(new Date());
 		  this.statusCode = statusCode;
