@@ -164,6 +164,7 @@
 		<property name="service" ref="flowService" />
 		<property name="serviceInterface" value="org.imirsel.nema.flowservice.FlowService" />
 		<property name="registryPort" value="1099" />
+		<property name="registryHost" value="128.174.154.145" />
 	</bean>
 
 </beans>
