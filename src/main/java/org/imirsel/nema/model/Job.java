@@ -28,9 +28,9 @@ import org.hibernate.annotations.Proxy;
 @Entity
 @Table(name="job")
 @Proxy(lazy=false)
-public class Job implements Serializable, Cloneable {
+public class Job implements Serializable, Cloneable { 
 
-	/**
+ 	/**
 	 * Version of this class.
 	 */
 	private static final long serialVersionUID = 3383935885803288343L;
@@ -134,6 +134,7 @@ public class Job implements Serializable, Cloneable {
 	
 	private Long id;
 	private String token;
+	private String type;
 	private String name;
 	private String description;
 	private String host;
@@ -226,6 +227,13 @@ public class Job implements Serializable, Cloneable {
 	}
 	public void setToken(String token) {
 		this.token = token;
+	}
+	@Column(name="token",nullable=false)
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
 	}
 	@Column(name="name",nullable=false)
 	public String getName() {
