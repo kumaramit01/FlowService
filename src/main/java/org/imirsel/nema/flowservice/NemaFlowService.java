@@ -19,6 +19,7 @@ import org.imirsel.nema.dao.FlowDao;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.dao.JobResultDao;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
+import org.imirsel.util.JobTypeUtils;
 import org.springframework.orm.ObjectRetrievalFailureException;
 
 /**
@@ -103,6 +104,7 @@ public class NemaFlowService implements FlowService {
 		job.setName(name);
 		job.setDescription(description);
 		job.setFlow(flowInstance);
+		job.setType(JobTypeUtils.DEFAULT_TYPE);
 		job.setOwnerId(userId);
 		job.setOwnerEmail(userEmail);
 		jobDao.makePersistent(job);

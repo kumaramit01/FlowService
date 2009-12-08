@@ -6,8 +6,9 @@ package org.imirsel.util;
  *
  */
 public class JobTypeUtils {
-	String DEFAULT_TYPE ="Analysis";
-	String TYPE_1 = "Feature Extraction";
-	String TYPE_2 = "Classification";
-	String TYPE_3 = "Evaluation";
+	public static String DEFAULT_TYPE ="Inherits";
+	public static String TYPE_1 = "Feature Extraction";
+	public static String TYPE_2 = "Classification";
+	public static String TYPE_3 = "Evaluation";
+	public static String TYPE_4 = "Analysis";
 }

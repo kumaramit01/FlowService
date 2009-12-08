@@ -12,6 +12,7 @@ import org.imirsel.nema.dao.impl.JobDaoImpl;
 import org.imirsel.nema.model.Flow;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.flowservice.MeandreServerException;
+import org.imirsel.util.JobTypeUtils;
 
 public class MeanderServerIntegrationTest {
 
@@ -72,6 +73,7 @@ public class MeanderServerIntegrationTest {
 		job.setOwnerId(200L);
 		job.setOwnerEmail("nobody@loopback.net");
 		job.setNumTries(0);
+		job.setToken(JobTypeUtils.DEFAULT_TYPE);
 		
 		jobDao.makePersistent(job);
 		
