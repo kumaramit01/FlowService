@@ -5,7 +5,7 @@ package org.imirsel.util;
  * @author amitku
  *
  */
-public class JobTypeUtils {
+public class FlowTypeUtils {
 	public static String DEFAULT_TYPE ="Inherits";
 	public static String TYPE_1 = "Feature Extraction";
 	public static String TYPE_2 = "Classification";

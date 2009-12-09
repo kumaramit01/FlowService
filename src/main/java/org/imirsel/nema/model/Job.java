@@ -134,7 +134,6 @@ public class Job implements Serializable, Cloneable {
 	
 	private Long id;
 	private String token;
-	private String type;
 	private String name;
 	private String description;
 	private String host;
@@ -228,13 +227,7 @@ public class Job implements Serializable, Cloneable {
 	public void setToken(String token) {
 		this.token = token;
 	}
-	@Column(name="type",nullable=false)
-	public String getType() {
-		return type;
-	}
-	public void setType(String type) {
-		this.type = type;
-	}
+
 	@Column(name="name",nullable=false)
 	public String getName() {
 		return name;
@@ -370,7 +363,6 @@ public class Job implements Serializable, Cloneable {
         clone.setOwnerId(this.getOwnerId());
         clone.setResults(this.getResults());
         clone.setToken(this.getToken());
-        clone.setType(this.getType());
         return clone;
 	}
 
