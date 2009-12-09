@@ -207,6 +207,22 @@
 					</execution>
 				</executions>
 			</plugin>
+	
+	<!-- This plugin is used to create the jar file used by the nema-webapp
+		 The webapp does not need the applicationContext file. It only needs
+		 the models and the interfaces
+	 -->		
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <excludes>
+            <exclude>**/applicationContext.xml</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+			
 
 		</plugins>
 	</build>
