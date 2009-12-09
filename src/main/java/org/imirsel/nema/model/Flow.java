@@ -33,10 +33,11 @@ public class Flow implements Serializable {
 	private Long id;
     private String name;
     private String description;
-    private Date dateCreated;
+    private Date dateCreated = new Date();
     private String keyWords;
     private Boolean template = false;
     private String type;
+    // TODO: change this to uri rather than url
     private String url;
     private Long creatorId;
     private Flow instanceOf = null;
