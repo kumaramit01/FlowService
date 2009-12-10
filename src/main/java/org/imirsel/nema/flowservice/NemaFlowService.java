@@ -138,15 +138,15 @@ public class NemaFlowService implements FlowService {
 		logger.info("getting job with id " + jobId);
 		Job job;
 		try {
+			logger.fine("Retrieving job "+ jobId);
 			job = jobDao.findById(jobId,false);
-			logger.info("got job "+ job);
-			logger.info("Number of results: "+ job.getResults().size());
+			logger.fine("Job "+ jobId + " has " + job.getResults().size() + " results.");
 		} catch (ObjectRetrievalFailureException e) {
 			throw new NoSuchEntityException("Job " + jobId + " does not exist.");
 		}
 		return job;
 	}
-
+	
 	/**
 	 * @see org.imirsel.nema.flowservice.FlowService#getUserJobs(long)
 	 */
