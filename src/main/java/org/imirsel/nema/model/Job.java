@@ -279,7 +279,7 @@ public class Job implements Serializable, Cloneable {
 	public void setJobStatus(JobStatus status) {
 		this.statusCode = status.getCode();
 	}
-	@JoinColumn(name="id")
+	@JoinColumn(name="jobId")
 	@OneToMany(mappedBy="job", fetch=FetchType.EAGER)
 	public Set<JobResult> getResults() {
 		return results;
