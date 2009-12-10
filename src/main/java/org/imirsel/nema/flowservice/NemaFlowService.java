@@ -135,10 +135,12 @@ public class NemaFlowService implements FlowService {
 	@Override
 	public Job getJob(long jobId) {
 		JobDao jobDao = daoFactory.getJobDao();
-		
+		logger.info("getting job with id " + jobId);
 		Job job;
 		try {
 			job = jobDao.findById(jobId,false);
+			logger.info("got job "+ job);
+			logger.info("Number of results: "+ job.getResults().size());
 		} catch (ObjectRetrievalFailureException e) {
 			throw new NoSuchEntityException("Job " + jobId + " does not exist.");
 		}
