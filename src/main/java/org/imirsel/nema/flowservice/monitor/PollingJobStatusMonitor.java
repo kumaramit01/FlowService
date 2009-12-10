@@ -283,7 +283,7 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
             logger.fine(
                      "Checking for job status updates...");
             if(jobs.size() > 0) {
-               logger.fine("Found " + jobs.size() + " with possible status updates.");
+               logger.fine("Found " + jobs.size() + " jobs with possible status updates.");
             } else {
                logger.fine("No jobs are currently being monitored.");
             }
