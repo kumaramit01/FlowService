@@ -14,8 +14,8 @@ public class JobDaoImpl extends GenericDaoImpl<Job, Long>implements JobDao {
 
 	@Override
 	public List<Job> getJobsByOwnerId(long ownerId) {
-		Criterion restriction=Restrictions.eq("ownerId", ownerId);
-		return this.findByCriteria(restriction);
+		Criterion userId=Restrictions.eq("ownerId", ownerId);
+		return this.findByCriteriaDistinct(userId);
 	}
 	
 }

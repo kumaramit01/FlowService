@@ -154,6 +154,29 @@ abstract public class GenericDaoImpl<T, ID extends Serializable>
       }
    }
    
+   /**
+    * Use this inside subclasses as a convenience method.
+    *
+    * @param criterion TODO: Description of parameter criterion.
+    * @return use this inside subclasses as a convenience method.
+    * @throws DataAccessException TODO: Description of exception {@link
+    * DataAccessException}.
+    */
+   @SuppressWarnings("unchecked")
+   protected List<T> findByCriteriaDistinct(Criterion... criterion)
+         throws DataAccessException {
+      try {
+         Criteria crit = getSession().createCriteria(getPersistentClass());
+         for (Criterion c : criterion) {
+            crit.add(c);
+         }
+         crit.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+         return crit.list();
+      } catch (HibernateException e) {
+         throw SessionFactoryUtils.convertHibernateAccessException(e);
+      }
+   }
+   
    public void startManagedSession(Session session) {
 	   this.managedSession = session;
    }
