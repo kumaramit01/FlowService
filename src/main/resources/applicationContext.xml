@@ -104,34 +104,34 @@
 	</bean>
 
 	<bean id="headServer" class="org.imirsel.nema.flowservice.MeandreServer">
-		<property name="host" value="128.174.154.145" />
+		<property name="host" value="${meandre.server.address.head}" />
 		<property name="port" value="11709" />
 		<property name="maxConcurrentJobs" value="1" />
 	</bean>
 
 	<bean id="worker1" class="org.imirsel.nema.flowservice.MeandreServer">
-		<property name="host" value="128.174.154.145" />
+		<property name="host" value="${meandre.server.address1}" />
 		<property name="port" value="11714" />
 		<property name="maxConcurrentJobs" value="1" />
 		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
 	</bean>
 
 	<bean id="worker2" class="org.imirsel.nema.flowservice.MeandreServer">
-		<property name="host" value="128.174.154.145" />
+		<property name="host" value="${meandre.server.address2}" />
 		<property name="port" value="11614" />
 		<property name="maxConcurrentJobs" value="1" />
 		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
 	</bean>
 
 	<bean id="worker3" class="org.imirsel.nema.flowservice.MeandreServer">
-		<property name="host" value="128.174.154.145" />
+		<property name="host" value="${meandre.server.address3}" />
 		<property name="port" value="11514" />
 		<property name="maxConcurrentJobs" value="1" />
 		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
 	</bean>
 
 	<bean id="worker4" class="org.imirsel.nema.flowservice.MeandreServer">
-		<property name="host" value="128.174.154.145" />
+		<property name="host" value="${meandre.server.address4}" />
 		<property name="port" value="11414" />
 		<property name="maxConcurrentJobs" value="1" />
 		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
