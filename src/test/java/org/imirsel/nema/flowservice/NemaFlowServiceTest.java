@@ -1,11 +1,13 @@
 package org.imirsel.nema.flowservice;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.imirsel.nema.dao.FlowDao;
 import org.imirsel.nema.model.Flow;
+import org.imirsel.nema.model.Job;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -25,11 +27,11 @@ public class NemaFlowServiceTest {
 	 */
 	public static void main(String[] args) {
 		ApplicationContext ctx  =  null;
-	    ctx = new ClassPathXmlApplicationContext("org/imirsel/nema/flowservice/config/applicationContext.xml");
+	    ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 	    
 		FlowService flowService = (FlowService)ctx.getBean("flowService");
 		
-		for(int i=0; i<5; i++) {
+		for(int i=0; i<0; i++) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -40,7 +42,7 @@ public class NemaFlowServiceTest {
 					"Test: " + new Date().toString(), "Test job " + i, 
 					1, 1L, "shirk@uiuc.edu");
 		}
-		
+
 	}
 
 }
