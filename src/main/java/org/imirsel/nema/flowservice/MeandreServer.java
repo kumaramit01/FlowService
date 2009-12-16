@@ -118,6 +118,9 @@ public class MeandreServer implements JobStatusUpdateHandler {
 	    return maxConcurrentJobs == runningJobs.size();
 	}
 	
+	public boolean isAborting(Job job) {
+		return abortPending.contains(job);
+	}
 
 	public JobStatusMonitor getJobStatusMonitor() {
 		return jobStatusMonitor;
