@@ -76,9 +76,9 @@ public class NemaFlowService implements FlowService {
 		
 		Job job = jobDao.findById(jobId,false);
 		// Job must be finished to be deleted.
-		if(job.isRunning()) {
+		if(!job.isDone()) {
 			throw new IllegalArgumentException("Cannot delete job " + jobId + 
-					" because it is still running.");
+					" because it is still running, scheduled or submitted.");
 		}
 		for(JobResult result : job.getResults()) {
 			resultDao.makeTransient(result);
