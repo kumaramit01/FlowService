@@ -261,7 +261,9 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
          }finally {
             jobsLock.unlock();
             jobDao.endManagedSession();
-            session.close();
+            if(session!=null) {
+            	session.close();
+            }
          } // end try-finally
       } // end method run
    }
