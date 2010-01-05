@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Column;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Proxy;
 
@@ -22,6 +23,62 @@ import org.hibernate.annotations.Proxy;
 @Table(name="notification")
 @Proxy(lazy=false)
 public class Notification implements Serializable {
+	public enum DeliveryStatus {
+		UNSENT(-1), SUCCESS(1), FAILURE(0);
+		
+	    private final int code;
+
+	    private DeliveryStatus(int code) { this.code = code; }
+
+	    public int getCode() { return code; }
+	    
+	    @Override
+		public String toString() {
+	         String name = null;
+	         switch (code) {
+
+	            case -1: {
+	               name = "Unsent";
+	               break;
+	            }
+	         
+	            case 0: {
+	               name = "Failure";
+	               break;
+	            }
+
+	            case 1: {
+	               name = "Success";
+	               break;
+	            }
+	            
+	         }
+	         return name;
+	      }
+
+	      static public DeliveryStatus toDeliveryStatus(int code) {
+	         DeliveryStatus status = null;
+	         switch (code) {
+
+	            case -1: {
+	               status = DeliveryStatus.UNSENT;
+	               break;
+	            }
+
+	            case 0: {
+	               status = DeliveryStatus.FAILURE;
+	               break;
+	             }
+	            
+	            case 1: {
+	               status = DeliveryStatus.SUCCESS;
+	               break;
+	            }
+	            
+	         }
+	         return status;
+	      }
+	}
 	/**
 	 * Version of this class.
 	 */
@@ -32,7 +89,9 @@ public class Notification implements Serializable {
 	private String recipientEmail;
 	private Date dateCreated = new Date();
 	private String message;
-	private Boolean sent = false;
+	private String subject;
+	private String errorMessage;
+	private Integer deliveryStatusCode = -1;
 	
 	@Id
 	@Column(name="id")
@@ -64,13 +123,19 @@ public class Notification implements Serializable {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	@Column(name="sent", nullable=false)
-	public Boolean getSent() {
-		return sent;
+	@Column(name="deliveryStatusCode",nullable=false)
+	public Integer getDeliveryStatusCode() {
+		return deliveryStatusCode;
 	}
-	
-	public void setSent(Boolean sent) {
-		this.sent = sent;
+	public void setDeliveryStatusCode(Integer deliveryStatusCode) {
+		this.deliveryStatusCode = deliveryStatusCode;
+	}
+	@Transient
+	public DeliveryStatus getDeliveryStatus() {
+	      return DeliveryStatus.toDeliveryStatus(deliveryStatusCode);
+	}
+	public void setDeliveryStatus(DeliveryStatus status) {
+		this.deliveryStatusCode = status.getCode();
 	}
 	@Column(name="recipientEmail",nullable=false)
 	public String getRecipientEmail() {
@@ -78,6 +143,20 @@ public class Notification implements Serializable {
 	}
 	public void setRecipientEmail(String recipientEmail) {
 		this.recipientEmail = recipientEmail;
+	}
+	@Column(name="subject")
+	public String getSubject() {
+		return subject;
+	}
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+	@Column(name="errorMessage")
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
 	}
 	@Override
 	public int hashCode() {
@@ -102,6 +181,4 @@ public class Notification implements Serializable {
 			return false;
 		return true;
 	}
-
-	
 }
