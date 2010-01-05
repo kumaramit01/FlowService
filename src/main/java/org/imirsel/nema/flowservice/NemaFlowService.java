@@ -39,7 +39,9 @@ public class NemaFlowService implements FlowService {
 	
 	private DaoFactory daoFactory;
 	
-	private NotificationCreator notificationCreator;
+	private NotificationSender notificationSender;
+	
+	private JobStatusNotificationCreator notificationCreator;
 	
 	public NemaFlowService() {	
 	}
@@ -49,7 +51,7 @@ public class NemaFlowService implements FlowService {
        logger.info("Initializing NEMA Flow Service...");
        
        notificationCreator = 
-    	   new NotificationCreator(daoFactory);
+    	   new JobStatusNotificationCreator(daoFactory);
 	}
 	
 	/**
@@ -220,5 +222,12 @@ public class NemaFlowService implements FlowService {
 		this.jobStatusMonitor = jobStatusMonitor;
 	}
 
+	public NotificationSender getNotificationSender() {
+		return notificationSender;
+	}
+
+	public void setNotificationSender(NotificationSender notificationSender) {
+		this.notificationSender = notificationSender;
+	}
 
 }

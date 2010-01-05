@@ -1,5 +1,7 @@
 package org.imirsel.nema.flowservice;
 
-public interface NotificationSender {
+import org.imirsel.nema.model.Notification;
 
+public interface NotificationSender {
+	public void send(Notification notification);
 }

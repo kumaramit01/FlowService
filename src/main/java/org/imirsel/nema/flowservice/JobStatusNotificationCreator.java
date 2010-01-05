@@ -16,10 +16,10 @@ import org.imirsel.nema.model.Notification;
  * @author shirk
  * @since 1.0
  */
-public class NotificationCreator implements JobStatusUpdateHandler {
+public class JobStatusNotificationCreator implements JobStatusUpdateHandler {
 
 	private static final Logger logger = 
-		Logger.getLogger(NotificationCreator.class.getName());
+		Logger.getLogger(JobStatusNotificationCreator.class.getName());
 	private final DaoFactory daoFactory;
 	
 	/**
@@ -28,7 +28,7 @@ public class NotificationCreator implements JobStatusUpdateHandler {
 	 * @param notificaitonDao The {@link NotificationDao} to use to store
 	 * {@link Notification}s persistently.
 	 */
-	public NotificationCreator(DaoFactory daoFactory) {
+	public JobStatusNotificationCreator(DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
 	
@@ -41,6 +41,7 @@ public class NotificationCreator implements JobStatusUpdateHandler {
 		Notification notification = new Notification();
 		notification.setRecipientId(job.getOwnerId());
 		notification.setRecipientEmail(job.getOwnerEmail());
+		notification.setSubject("The status of your NEMA job has changed.");
 		StringBuilder messageBuilder = new StringBuilder();
 		messageBuilder.append("Job " + job.getId() + " (" + job.getName() + ")" + " ");
 		switch(job.getJobStatus()) {

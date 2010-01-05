@@ -3,9 +3,13 @@ package org.imirsel.nema.flowservice;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+
+import net.jcip.annotations.ThreadSafe;
 
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
 import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
@@ -20,7 +24,7 @@ import org.imirsel.meandre.client.TransmissionException;
  * @author shirk
  * @since 1.0
  */
-// Make thread safe
+@ThreadSafe
 public class MeandreServer implements JobStatusUpdateHandler { 
 
 	private static final Logger logger = 
@@ -30,10 +34,13 @@ public class MeandreServer implements JobStatusUpdateHandler {
 	private int port;
 	private int maxConcurrentJobs = 1;
 	
-	private JobStatusMonitor jobStatusMonitor;
 	private final Set<Job> runningJobs = new HashSet<Job>(8);
-	private final Set<Job> abortPending = new HashSet<Job>(8);
+	private Lock runningLock = new ReentrantLock();
 	
+	private final Set<Job> abortPending = new HashSet<Job>(8);
+	private Lock abortingLock = new ReentrantLock();
+	
+	private JobStatusMonitor jobStatusMonitor;
 	private MeandreClient meandreClient;
 	
 	public MeandreServer(String host, int port, int maxConcurrentJobs) {
@@ -108,18 +115,33 @@ public class MeandreServer implements JobStatusUpdateHandler {
 	 * @return Number of jobs the server is currently processing.
 	 */
 	public int getNumJobsRunning() {
-		return runningJobs.size();
+		runningLock.lock();
+		try {
+		    return runningJobs.size();
+		} finally {
+			runningLock.unlock();
+		}
 	}
 
 	/**
 	 * Tests if the server is busy such that it cannot process any more jobs.
 	 */
 	public boolean isBusy() {
-	    return maxConcurrentJobs == runningJobs.size();
+		runningLock.lock();
+		try {
+	        return maxConcurrentJobs == runningJobs.size();
+		} finally {
+			runningLock.unlock();
+		}
 	}
 	
 	public boolean isAborting(Job job) {
-		return abortPending.contains(job);
+		abortingLock.lock();
+		try {
+		    return abortPending.contains(job);
+		} finally {
+			abortingLock.unlock();
+		}
 	}
 
 	public JobStatusMonitor getJobStatusMonitor() {
@@ -138,43 +160,51 @@ public class MeandreServer implements JobStatusUpdateHandler {
 		}
 		
 		HashMap<String,String> probes = new HashMap<String,String>();
-		// Instructs Meandre to use the NEMA probe while executing
+		// Instructs the Meandre server to use the NEMA probe while executing
 		probes.put("nema","true");
 		
 		logger.fine("Attempting to execute job " + job.getId() +
 				" on server " + getServerString() + ".");
 		ExecResponse response = null;
+		runningLock.lock();
 		try {
 			assert meandreClient!=null:"Meandre client null";
 			meandreClient.runAsyncFlow(job.getFlow().getUrl(), job.getToken(), probes);
 			response = meandreClient.getFlowExecutionInstanceId(job.getToken());
+			
+			logger.fine("Job " + job.getId() +
+					" successfully submitted to server " + getServerString() + " for execution.");
+			
+			runningJobs.add(job);
+			jobStatusMonitor.start(job, this);
 		} catch (TransmissionException e) {
 			throw new MeandreServerException("A problem occurred while " +
 					"communicating with server " +  getServerString() + 
 					" in order to execute job " + job.getId() + ".",e);
+		} finally {
+			runningLock.unlock();
 		}
-		
-		logger.fine("Job " + job.getId() +
-				" successfully submitted to server " + getServerString() + " for execution.");
-		
-		runningJobs.add(job);
-		jobStatusMonitor.start(job, this);
 		
 		return response;
 	}
 	
 	public void abortJob(Job job) throws MeandreServerException {
-		if(abortPending.contains(job)) {
-			throw new IllegalStateException("An abort request has already " +
-					"been made for job " + job.getId() + ".");
-		}
+		abortingLock.lock();
 		try {
-			meandreClient.abortFlow(job.getExecPort());
-		} catch (TransmissionException e) {
-			throw new MeandreServerException("Could not abort job " + 
-					job.getId() + ".",e);
+			if (isAborting(job)) {
+				throw new IllegalStateException("An abort request has already "
+						+ "been made for job " + job.getId() + ".");
+			}
+			try {
+				meandreClient.abortFlow(job.getExecPort());
+			} catch (TransmissionException e) {
+				throw new MeandreServerException("Could not abort job "
+						+ job.getId() + ".", e);
+			}
+			abortPending.add(job);
+		} finally {
+			abortingLock.unlock();
 		}
-		abortPending.add(job);
 	}
 
 	public String getServerString() {
@@ -184,9 +214,16 @@ public class MeandreServer implements JobStatusUpdateHandler {
 	@Override
 	public void jobStatusUpdate(Job job) {
 		logger.fine("Status update received for job " + job.getId() + ".");
-		if(!job.isRunning()) {
-	       runningJobs.remove(job);
-	       abortPending.remove(job);
+		if (!job.isRunning()) {
+			runningLock.lock();
+			abortingLock.lock();
+			try {
+				runningJobs.remove(job);
+				abortPending.remove(job);
+			} finally {
+				runningLock.unlock();
+				abortingLock.unlock();
+			}
 		}
 	}
 

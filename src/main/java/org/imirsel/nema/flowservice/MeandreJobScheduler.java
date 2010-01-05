@@ -209,6 +209,7 @@ public class MeandreJobScheduler implements JobScheduler {
             Transaction transaction = session.beginTransaction();
         	transaction.begin();
             try {
+            	// Load job in DB here
 				jobDao.makePersistent(job);
 				transaction.commit();
 				logger.fine("Job " + job.getId() + " updated.");
@@ -284,7 +285,6 @@ public class MeandreJobScheduler implements JobScheduler {
 				  logger.warning(e.getMessage());
 				  rollback(transaction);
 			   }
-			   return;
             }
          }
       } catch (Exception e) {
