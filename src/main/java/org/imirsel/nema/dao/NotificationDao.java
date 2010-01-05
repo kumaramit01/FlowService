@@ -15,4 +15,6 @@ public interface NotificationDao extends GenericDao<Notification, Long>{
      * @return A list of {@link Notifications}s.
      */
     List<Notification> getNotificationsByRecipientId(Long userId);
+    
+    List<Notification> getUnsentNotifications();
 }
