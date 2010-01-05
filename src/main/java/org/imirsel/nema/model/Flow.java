@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Proxy;
 
@@ -21,101 +22,159 @@ import org.hibernate.annotations.Proxy;
  * @author shirk
  */
 @Entity
-@Table(name="flow")
-@Proxy(lazy=false)
+@Table(name = "flow")
+@Proxy(lazy = false)
 public class Flow implements Serializable {
-	
+	public enum FlowType {
+		INHERITS("Inherits"), FEATURE_EXTRACTION("Feature Extraction"), CLASSIFICATION(
+				"Classification"), EVALUATION("Evaluation"), ANALYSIS(
+				"Analysis");
+		String name;
+
+		private FlowType(String name) {
+			this.name = name;
+		}
+		public String getName() {
+			return name;
+		}
+        @Override
+		public String toString() {
+			return name;
+		}
+        public static FlowType toFlowType(String typeName) {
+        	if(typeName.equals(INHERITS.getName())) {
+        		return INHERITS;
+        	} else if (typeName.equals(FEATURE_EXTRACTION.getName())) {
+        		return FEATURE_EXTRACTION;
+        	} else if (typeName.equals(CLASSIFICATION.getName())) {
+        		return CLASSIFICATION;
+        	} else if (typeName.equals(EVALUATION.getName())) {
+        		return EVALUATION;
+        	} else if (typeName.equals(ANALYSIS.getName())) {
+        		return ANALYSIS;
+        	} else {
+        		return null;
+        	}
+        }
+	}
+
 	/**
 	 * Version of this class.
 	 */
 	private static final long serialVersionUID = 8013326562531128503L;
-	
+
 	private Long id;
-    private String name;
-    private String description;
-    private Date dateCreated = new Date();
-    private String keyWords;
-    private Boolean template = false;
-    private String type;
-    // TODO: change this to uri rather than url
-    private String url;
-    private Long creatorId;
-    private Flow instanceOf = null;
-    
-    
-    @Id
-    @Column(name="id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	private String name;
+	private String description;
+	private Date dateCreated = new Date();
+	private String keyWords;
+	private Boolean template = false;
+	private String typeName;
+	// TODO: change this to uri rather than url
+	private String url;
+	private Long creatorId;
+	private Flow instanceOf = null;
+
+	@Id
+	@Column(name = "id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
-    @Column(name="name",nullable=false)
+
+	@Column(name = "name", nullable = false)
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	@Column(name="description",nullable=false)
+
+	@Column(name = "description", nullable = false)
 	public String getDescription() {
 		return description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	@Column(name="dateCreated",nullable=false)
+
+	@Column(name = "dateCreated", nullable = false)
 	public Date getDateCreated() {
 		return dateCreated;
 	}
+
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
-	@Column(name="keyWords",nullable=false)
+
+	@Column(name = "keyWords", nullable = false)
 	public String getKeyWords() {
 		return keyWords;
 	}
+
 	public void setKeyWords(String keyWords) {
 		this.keyWords = keyWords;
 	}
-	@Column(name="isTemplate",nullable=false)
+
+	@Column(name = "isTemplate", nullable = false)
 	public Boolean isTemplate() {
 		return template;
 	}
+
 	public void setTemplate(Boolean template) {
 		this.template = template;
 	}
-	@Column(name="type",nullable=false)
-	public String getType() {
-		return type;
+
+	@Column(name = "typeName", nullable = false)
+	public String getTypeName() {
+		return typeName;
 	}
-	public void setType(String type) {
-		this.type = type;
+
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
 	}
-	@Column(name="url",nullable=false)
+    @Transient
+    public FlowType getType() {
+    	return FlowType.toFlowType(typeName);
+    }
+    public void setType(FlowType flowType) {
+    	this.typeName = flowType.getName();
+    }
+    
+	@Column(name = "url", nullable = false)
 	public String getUrl() {
 		return url;
 	}
+
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	@Column(name="creatorId",nullable=false)
+
+	@Column(name = "creatorId", nullable = false)
 	public Long getCreatorId() {
 		return creatorId;
 	}
+
 	public void setCreatorId(Long creatorId) {
 		this.creatorId = creatorId;
 	}
-	@JoinColumn(name = "instanceOf", nullable=true)
-	@ManyToOne(fetch=FetchType.EAGER)
+
+	@JoinColumn(name = "instanceOf", nullable = true)
+	@ManyToOne(fetch = FetchType.EAGER)
 	public Flow getInstanceOf() {
 		return instanceOf;
 	}
+
 	public void setInstanceOf(Flow instanceOf) {
 		this.instanceOf = instanceOf;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -137,6 +196,7 @@ public class Flow implements Serializable {
 		result = prime * result + ((url == null) ? 0 : url.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -193,6 +253,5 @@ public class Flow implements Serializable {
 			return false;
 		return true;
 	}
-    
-    
+
 }
