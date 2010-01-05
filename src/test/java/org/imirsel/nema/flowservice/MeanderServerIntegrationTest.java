@@ -55,7 +55,7 @@ public class MeanderServerIntegrationTest {
         flow.setDescription("bite me");
         flow.setKeyWords("test flow");
         flow.setTemplate(false);
-        flow.setType(FlowTypeUtils.DEFAULT_TYPE);
+        flow.setType(Flow.FlowType.INHERITS);
 
         Session currentSession = sessionFactory.getCurrentSession();
         Transaction transaction = currentSession.beginTransaction();
