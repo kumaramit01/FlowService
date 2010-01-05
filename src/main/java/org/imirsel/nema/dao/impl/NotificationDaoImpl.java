@@ -17,5 +17,10 @@ public class NotificationDaoImpl extends GenericDaoImpl<Notification, Long>imple
 		Criterion restriction=Restrictions.eq("recipientId", recipientId);
 		return this.findByCriteria(restriction);
 	}
+	
+	public List<Notification> getUnsentNotifications() {
+		Criterion restriction=Restrictions.eq("deliveryStatusCode", -1);
+		return this.findByCriteria(restriction);
+	}
 
 }
