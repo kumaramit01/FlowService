@@ -8,18 +8,42 @@
 	<name>nema-flow-service</name>
 	<url>http://maven.apache.org</url>
 
-	<parent>
-		<groupId>org.imirsel</groupId>
-		<artifactId>nema</artifactId>
-		<version>1.0.2-SNAPSHOT</version>
-		<relativePath>../nema/pom.xml</relativePath>
-	</parent>
+	<prerequisites>
+		<maven>2.0.6</maven>
+	</prerequisites>
+
+	<scm>
+		<connection>scm:svn:https://nemadiy.googlecode.com/svn/flowservice/trunk</connection>
+		<developerConnection>scm:svn:https://nemadiy.googlecode.com/svn/flowservice/trunk</developerConnection>
+		<tag>HEAD</tag>
+		<url>http://code.google.com/p/nemadiy/source/browse/#svn/flowservice/trunk</url>
+	</scm>
+
+	<issueManagement>
+		<system>Google Code</system>
+		<url>http://code.google.com/p/nemadiy/issues/list</url>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<id>amitku</id>
+			<name>Amit Kumar</name>
+			<email>amitku@illinois.edu</email>
+			<timezone>-5</timezone>
+		</developer>
+		<developer>
+			<id>shirk</id>
+			<name>Andrew Shirk</name>
+			<email>shirk@illinois.edu</email>
+			<timezone>-5</timezone>
+		</developer>
+	</developers>
 
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.0</version>
+			<version>4.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -71,6 +95,12 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-hibernate3</artifactId>
 			<version>2.0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring-framework.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -189,71 +219,82 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-	
-			
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3</version>
-   <!-- This plugin is used to create the jar file used by the nema-webapp
-		 The webapp does not need the applicationContext file. It only needs
-		 the models and the interfaces
-	 -->  
-        <configuration>
-          <excludes>
-            <exclude>**/applicationContext.xml</exclude>
-          </excludes>
-        </configuration>
-      
-      </plugin>
 
-	</plugins>
-        <resources>
-          <resource>
-           <directory>src/main/resources</directory>
-           <filtering>true</filtering>
-           <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-           </includes>
-          </resource>
-        </resources>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3</version>
+				<!--
+					This plugin is used to create the jar file used by the nema-webapp
+					The webapp does not need the applicationContext file. It only needs
+					the models and the interfaces
+				-->
+				<configuration>
+					<excludes>
+						<exclude>**/applicationContext.xml</exclude>
+					</excludes>
+				</configuration>
+
+			</plugin>
+
+		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
-  
-      <profiles>
 
-      <profile>
-          <id>development</id>
-          <activation>
-          <activeByDefault>true</activeByDefault>
-         </activation>
-         <properties>
-         <meandre.server.address.head>128.174.154.145</meandre.server.address.head>
-         <meandre.server.address1>128.174.154.145</meandre.server.address1>
-         <meandre.server.address2>128.174.154.145</meandre.server.address2>
-         <meandre.server.address3>128.174.154.145</meandre.server.address3>
-         <meandre.server.address4>128.174.154.145</meandre.server.address4>
-         <nema.mail.server>128.174.154.145</nema.mail.server>
-         </properties>
-      </profile>
-      <profile>
-          <id>production</id>
-          <activation>
-          <activeByDefault>false</activeByDefault>
-         </activation>
-         <properties>
-         <meandre.server.address.head>nema.lis.uiuc.edu</meandre.server.address.head>
-         <meandre.server.address1>nema.lis.uiuc.edu</meandre.server.address1>
-         <meandre.server.address2>nema.lis.uiuc.edu</meandre.server.address2>
-         <meandre.server.address3>nema.lis.uiuc.edu</meandre.server.address3>
-         <meandre.server.address4>nema.lis.uiuc.edu</meandre.server.address4>
-         <nema.mail.server>nema.lis.uiuc.edu</nema.mail.server>
-         </properties>
-      </profile>
+	<repositories>
+		<repository>
+			<id>central</id>
+			<url>http://repo1.maven.org/maven2</url>
+		</repository>
+		<repository>
+			<id>nema-artifactory-repo</id>
+			<url>http://nema.lis.uiuc.edu/artifactory/repo</url>
+		</repository>
+		<repository>
+			<id>nema-artifactory-remote</id>
+			<url>http://nema.lis.uiuc.edu/artifactory/remote-repos</url>
+		</repository>
+	</repositories>
 
+	<profiles>
+		<profile>
+			<id>development</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<meandre.server.address.head>128.174.154.145</meandre.server.address.head>
+				<meandre.server.address1>128.174.154.145</meandre.server.address1>
+				<meandre.server.address2>128.174.154.145</meandre.server.address2>
+				<meandre.server.address3>128.174.154.145</meandre.server.address3>
+				<meandre.server.address4>128.174.154.145</meandre.server.address4>
+				<nema.mail.server>128.174.154.145</nema.mail.server>
+			</properties>
+		</profile>
+		<profile>
+			<id>production</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<meandre.server.address.head>nema.lis.uiuc.edu</meandre.server.address.head>
+				<meandre.server.address1>nema.lis.uiuc.edu</meandre.server.address1>
+				<meandre.server.address2>nema.lis.uiuc.edu</meandre.server.address2>
+				<meandre.server.address3>nema.lis.uiuc.edu</meandre.server.address3>
+				<meandre.server.address4>nema.lis.uiuc.edu</meandre.server.address4>
+				<nema.mail.server>nema.lis.uiuc.edu</nema.mail.server>
+			</properties>
+		</profile>
 
-
-      </profiles>
-
-
+	</profiles>
 </project>
