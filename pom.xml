@@ -4,13 +4,32 @@
 	<groupId>org.imirsel</groupId>
 	<artifactId>nema-flow-service</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>0.1.0-SNAPSHOT</version>
 	<name>nema-flow-service</name>
 	<url>http://maven.apache.org</url>
 
 	<prerequisites>
 		<maven>2.0.6</maven>
 	</prerequisites>
+<distributionManagement>
+		<!-- use the following if you're not using a snapshot version. -->
+		<repository>
+			<name>IMIRSEL Releases</name>
+			<id>nema.lis.uiuc.edu-releases</id>
+			<url>dav:http://nema.lis.uiuc.edu/artifactory/libs-releases-local/</url>
+			
+		</repository>
+		<!-- use the following if you ARE using a snapshot version. -->
+		
+			<snapshotRepository>
+				<id>nema.lis.uiuc.edu-snapshots</id>
+				<name>IMIRSEL Snapshots</name>
+				<url>dav:http://nema.lis.uiuc.edu/artifactory/libs-snapshots-local</url>
+			</snapshotRepository>
+		
+		<downloadUrl>http://nema.lis.uiuc.edu/artifactory/</downloadUrl>
+	</distributionManagement>
+	
 
 	<scm>
 		<connection>scm:svn:https://nemadiy.googlecode.com/svn/flowservice/trunk</connection>
@@ -125,15 +144,17 @@
 		<dependency>
 			<groupId>org.imirsel</groupId>
 			<artifactId>nema-core</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>${imirsel-nema-core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.imirsel</groupId>
 			<artifactId>imirsel-meandre-client</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>${imirsel-meandre-client.version}</version>
 		</dependency>
 	</dependencies>
 	<properties>
+		<imirsel-nema-core.version>0.5.0-SNAPSHOT</imirsel-nema-core.version>
+		<imirsel-meandre-client.version>0.5.0-SNAPSHOT</imirsel-meandre-client.version>
 		<meandre-server.version>1.4.8</meandre-server.version>
 		<spring-framework.version>2.5.6</spring-framework.version>
 	</properties>
