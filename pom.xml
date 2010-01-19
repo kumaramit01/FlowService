@@ -4,7 +4,7 @@
 	<groupId>org.imirsel</groupId>
 	<artifactId>nema-flow-service</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.5.0-SNAPSHOT</version>
 	<name>nema-flow-service</name>
 	<url>http://maven.apache.org</url>
 
@@ -151,6 +151,15 @@
 			<artifactId>imirsel-meandre-client</artifactId>
 			<version>${imirsel-meandre-client.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.imirsel</groupId>
+			<artifactId>nema-flowservice-interface</artifactId>
+			<version>0.5.0-SNAPSHOT</version>
+		</dependency>
+		
+		
+		
 	</dependencies>
 	<properties>
 		<imirsel-nema-core.version>0.5.0-SNAPSHOT</imirsel-nema-core.version>
