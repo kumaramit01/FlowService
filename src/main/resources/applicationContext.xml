@@ -59,7 +59,7 @@
     </bean>
 
     <bean id="messageTemplate" class="org.springframework.mail.SimpleMailMessage">
-        <property name="from" value="nema@lis.illinois.edu"/>
+        <property name="from" value="nema-diy-manager@mail.lis.illinois.edu"/>
     </bean>
 
     <bean id="notificationSender" class="org.imirsel.nema.flowservice.EmailNotificationSender">
