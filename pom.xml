@@ -166,6 +166,10 @@
 		<imirsel-meandre-client.version>0.5.0-SNAPSHOT</imirsel-meandre-client.version>
 		<meandre-server.version>1.4.8</meandre-server.version>
 		<spring-framework.version>2.5.6</spring-framework.version>
+                <jdbc.groupId>mysql</jdbc.groupId>
+                <jdbc.artifactId>mysql-connector-java</jdbc.artifactId>
+                <jdbc.version>5.0.5</jdbc.version>
+                <jdbc.driverClassName>com.mysql.jdbc.Driver</jdbc.driverClassName>
 	</properties>
 	<build>
 		<plugins>
