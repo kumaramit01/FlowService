@@ -63,6 +63,7 @@
     </bean>
 
     <bean id="notificationSender" class="org.imirsel.nema.flowservice.EmailNotificationSender">
+   		<property name="daoFactory" ref="daoFactory"/>
         <property name="mailSender" ref="mailSender"/>
         <property name="messageTemplate" ref="messageTemplate"/>
     </bean>
