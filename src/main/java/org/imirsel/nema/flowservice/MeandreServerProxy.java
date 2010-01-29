@@ -325,6 +325,34 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 		}
 		return mapRoles;
 	}
+	
+
+	public ExecutableComponentDescription retrieveComponentDescriptor(
+			String componentURL) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Set<URI> retrieveFlowUris() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public FlowDescription retrieveFlowDescriptor(String flowURL) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void uploadFlow(FlowDescription flow, boolean overwrite) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Set<URI> retrieveComponentUris() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 
 
@@ -379,32 +407,6 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	@Override
 	public String toString() {
 		return meandreServerProxyConfig.getHost()+":"+meandreServerProxyConfig.getPort();
-	}
-
-	public ExecutableComponentDescription retrieveComponentDescriptor(
-			String componentURL) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Set<URI> retrieveFlowUris() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public FlowDescription retrieveFlowDescriptor(String flowURL) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void uploadFlow(FlowDescription flow, boolean overwrite) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public Set<URI> retrieveComponentUris() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 
