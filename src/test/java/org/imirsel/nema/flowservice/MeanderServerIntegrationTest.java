@@ -12,6 +12,7 @@ import org.imirsel.nema.dao.impl.JobDaoImpl;
 import org.imirsel.nema.model.Flow;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.flowservice.MeandreServerException;
+import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.util.FlowTypeUtils;
 
 public class MeanderServerIntegrationTest {
@@ -41,10 +42,16 @@ public class MeanderServerIntegrationTest {
 	}
 	
 	public static void main(String[] args) throws MeandreServerException {
-        MeandreServer server = new MeandreServer();
-        server.setHost("128.174.154.145");
-        server.setPort(1714);
-        server.setMaxConcurrentJobs(1);
+		String host ="128.174.154.145";
+		String password = "admin";
+		String username ="admin";
+		int port = 1714;
+		int maxConcurrentJobs =1;
+		
+		MeandreServerProxyConfig config = new MeandreServerProxyConfig(
+				username,password,host,port,maxConcurrentJobs);
+				
+        MeandreServerProxy server = new MeandreServerProxy(config);
         server.init();
         
 		Flow flow = new Flow();

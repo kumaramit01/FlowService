@@ -117,51 +117,9 @@
 		<property name="daoFactory" ref="daoFactory" />
 	</bean>
 
-	<bean id="headServer" class="org.imirsel.nema.flowservice.MeandreServer">
-		<property name="host" value="${meandre.server.address.head}" />
-		<property name="port" value="11709" />
-		<property name="maxConcurrentJobs" value="1" />
-	</bean>
-
-	<bean id="worker1" class="org.imirsel.nema.flowservice.MeandreServer">
-		<property name="host" value="${meandre.server.address1}" />
-		<property name="port" value="11714" />
-		<property name="maxConcurrentJobs" value="1" />
-		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
-	</bean>
-
-	<bean id="worker2" class="org.imirsel.nema.flowservice.MeandreServer">
-		<property name="host" value="${meandre.server.address2}" />
-		<property name="port" value="11614" />
-		<property name="maxConcurrentJobs" value="1" />
-		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
-	</bean>
-
-	<bean id="worker3" class="org.imirsel.nema.flowservice.MeandreServer">
-		<property name="host" value="${meandre.server.address3}" />
-		<property name="port" value="11514" />
-		<property name="maxConcurrentJobs" value="1" />
-		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
-	</bean>
-
-	<bean id="worker4" class="org.imirsel.nema.flowservice.MeandreServer">
-		<property name="host" value="${meandre.server.address4}" />
-		<property name="port" value="11414" />
-		<property name="maxConcurrentJobs" value="1" />
-		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
-	</bean>
-
 	<bean id="jobSchedulerConfig"
-		class="org.imirsel.nema.flowservice.config.SimpleMeandreJobSchedulerConfig">
-		<property name="head" ref="headServer" />
-		<property name="servers">
-			<set>
-				<ref bean="worker1" />
-				<ref bean="worker2" />
-				<ref bean="worker3" />
-				<ref bean="worker4" />
-			</set>
-		</property>
+		class="org.imirsel.nema.flowservice.config.PropertyMeandreJobSchedulerConfig">
+		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
 	</bean>
 
 	<bean id="loadBalancer" class="org.imirsel.nema.flowservice.RoundRobinLoadBalancer" />

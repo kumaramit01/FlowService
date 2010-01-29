@@ -3,7 +3,7 @@ package org.imirsel.nema.flowservice.config;
 import java.util.Set;
 
 import org.imirsel.nema.flowservice.MeandreJobScheduler;
-import org.imirsel.nema.flowservice.MeandreServer;
+import org.imirsel.nema.flowservice.MeandreServerProxy;
 
 /**
  * Configuration instructions for a {@link MeandreJobScheduler}.
@@ -13,20 +13,20 @@ import org.imirsel.nema.flowservice.MeandreServer;
  */
 public interface MeandreJobSchedulerConfig {
 	/**
-	 * Return the {@link MeandreServer} to use as the head node. The head
+	 * Return the {@link MeandreServerProxy} to use as the head node. The head
 	 * will be used to field requests for cluster information. It will not be
 	 * used to process jobs.
 	 * 
-	 * @return The head {@link MeandreServer} to use.
+	 * @return The head {@link MeandreServerProxy} to use.
 	 */
-	public MeandreServer getHead();
+	public MeandreServerProxy getHead();
 	
 	/**
-	 * Return the set of {@link MeandreServer} workers. These servers will be
+	 * Return the set of {@link MeandreServerProxy} workers. These servers will be
 	 * used to process jobs.
 	 * 
-	 * @return The set of {@link MeandreServer}s that will be used to process
+	 * @return The set of {@link MeandreServerProxy}s that will be used to process
 	 * jobs.
 	 */
-	public Set<MeandreServer> getServers();
+	public Set<MeandreServerProxy> getServers();
 }

@@ -68,7 +68,7 @@ public class MeandreJobScheduler implements JobScheduler {
 
    /** Meandre servers for processing jobs. */
    @GuardedBy("workersLock")
-   private Set<MeandreServer> workers;
+   private Set<MeandreServerProxy> workers;
 
    private DaoFactory daoFactory;
    
@@ -106,7 +106,7 @@ public class MeandreJobScheduler implements JobScheduler {
       MeandreJobSchedulerConfig config, MeandreLoadBalancer balancer) {
       loadBalancer = balancer;
       workers = config.getServers();
-      for (MeandreServer server : workers) {
+      for (MeandreServerProxy server : workers) {
          loadBalancer.addServer(server);
       }
    }
@@ -120,7 +120,7 @@ public class MeandreJobScheduler implements JobScheduler {
    public void init() {
 	  assert config!=null:"No configuration was provided to the job scheduler.";
       workers = config.getServers();
-      for (MeandreServer server : workers) {
+      for (MeandreServerProxy server : workers) {
          loadBalancer.addServer(server);
       }
    }
@@ -129,7 +129,7 @@ public class MeandreJobScheduler implements JobScheduler {
     * @see org.imirsel.nema.flowservice.JobScheduler#abortJob(org.imirsel.nema.model.Job)
     */
    public void abortJob(Job job) {
-      MeandreServer executingServer = findExecutingServer(job);
+      MeandreServerProxy executingServer = findExecutingServer(job);
       try {
 		executingServer.abortJob(job);
 	} catch (MeandreServerException e) {
@@ -142,16 +142,16 @@ public class MeandreJobScheduler implements JobScheduler {
     * Find the server that is executing the given {@link Job}.
     *
     * @param job The {@link Job} to find the executing server instance for.
-    * @return The {@link MeandreServer} that is currently executing the job, or
+    * @return The {@link MeandreServerProxy} that is currently executing the job, or
     * <code>null</code> if no known server is executing the job.
     */
-   private MeandreServer findExecutingServer(Job job) {
+   private MeandreServerProxy findExecutingServer(Job job) {
       workersLock.lock();
       try {
-         for (MeandreServer server : workers) {
+         for (MeandreServerProxy server : workers) {
             if (
-               job.getHost().equals(server.getHost()) &&
-               job.getPort().equals(server.getPort())) {
+               job.getHost().equals(server.getMeandreServerProxyConfig().getHost()) &&
+               job.getPort().equals(server.getMeandreServerProxyConfig().getPort())) {
                return server;
             }
          }
@@ -188,7 +188,7 @@ public class MeandreJobScheduler implements JobScheduler {
          }
          while (!jobQueue.isEmpty()) {
             logger.fine("Found " + jobQueue.size() + " queued jobs.");
-            MeandreServer server = loadBalancer.nextAvailableServer();
+            MeandreServerProxy server = loadBalancer.nextAvailableServer();
             if (server == null) {
                logger.info(
                   "All servers are busy. Will try again in " + POLL_PERIOD + " seconds.");
@@ -233,8 +233,8 @@ public class MeandreJobScheduler implements JobScheduler {
                logger.fine("Execution response received.");
 
                logger.fine("Attempting to record job execution response.");
-               job.setHost(server.getHost());
-               job.setPort(server.getPort());
+               job.setHost(server.getMeandreServerProxyConfig().getHost());
+               job.setPort(server.getMeandreServerProxyConfig().getPort());
                job.setExecPort(response.getPort());
                job.setExecutionInstanceId(response.getUri());
 
@@ -322,7 +322,7 @@ public class MeandreJobScheduler implements JobScheduler {
     *
     * @param server Server to add.
     */
-   public void addServer(MeandreServer server) {
+   public void addServer(MeandreServerProxy server) {
       workersLock.lock();
       try {
          workers.add(server);
@@ -337,7 +337,7 @@ public class MeandreJobScheduler implements JobScheduler {
     *
     * @param server Server to remove.
     */
-   public void removeServer(MeandreServer server) {
+   public void removeServer(MeandreServerProxy server) {
       workersLock.lock();
       try {
          workers.remove(server);

@@ -1,5 +1,6 @@
 package org.imirsel.nema.flowservice;
 
+import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,18 +14,44 @@ import static org.junit.Assert.assertTrue;
 public class RoundRobinLoadBalancerTest {
 
    private RoundRobinLoadBalancer loadBalancer;
-   private MeandreServer server1;
-   private MeandreServer server2;
-   private MeandreServer server3;
-   private MeandreServer server4;
+   private MeandreServerProxy server1;
+   private MeandreServerProxy server2;
+   private MeandreServerProxy server3;
+   private MeandreServerProxy server4;
 
    @Before
    public void setUp() throws Exception {
       loadBalancer = new RoundRobinLoadBalancer();
-      server1 = new MeandreServer("192.168.0.1", 10000, 1);
-      server2 = new MeandreServer("192.168.0.2", 10000, 1);
-      server3 = new MeandreServer("192.168.0.3", 10000, 1);
-      server4 = new MeandreServer("192.168.0.4", 10000, 1);
+      
+      Set<MeandreServerProxy> servers = new HashSet<MeandreServerProxy>();
+      
+      
+      String host ="192.168.0.1";
+      String host1 ="192.168.0.2";
+      String host2 ="192.168.0.3";
+      String host3 ="192.168.0.4";
+      String password = "admin";
+      String username ="admin";
+      int port = 1714;
+      int maxConcurrentJobs =1;
+
+      MeandreServerProxyConfig config = new 
+      MeandreServerProxyConfig(username,password,host,port,maxConcurrentJobs);
+
+      MeandreServerProxyConfig config1 = new 
+      MeandreServerProxyConfig(username,password,host1,port,maxConcurrentJobs);
+      MeandreServerProxyConfig config2 = new 
+      MeandreServerProxyConfig(username,password,host2,port,maxConcurrentJobs);
+      MeandreServerProxyConfig config3 = new 
+      MeandreServerProxyConfig(username,password,host3,port,maxConcurrentJobs);
+
+		
+      
+      
+      server1 = new MeandreServerProxy(config);
+      server2 = new MeandreServerProxy(config1);
+      server3 = new MeandreServerProxy(config2);
+      server4 = new MeandreServerProxy(config3);
    }
 
    @Test
@@ -77,7 +104,7 @@ public class RoundRobinLoadBalancerTest {
       loadBalancer.addServer(server4);
 
       int max = 4;
-      Set<MeandreServer> serverSet = new HashSet<MeandreServer>();
+      Set<MeandreServerProxy> serverSet = new HashSet<MeandreServerProxy>();
       for (int i = 0; i <= max; i++) {
          serverSet.add(loadBalancer.nextAvailableServer());
       }

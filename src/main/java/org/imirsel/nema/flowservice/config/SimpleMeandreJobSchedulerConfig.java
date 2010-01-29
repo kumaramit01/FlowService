@@ -2,7 +2,7 @@ package org.imirsel.nema.flowservice.config;
 
 import java.util.Set;
 
-import org.imirsel.nema.flowservice.MeandreServer;
+import org.imirsel.nema.flowservice.MeandreServerProxy;
 
 /**
  * A {@link MeandreJobSchedulerConfig} intended to work in concert with a
@@ -15,14 +15,14 @@ import org.imirsel.nema.flowservice.MeandreServer;
 public class SimpleMeandreJobSchedulerConfig implements
 		MeandreJobSchedulerConfig {
 
-	MeandreServer head;
-	Set<MeandreServer> servers;
+	MeandreServerProxy head;
+	Set<MeandreServerProxy> servers;
 	
 	/**
 	 * @see org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig#getHead()
 	 */
 	@Override
-	public MeandreServer getHead() {
+	public MeandreServerProxy getHead() {
 		return head;
 	}
 
@@ -30,7 +30,7 @@ public class SimpleMeandreJobSchedulerConfig implements
 	 * @see org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig#getServers()
 	 */
 	@Override
-	public Set<MeandreServer> getServers() {
+	public Set<MeandreServerProxy> getServers() {
 		return servers;
 	}
 
@@ -39,7 +39,7 @@ public class SimpleMeandreJobSchedulerConfig implements
 	 * 
 	 * @param head The head server to use.
 	 */
-	public void setHead(MeandreServer head) {
+	public void setHead(MeandreServerProxy head) {
 		this.head = head;
 	}
 	
@@ -48,7 +48,7 @@ public class SimpleMeandreJobSchedulerConfig implements
 	 * 
 	 * @param servers The workers to be used to process jobs.
 	 */
-	public void setServers(Set<MeandreServer> servers) {
+	public void setServers(Set<MeandreServerProxy> servers) {
 		this.servers = servers;
 	}
 }

@@ -37,9 +37,9 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
    //~ Methods -----------------------------------------------------------------
 
    /**
-    * @see org.imirsel.nema.flowservice.MeandreLoadBalancer#addServer(org.imirsel.nema.flowservice.MeandreServer)
+    * @see org.imirsel.nema.flowservice.MeandreLoadBalancer#addServer(org.imirsel.nema.flowservice.MeandreServerProxy)
     */
-   public synchronized void addServer(MeandreServer server) {
+   public synchronized void addServer(MeandreServerProxy server) {
 	   // do not allow duplicate servers
 	  if(findNodeWithServer(server)!=null) {
 		  return;
@@ -61,9 +61,9 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.MeandreLoadBalancer#removeServer(org.imirsel.nema.flowservice.MeandreServer)
+    * @see org.imirsel.nema.flowservice.MeandreLoadBalancer#removeServer(org.imirsel.nema.flowservice.MeandreServerProxy)
     */
-   public synchronized void removeServer(MeandreServer server)
+   public synchronized void removeServer(MeandreServerProxy server)
          throws IllegalStateException {
       if (size == 0) {
          return;
@@ -78,8 +78,7 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
       if (server.getNumJobsRunning() != 0) {
          throw new IllegalStateException(
             "Server " +
-            server.getHost() +
-            ":" + server.getPort() +
+            server.getServerString()+
             " cannot be removed from the scheduler because it is currently running a job.");
       }
 
@@ -97,14 +96,14 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
 
    /**
     * Finds the list {@link Node} that contains the specified
-    * {@link MeandreServer}.
+    * {@link MeandreServerProxy}.
     *
-    * @param server The {@link MeandreServer} to search for in the list
+    * @param server The {@link MeandreServerProxy} to search for in the list
     * {@link Node}s.
     * @return List {@link Node} that contains the specified
-    * {@link MeandreServer}.
+    * {@link MeandreServerProxy}.
     */
-   private Node findNodeWithServer(MeandreServer server) {
+   private Node findNodeWithServer(MeandreServerProxy server) {
       if (size == 0) {
          return null;
       }
@@ -127,7 +126,7 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
     * @see org.imirsel.nema.flowservice.MeandreLoadBalancer#nextAvailableServer()
     */
    @Override
-   public synchronized MeandreServer nextAvailableServer() {
+   public synchronized MeandreServerProxy nextAvailableServer() {
       if (size == 0) {
          return null;
       }
@@ -142,7 +141,7 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
       do {
          if (!iterNode.getServer().isBusy()) {
             curr = iterNode;
-        	MeandreServer server = iterNode.getServer();
+        	MeandreServerProxy server = iterNode.getServer();
         	logger.fine("Next available server: " + server);
             return server;
          }
@@ -193,9 +192,9 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
    private class Node {
       Node next = null;
       Node prev = null;
-      MeandreServer server = null;
+      MeandreServerProxy server = null;
 
-      public Node(MeandreServer server) { this.server = server; }
+      public Node(MeandreServerProxy server) { this.server = server; }
 
       public void setNext(Node next) { this.next = next; }
 
@@ -205,7 +204,7 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
 
       public Node getPrev() { return prev; }
 
-      public MeandreServer getServer() { return server; }
+      public MeandreServerProxy getServer() { return server; }
 
       @Override
       public int hashCode() {

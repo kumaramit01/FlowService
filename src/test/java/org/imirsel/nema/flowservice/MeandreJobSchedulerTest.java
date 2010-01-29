@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig;
+import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -25,16 +26,47 @@ public class MeandreJobSchedulerTest {
 	public void setUp() throws Exception {
 	      MeandreJobSchedulerConfig config =
 	          new MeandreJobSchedulerConfig() {
-	             public MeandreServer getHead() {
-	                return new MeandreServer("localhost", 10000, 1);
+	             public MeandreServerProxy getHead() {
+	            		String host ="localhost";
+	            		String password = "admin";
+	            		String username ="admin";
+	            		int port = 1714;
+	            		int maxConcurrentJobs =1;
+	            		
+	            		MeandreServerProxyConfig config = new MeandreServerProxyConfig(
+	            				username,password,host,port,maxConcurrentJobs);
+	            				
+	                    MeandreServerProxy server = new MeandreServerProxy(config);
+	                    
+	                    return server;
 	             }
 
-	             public Set<MeandreServer> getServers() {
-	                Set<MeandreServer> servers = new HashSet<MeandreServer>();
-	                servers.add(new MeandreServer("192.168.0.1", 10000, 1));
-	                servers.add(new MeandreServer("192.168.0.2", 10000, 1));
-	                servers.add(new MeandreServer("192.168.0.3", 10000, 1));
-	                servers.add(new MeandreServer("192.168.0.4", 10000, 1));
+	             public Set<MeandreServerProxy> getServers() {
+	                Set<MeandreServerProxy> servers = new HashSet<MeandreServerProxy>();
+	                
+	                
+	                String host ="192.168.0.1";
+	                String host1 ="192.168.0.2";
+	                String host2 ="192.168.0.3";
+	                String host3 ="192.168.0.4";
+            		String password = "admin";
+            		String username ="admin";
+            		int port = 1714;
+            		int maxConcurrentJobs =1;
+            		
+            		MeandreServerProxyConfig config = new 
+            		MeandreServerProxyConfig(username,password,host,port,maxConcurrentJobs);
+            		MeandreServerProxyConfig config1 = new 
+            		MeandreServerProxyConfig(username,password,host1,port,maxConcurrentJobs);
+            		MeandreServerProxyConfig config2 = new 
+            		MeandreServerProxyConfig(username,password,host2,port,maxConcurrentJobs);
+            		MeandreServerProxyConfig config3 = new 
+            		MeandreServerProxyConfig(username,password,host3,port,maxConcurrentJobs);
+    
+            		servers.add(new MeandreServerProxy(config));
+	                servers.add(new MeandreServerProxy(config1));
+	                servers.add(new MeandreServerProxy(config2));
+	                servers.add(new MeandreServerProxy(config3));
 	                return servers;
 	             }
 	          };

@@ -1,7 +1,7 @@
 package org.imirsel.nema.flowservice;
 
 /**
- * Given a set of {@link MeandreServer}s, determines which server will get
+ * Given a set of {@link MeandreServerProxy}s, determines which server will get
  * the next job request.
  *
  * @author shirk
@@ -12,13 +12,13 @@ public interface MeandreLoadBalancer {
    //~ Methods -----------------------------------------------------------------
 
    /**
-    * Return the {@link MeandreServer} to receive the next job execution 
+    * Return the {@link MeandreServerProxy} to receive the next job execution 
     * request.
     *
-    * @return The next eligible {@link MeandreServer} to receive a job, or 
+    * @return The next eligible {@link MeandreServerProxy} to receive a job, or 
     * <code>null</code> if no servers are available.
     */
-   public MeandreServer nextAvailableServer();
+   public MeandreServerProxy nextAvailableServer();
 
    /**
     * Test if there are any servers currently available for processing a job.
@@ -28,20 +28,20 @@ public interface MeandreLoadBalancer {
    public boolean hasAvailableServer();
 
    /**
-    * Register a new {@link MeandreServer} with the load balancer.
+    * Register a new {@link MeandreServerProxy} with the load balancer.
     *
-    * @param server The {@link MeandreServer} to add.
+    * @param server The {@link MeandreServerProxy} to add.
     */
-   public void addServer(MeandreServer server);
+   public void addServer(MeandreServerProxy server);
 
    /**
-    * Remove a {@link MeandreServer} from the load balancer.
+    * Remove a {@link MeandreServerProxy} from the load balancer.
     *
     * @param server The server to remove.
     * @throws IllegalStateException if the server is currently processing a
     * job.
     */
-   public void removeServer(MeandreServer server) throws IllegalStateException;
+   public void removeServer(MeandreServerProxy server) throws IllegalStateException;
    
    /**
     * Number of servers the load balancer is aware of.
