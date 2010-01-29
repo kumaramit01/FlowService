@@ -46,15 +46,14 @@ import java.io.FileOutputStream;
 import java.net.URI;
 import java.util.Set;
 
-import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.client.beans.converters.IBeanConverter;
 import org.imirsel.nema.client.beans.converters.MeandreConverter;
 import org.imirsel.nema.client.beans.repository.WBExecutableComponentDescription;
 import org.imirsel.nema.client.beans.repository.WBFlowDescription;
 import org.imirsel.nema.flowmetadataservice.CorruptedFlowException;
 import org.imirsel.nema.flowservice.MeandreServerException;
+import org.imirsel.nema.flowservice.MeandreServerProxy;
 
-import org.imirsel.nema.service.impl.MeandreProxyWrapper;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
@@ -67,7 +66,7 @@ import com.hp.hpl.jena.rdf.model.Model;
  */
 public class Repository {
 
-	public MeandreProxyWrapper meandreProxyWrapper;
+	public MeandreServerProxy meandreServerProxy;
 
 
 	private static final IBeanConverter<URI, String> UriStringConverter =
@@ -79,12 +78,12 @@ public class Repository {
 
 
 
-	public MeandreProxyWrapper getMeandreProxyWrapper() {
-		return meandreProxyWrapper;
+	public MeandreServerProxy getMeandreServerProxy() {
+		return meandreServerProxy;
 	}
 
-	public void setMeandreProxyWrapper(MeandreProxyWrapper meandreProxyWrapper) {
-		this.meandreProxyWrapper = meandreProxyWrapper;
+	public void setMeandreProxyWrapper(MeandreServerProxy meandreServerProxy) {
+		this.meandreServerProxy = meandreServerProxy;
 	}
 
 
@@ -93,74 +92,44 @@ public class Repository {
 
 	public Set<String> retrieveComponentUrls()
 	throws  MeandreServerException {
-		try {
-			Set<URI> componentUrls = getMeandreProxyWrapper().retrieveComponentUris();
-			return MeandreConverter.convert(componentUrls, UriStringConverter);
-		}catch (TransmissionException e) {
-			throw new MeandreServerException(e);
-		}
+		Set<URI> componentUrls = getMeandreServerProxy().retrieveComponentUris();
+		return MeandreConverter.convert(componentUrls, UriStringConverter);
 	}
 
 	public WBExecutableComponentDescription retrieveComponentDescriptor(String componentURL)
 	throws  MeandreServerException {
-		try {
-			return MeandreConverter.ExecutableComponentDescriptionConverter.convert(
-					getMeandreProxyWrapper().retrieveComponentDescriptor(componentURL));
-		}
-		catch (TransmissionException e) {
-			throw new MeandreServerException(e);
-		}
+		return MeandreConverter.ExecutableComponentDescriptionConverter.convert(
+				getMeandreServerProxy().retrieveComponentDescriptor(componentURL));
 	}
 
 	public Set<WBExecutableComponentDescription> retrieveComponentDescriptors()
 	throws  MeandreServerException {
-
-		try {
-			QueryableRepository repository = this.getMeandreProxyWrapper().getRepository();
-			return MeandreConverter.convert(
-					repository.getAvailableExecutableComponentDescriptions(),
-					MeandreConverter.ExecutableComponentDescriptionConverter);
-		}
-		catch (TransmissionException e) {
-			throw new MeandreServerException(e);
-		}
+		QueryableRepository repository = this.getMeandreServerProxy().getRepository();
+		return MeandreConverter.convert(
+				repository.getAvailableExecutableComponentDescriptions(),
+				MeandreConverter.ExecutableComponentDescriptionConverter);
 	}
 
 	public Set<String> retrieveFlowUrls()
 	throws  MeandreServerException {
 
-		try {
-			return MeandreConverter.convert(getMeandreProxyWrapper().retrieveFlowUris(), UriStringConverter);
-		}
-		catch (TransmissionException e) {
-			throw new MeandreServerException(e);
-		}
+		return MeandreConverter.convert(getMeandreServerProxy().retrieveFlowUris(), UriStringConverter);
 	}
 
 	public WBFlowDescription retrieveFlowDescriptor(String flowURL)
 	throws  MeandreServerException {
 
-		try {
-			return MeandreConverter.FlowDescriptionConverter.convert(
-					getMeandreProxyWrapper().retrieveFlowDescriptor(flowURL));
-		}
-		catch (TransmissionException e) {
-			throw new MeandreServerException(e);
-		}
+		return MeandreConverter.FlowDescriptionConverter.convert(
+				getMeandreServerProxy().retrieveFlowDescriptor(flowURL));
 	}
 
 	public Set<WBFlowDescription> retrieveFlowDescriptors()
 	throws  MeandreServerException {
 
-		try {
-			QueryableRepository repository = this.getMeandreProxyWrapper().getRepository();
-			return MeandreConverter.convert(
-					repository.getAvailableFlowDescriptions(),
-					MeandreConverter.FlowDescriptionConverter);
-		}
-		catch (TransmissionException e) {
-			throw new MeandreServerException(e);
-		}
+		QueryableRepository repository = this.getMeandreServerProxy().getRepository();
+		return MeandreConverter.convert(
+				repository.getAvailableFlowDescriptions(),
+				MeandreConverter.FlowDescriptionConverter);
 	}
 
 	public boolean uploadFlow(WBFlowDescription wbFlow, boolean overwrite)
@@ -210,24 +179,14 @@ public class Repository {
 			throw corruptedFlowException;
 		}
 
-		try {
-			getMeandreProxyWrapper().uploadFlow(flow, overwrite);
-			return true;
-		}catch (TransmissionException e) {
-			throw new MeandreServerException(e);
-		}
+		getMeandreServerProxy().uploadFlow(flow, overwrite);
+		return true;
 	}
 
 
 	public boolean removeResource(String resourceURL)
 	throws  MeandreServerException {
-
-		try {
-			return getMeandreProxyWrapper().removeResource(resourceURL);
-		}
-		catch (TransmissionException e) {
-			throw new MeandreServerException(e);
-		}
+		return getMeandreServerProxy().removeResource(resourceURL);
 	}
 
 

@@ -1,5 +1,6 @@
 package org.imirsel.nema.flowservice;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -258,7 +259,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	 * 
 	 * @return The cached queryable repository 
 	 */
-	private QueryableRepository getRepository() {
+	public QueryableRepository getRepository() {
 		try{
 			this.qrCached = this.meandreClient.retrieveRepository();
 		}catch(TransmissionException e){
@@ -378,6 +379,32 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	@Override
 	public String toString() {
 		return meandreServerProxyConfig.getHost()+":"+meandreServerProxyConfig.getPort();
+	}
+
+	public ExecutableComponentDescription retrieveComponentDescriptor(
+			String componentURL) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Set<URI> retrieveFlowUris() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public FlowDescription retrieveFlowDescriptor(String flowURL) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void uploadFlow(FlowDescription flow, boolean overwrite) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Set<URI> retrieveComponentUris() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
