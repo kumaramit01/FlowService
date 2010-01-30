@@ -1,7 +1,6 @@
 package org.imirsel.nema.flowservice;
 
-import static org.imirsel.nema.model.Job.JobStatus;
-
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,23 +9,27 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 import org.imirsel.nema.NoSuchEntityException;
-import org.imirsel.nema.model.Flow;
-import org.imirsel.nema.model.Job;
-import org.imirsel.nema.model.JobResult;
-import org.imirsel.nema.model.Notification;
 import org.imirsel.nema.dao.DaoFactory;
 import org.imirsel.nema.dao.FlowDao;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.dao.JobResultDao;
+import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
+import org.imirsel.nema.flowservice.config.MeandreServerProxyStatus;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
-import org.imirsel.util.FlowTypeUtils;
+import org.imirsel.nema.model.Component;
+import org.imirsel.nema.model.Flow;
+import org.imirsel.nema.model.Job;
+import org.imirsel.nema.model.JobResult;
+import org.imirsel.nema.model.Notification;
+import org.imirsel.nema.model.Property;
+import org.imirsel.nema.model.Job.JobStatus;
 import org.springframework.orm.ObjectRetrievalFailureException;
 
 /**
  * A {@link FlowService} implementation for the NEMA project.
  * 
  * @author shirk
- * @since 1.0
+ * @since 0.4.0
  */
 public class NemaFlowService implements FlowService {
 
@@ -34,6 +37,8 @@ public class NemaFlowService implements FlowService {
 		Logger.getLogger(NemaFlowService.class.getName());
 	
 	private JobScheduler jobScheduler;
+	
+	private MeandreFlowStore meandreFlowStore;
 	
 	private JobStatusMonitor jobStatusMonitor;
 	
@@ -185,8 +190,33 @@ public class NemaFlowService implements FlowService {
 		FlowDao flowDao = daoFactory.getFlowDao();
 		return flowDao.findById(flowId, false);
 	}
-	
 
+
+	@Override
+	public String createNewFlow(HashMap<String, String> paramMap, String flowURI) {
+		return this.getMeandreFlowStore().createNewFlow(paramMap, flowURI);
+	}
+
+	@Override
+	public HashMap<String, Property> getComponentPropertyDataType(
+			Component component, String url) {
+		return  this.getMeandreFlowStore().getComponentPropertyDataType(component, url);
+	}
+
+	@Override
+	public List<Component> getComponents(String url) {
+		return  this.getMeandreFlowStore().getComponents(url);
+	}
+
+	@Override
+	public String getConsole(String uri) {
+		return this.getMeandreFlowStore().getConsole(uri);
+	}
+
+	@Override
+	public boolean removeFlow(String url) {
+		return this.getMeandreFlowStore().removeFlow(url);
+	}
 	
 	/**
 	 * Return the {@link JobScheduler} instance currently being used.
@@ -228,6 +258,33 @@ public class NemaFlowService implements FlowService {
 
 	public void setNotificationSender(NotificationSender notificationSender) {
 		this.notificationSender = notificationSender;
+	}
+
+	public void setMeandreFlowStore(MeandreFlowStore meandreFlowStore) {
+		this.meandreFlowStore = meandreFlowStore;
+	}
+
+	public MeandreFlowStore getMeandreFlowStore() {
+		return meandreFlowStore;
+	}
+
+	@Override
+	public HashMap<MeandreServerProxyConfig, MeandreServerProxyStatus> getMeandreServerProxyStatus() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public MeandreServerProxyStatus getMeandreServerProxyStatus(String host,
+			int port) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<MeandreServerProxyConfig> getSchedulerConfig() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

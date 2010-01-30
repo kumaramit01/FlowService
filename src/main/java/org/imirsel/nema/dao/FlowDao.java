@@ -18,7 +18,7 @@ public interface FlowDao extends GenericDao<Flow,Long>{
     /**
      * Return the {@link Flow}s that are templates.
      * 
-     * @return
+     * @return List<Flow> List of flows
      */
     public List<Flow> getFlowTemplates();
 

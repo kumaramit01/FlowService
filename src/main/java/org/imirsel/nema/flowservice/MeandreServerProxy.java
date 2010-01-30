@@ -13,13 +13,13 @@ import javax.annotation.PostConstruct;
 
 import net.jcip.annotations.ThreadSafe;
 
+import org.imirsel.meandre.client.ExecResponse;
+import org.imirsel.meandre.client.MeandreClient;
+import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
 import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
 import org.imirsel.nema.model.Job;
-import org.imirsel.meandre.client.ExecResponse;
-import org.imirsel.meandre.client.MeandreClient;
-import org.imirsel.meandre.client.TransmissionException;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
@@ -32,8 +32,9 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * A proxy class for a remote Meandre server.
  * 
  * @author shirk
- * @since 1.0
- * @modified -amitku version 0.5.0 
+ * @author kumaramit01
+ * @since 0.4.0
+ * @modified  version 0.5.0 
  *  Abstracted the server configuration parameters
  *  Added flow specific functions used by the FlowMetadataServiceImpl and
  *  ComponentMetadataServiceImpl classes
@@ -48,10 +49,10 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	private MeandreServerProxyConfig meandreServerProxyConfig = null;
 
 	private final Set<Job> runningJobs = new HashSet<Job>(8);
-	private Lock runningLock = new ReentrantLock();
+	private final Lock runningLock = new ReentrantLock();
 
 	private final Set<Job> abortPending = new HashSet<Job>(8);
-	private Lock abortingLock = new ReentrantLock();
+	private final Lock abortingLock = new ReentrantLock();
 
 	private JobStatusMonitor jobStatusMonitor;
 	private MeandreClient meandreClient;
@@ -104,6 +105,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 
 	/**
 	 * Tests if the server is busy such that it cannot process any more jobs.
+	 * @return busy true or false
 	 */
 	public boolean isBusy() {
 		runningLock.lock();
@@ -226,7 +228,8 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	/**
 	 * Returns the console from the job identified by uri
 	 * @param uri
-	 * @return
+	 * @return console The console string
+	 * @throws MeandreServerException 
 	 */
 	public String getConsole(String uri) throws MeandreServerException{
 			String jc;
@@ -269,6 +272,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	
 	/**
 	 * Returns the list of Flows available as resource
+	 * @return Set<Resource> The set of resource
 	 */
 	public Set<Resource> getAvailableFlows() {
 		// TODO Auto-generated method stub
@@ -294,7 +298,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	
 	/**
 	 * 
-	 * @returns the flow description
+	 * @return Map<String,FlowDescription> The Map of String and FlowDescription 
 	 */
 	public Map<String, FlowDescription> getAvailableFlowDescriptionsMap() {
 		QueryableRepository qp= getRepository();

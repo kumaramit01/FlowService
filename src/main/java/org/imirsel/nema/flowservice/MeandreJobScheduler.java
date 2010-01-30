@@ -398,7 +398,7 @@ public class MeandreJobScheduler implements JobScheduler {
    /**
     * Set the {@link DaoFactory} to use.
     * 
-    * @param jobDao The {@link DaoFactory} implementation to use.
+    * @param daoFactory The {@link DaoFactory} implementation to use.
     */
    public void setDaoFactory(DaoFactory daoFactory) {
 	   this.daoFactory = daoFactory;

@@ -10,14 +10,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-
 import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.client.beans.repository.WBFlowDescription;
+import org.imirsel.nema.flowmetadataservice.CorruptedFlowException;
+import org.imirsel.nema.flowmetadataservice.FlowMetadataService;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.model.Component;
-import org.imirsel.nema.flowmetadataservice.CorruptedFlowException;
-import org.imirsel.nema.flowmetadataservice.FlowMetadataService;
 import org.meandre.core.repository.ExecutableComponentInstanceDescription;
 import org.meandre.core.repository.FlowDescription;
 
@@ -50,7 +49,7 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 	/**For the given flowUrl return the list of components urls that make the flow.
 	 * 
 	 * @param flowUrl
-	 * @return
+	 * @return List<Component> The list of components
 	 * @throws TransmissionException 
 	 */
 	public List<Component> getComponents(String flowUri) throws TransmissionException{

@@ -7,11 +7,18 @@ import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.model.Component;
 
+/**
+ * Methods and functions to create new flow and retrieve flow components.
+ * @author kumaramit01
+ * @since 0.5.0
+ *
+ */
 public interface FlowMetadataService {
 	/**Returns the list of components that make a flow
 	 * 
 	 * @param flowUrl
-	 * @return
+	 * @return List<Component> List of the Components
+	 * @throws TransmissionException 
 	 */
 	public List<Component> getComponents(String flowUrl) throws TransmissionException;
 
@@ -20,7 +27,8 @@ public interface FlowMetadataService {
 	 * 
 	 * @param paramMap
 	 * @param flowUri
-	 * @return
+	 * @return URI The flow URI
+	 * @throws MeandreServerException 
 	 * @throws MeandreCommunicationException 
 	 * @throws CorruptedFlowException 
 	 */
@@ -28,18 +36,18 @@ public interface FlowMetadataService {
 	
 	/** Removes the flow
 	 * 
-	 * @param uri
-	 * @return
-	 * @throws TransmissionException
+	 * @param URI
+	 * @return  success returns true/false
+	 * @throws MeandreServerException 
 	 */
-	public boolean removeFlow(String uri) throws MeandreServerException;
+	public boolean removeFlow(String URI) throws MeandreServerException;
 
 	/**Gets the console
 	 * 
-	 * @param uri
-	 * @return
+	 * @param URI
+	 * @return console The string 
 	 * @throws TransmissionException
 	 * @throws MeandreServerException 
 	 */
-	public String getConsole(String uri) throws  MeandreServerException;
+	public String getConsole(String URI) throws  MeandreServerException;
 }

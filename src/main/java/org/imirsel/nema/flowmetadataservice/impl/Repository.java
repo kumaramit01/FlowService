@@ -53,7 +53,6 @@ import org.imirsel.nema.client.beans.repository.WBFlowDescription;
 import org.imirsel.nema.flowmetadataservice.CorruptedFlowException;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
-
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
@@ -61,7 +60,9 @@ import org.meandre.core.repository.RepositoryImpl;
 import com.hp.hpl.jena.rdf.model.Model;
 
 /**
- * @author Amit Kumar
+ * Encapsulates the Flow Repository for a {@link MeandreServerProxy}
+ * 
+ * @author kumaramit01
  *
  */
 public class Repository {
@@ -178,7 +179,6 @@ public class Repository {
 					new CorruptedFlowException(execStepMsg, e) : (CorruptedFlowException) e;
 			throw corruptedFlowException;
 		}
-
 		getMeandreServerProxy().uploadFlow(flow, overwrite);
 		return true;
 	}
