@@ -177,11 +177,11 @@ public class MeandreJobScheduler implements JobScheduler {
     * Attempt to run any queued jobs.
     */
    public void runJobs() {
-      queueLock.lock();
-      workersLock.lock();
-      JobDao jobDao = daoFactory.getJobDao();
-      Session session = null;
-      try {
+       Session session = null;
+       JobDao jobDao = daoFactory.getJobDao();
+       try {
+    	  queueLock.lock();
+          workersLock.lock();
          if (jobQueue.size() < 1) {
             logger.fine("No queued jobs.");
             return;
