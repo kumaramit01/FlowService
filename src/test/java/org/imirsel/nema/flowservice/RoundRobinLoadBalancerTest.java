@@ -1,16 +1,20 @@
 package org.imirsel.nema.flowservice;
 
-import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
+import org.junit.Before;
+import org.junit.Test;
 
-
+/**
+ * 
+ * @author shirk
+ * @since 0.4.0
+ */
 public class RoundRobinLoadBalancerTest {
 
    private RoundRobinLoadBalancer loadBalancer;

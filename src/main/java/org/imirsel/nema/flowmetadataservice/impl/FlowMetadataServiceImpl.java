@@ -26,7 +26,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 /**This class encapsulated all the flow related services and provides
  * an injectable implementation of the FlowMetadataService to the flow service
  * 
- * @author amitku
+ * @author kumaramit01
  * @since 0.5.0
  *
  */
@@ -34,7 +34,7 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 	public MeandreServerProxy meandreServerProxy;
 	private Repository repository;
 	
-	private static final Logger log= Logger.getLogger(FlowMetadataService.class.getName());
+	private static final Logger LOGGER= Logger.getLogger(FlowMetadataService.class.getName());
 
 	
 	public MeandreServerProxy getMeandreServerProxy() {
@@ -56,17 +56,16 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 		Map<String, FlowDescription> map=null;
 			map = meandreServerProxy.getAvailableFlowDescriptionsMap();
 		if(map==null){
-			log.severe("Could not find components for the flowUri: "+ flowUri);
+			LOGGER.severe("Could not find components for the flowUri: "+ flowUri);
 			return null;
 		}
 		FlowDescription fdesc = map.get(flowUri);
 		if(fdesc==null){
-			log.severe("Could not find components for the flowUri: "+ flowUri);
+			LOGGER.severe("Could not find components for the flowUri: "+ flowUri);
 			return null;
 		}
 		Set<ExecutableComponentInstanceDescription> se = fdesc.getExecutableComponentInstances();
 		ArrayList<Component> list = new ArrayList<Component>(se.size());
-		int count=0;
 		Iterator<ExecutableComponentInstanceDescription> ite = se.iterator();
 		while(ite.hasNext()){
 			ExecutableComponentInstanceDescription ecd = ite.next();
@@ -79,7 +78,6 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 			component.setDescription(ecd.getDescription());
 			component.setHidden(isHiddenComponentForFlow(flowUri,instanceUri));
 			list.add(component);
-			count++;
 		}
 		return list;
 	}
@@ -107,14 +105,13 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 	}
 	
 	private String[] getFlowUriList() throws TransmissionException{
-		Set<Resource> resources = null;
-		resources = meandreServerProxy.getAvailableFlows();
+		Set<Resource> resources = meandreServerProxy.getAvailableFlows();
 		
 		if(resources==null){
-			log.warning("Did not find any flow resources.");
+			LOGGER.warning("Did not find any flow resources.");
 			return null;
 		}
-		log.info("Number of flows found: " + resources.size());
+		LOGGER.info("Number of flows found: " + resources.size());
 		int size = resources.size();
 		if(size==0){
 			return null;
@@ -148,7 +145,7 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 		flowDesc.setCreationDate(new Date());
 		flowDesc.updateParameters(flowUri,paramMap);
         boolean uploadSuccess=this.repository.uploadFlow(flowDesc, false);
-	    System.out.println("upload was "+ uploadSuccess);
+        LOGGER.info("upload was "+ uploadSuccess);
 	   return flowDesc.getFlowURI();
 	}
 	

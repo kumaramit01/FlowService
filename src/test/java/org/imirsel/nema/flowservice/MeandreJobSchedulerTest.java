@@ -24,6 +24,7 @@ public class MeandreJobSchedulerTest {
 
 	@Before
 	public void setUp() throws Exception {
+		int i=1;
 	      MeandreJobSchedulerConfig config =
 	          new MeandreJobSchedulerConfig() {
 	             public MeandreServerProxy getHead() {
@@ -33,10 +34,10 @@ public class MeandreJobSchedulerTest {
 	            		int port = 1714;
 	            		int maxConcurrentJobs =1;
 	            		
-	            		MeandreServerProxyConfig config = new MeandreServerProxyConfig(
+	            		MeandreServerProxyConfig pconfig = new MeandreServerProxyConfig(
 	            				username,password,host,port,maxConcurrentJobs);
 	            				
-	                    MeandreServerProxy server = new MeandreServerProxy(config);
+	                    MeandreServerProxy server = new MeandreServerProxy(pconfig);
 	                    
 	                    return server;
 	             }

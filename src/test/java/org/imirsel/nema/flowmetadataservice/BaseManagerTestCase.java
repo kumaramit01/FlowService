@@ -2,23 +2,29 @@ package org.imirsel.nema.flowmetadataservice;
 
 
 
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.imirsel.nema.util.ConvertUtil;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
-
+/**
+ * 
+ * @author kumaramit01
+ * @since 0.5.0
+ *
+ */
 public abstract class BaseManagerTestCase extends AbstractTransactionalDataSourceSpringContextTests {
 
     protected final Log log = LogFactory.getLog(getClass());
-    protected static ResourceBundle rb = null;
+    protected ResourceBundle rb = null;
 
-    protected String[] getConfigLocations() {
+    @Override
+	protected String[] getConfigLocations() {
         setAutowireMode(AUTOWIRE_BY_NAME);
         return new String[] {"/applicationContext-resources.xml", "classpath:/applicationContext-dao.xml",
                              "/applicationContext-service.xml", "classpath*:/**/applicationContext.xml"};

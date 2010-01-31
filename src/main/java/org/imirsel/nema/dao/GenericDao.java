@@ -1,7 +1,7 @@
 package org.imirsel.nema.dao;
 
-import java.util.List;
 import java.io.Serializable;
+import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -17,6 +17,8 @@ import org.hibernate.SessionFactory;
  * state.
  *
  * @author Christian Bauer
+ * @param <T> 
+ * @param <ID> 
  */
 public interface GenericDao<T, ID extends Serializable> {
 

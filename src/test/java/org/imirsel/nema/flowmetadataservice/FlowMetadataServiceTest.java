@@ -8,11 +8,16 @@ import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
 
-
+/**
+ * 
+ * @author kumaramit01
+ * @since 0.5.0
+ *
+ */
 public class FlowMetadataServiceTest extends BaseManagerTestCase{
 	
-	private FlowMetadataServiceImpl flowMetadataService = new FlowMetadataServiceImpl();
-	private MeandreServerProxy meandreProxyWrapper;
+	private final FlowMetadataServiceImpl flowMetadataService = new FlowMetadataServiceImpl();
+	private final MeandreServerProxy meandreProxyWrapper;
 	
 	public FlowMetadataServiceTest(){
 		String host ="128.174.154.145";

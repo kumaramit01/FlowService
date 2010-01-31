@@ -8,7 +8,8 @@ import org.imirsel.nema.dao.FlowDao;
 import org.imirsel.nema.model.Flow;
 
 public class FlowDaoImpl extends GenericDaoImpl<Flow,Long> implements FlowDao {
-	
+	 
+	   
 	public FlowDaoImpl() {
 	}
 

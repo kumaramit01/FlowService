@@ -3,14 +3,15 @@
  */
 package org.imirsel.nema.flowservice;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfigException;
 import org.imirsel.nema.flowservice.config.PropertyMeandreJobSchedulerConfig;
 import org.junit.Test;
 
 /**
- * @author amitku
+ * @author kumaramit01
  * @since 0.5.0
  */
 public class PropertyMeandreJobSchedulerConfigTest {

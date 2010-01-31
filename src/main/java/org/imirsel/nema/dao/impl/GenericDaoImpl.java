@@ -1,5 +1,10 @@
 package org.imirsel.nema.dao.impl;
 
+import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
+import java.util.logging.Logger;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
@@ -7,18 +12,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Example;
-
 import org.imirsel.nema.dao.GenericDao;
-
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
-
-import java.io.Serializable;
-
-import java.lang.reflect.ParameterizedType;
-
-import java.util.List;
-import java.util.logging.Logger;
 
 
 /**
@@ -34,13 +30,15 @@ import java.util.logging.Logger;
  * </p>
  *
  * @author Christian Bauer
+ * @param <T> 
+ * @param <ID> 
  * @see HibernateDAOFactory
  */
 abstract public class GenericDaoImpl<T, ID extends Serializable>
       implements GenericDao<T, ID> {
 
-   private final Logger logger = Logger.getLogger(this.getClass().getName());
-   
+	private final Logger logger = Logger.getLogger(this.getClass().getName());
+	
    private final Class<T> persistentClass;
 
    private SessionFactory sessionFactory;

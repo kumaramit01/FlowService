@@ -24,6 +24,7 @@ public class JobStatusNotificationCreator implements JobStatusUpdateHandler {
 	
 	/**
 	 * Create a new instance with the specified {@link NotificationDao}.
+	 * @param daoFactory Sets the daoFactory
 	 * 
 	 * @param notificaitonDao The {@link NotificationDao} to use to store
 	 * {@link Notification}s persistently.

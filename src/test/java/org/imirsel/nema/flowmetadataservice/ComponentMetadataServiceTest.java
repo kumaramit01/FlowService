@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.annotatons.parser.beans.DataTypeBean;
@@ -13,11 +14,16 @@ import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Property;
 
-
+/**
+ * 
+ * @author kumaramit01
+ * @since 0.5.0
+ *
+ */
 public class ComponentMetadataServiceTest extends BaseManagerTestCase{
 	
-	private ComponentMetadataServiceImpl componentMetadataManager = new ComponentMetadataServiceImpl();
-	private MeandreServerProxy meandreServerProxy;
+	private final ComponentMetadataServiceImpl componentMetadataManager = new ComponentMetadataServiceImpl();
+	private final MeandreServerProxy meandreServerProxy;
 	
 	public ComponentMetadataServiceTest(){
 		String host ="128.174.154.145";
@@ -45,10 +51,10 @@ public class ComponentMetadataServiceTest extends BaseManagerTestCase{
 		component.setUri(componentUri);
 		Map<String, Property> map=componentMetadataManager.getComponentPropertyDataType(component, instanceUri);
 		System.out.println("--> here "+ map.size());
-		Iterator<String> its = map.keySet().iterator();
+		Iterator<Entry<String,Property>> its = map.entrySet().iterator();
 		while(its.hasNext()){
-			String key = its.next();
-			Property property = map.get(key);
+			Entry<String,Property> tmp = its.next();
+			Property property =tmp.getValue();
 			List<DataTypeBean> ltb = property.getDataTypeBeanList();
 			System.out.println(property.getName() + "  " + property.getDefaultValue());
 			 Iterator<DataTypeBean> itb = ltb.iterator();

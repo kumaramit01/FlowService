@@ -1,5 +1,7 @@
 package org.imirsel.nema.flowservice;
 
+import static org.junit.Assert.assertTrue;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -18,7 +20,7 @@ public class NemaFlowServiceClientTest {
 	public static void main(String[] args) {
 		ApplicationContext ctx  =  null;
 	    ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
-	    
 		FlowService flowService = (FlowService)ctx.getBean("flowService");
+		assertTrue(flowService!=null);
 	}
 }

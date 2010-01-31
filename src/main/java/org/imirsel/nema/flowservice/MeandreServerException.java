@@ -1,6 +1,5 @@
 package org.imirsel.nema.flowservice;
 
-import org.imirsel.meandre.client.TransmissionException;
 
 /**
  * Signals that a problem occurred while the server was performing some
@@ -40,7 +39,7 @@ public class MeandreServerException extends Exception {
 	 * 
 	 * @param exception wrap an external exception
 	 */
-	public MeandreServerException(Exception e) {
-		super(e);
+	public MeandreServerException(Exception exception) {
+		super(exception);
 	}
 }

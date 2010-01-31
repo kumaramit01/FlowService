@@ -8,20 +8,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.annotatons.parser.beans.DataTypeBean;
 import org.imirsel.nema.annotatons.parser.beans.StringDataTypeBean;
+import org.imirsel.nema.flowmetadataservice.ComponentMetadataService;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.model.Component;
-import org.imirsel.nema.model.Property;
 import org.imirsel.nema.model.NEMADataset;
+import org.imirsel.nema.model.Property;
 import org.imirsel.nema.renderers.CollectionRenderer;
 import org.imirsel.nema.repository.RepositoryClientConnectionPool;
 import org.imirsel.nema.repositoryservice.RepositoryClientInterface;
-import org.imirsel.nema.flowmetadataservice.ComponentMetadataService;
-
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.ExecutableComponentInstanceDescription;
 import org.meandre.core.repository.FlowDescription;
@@ -47,9 +47,9 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 	
 	private static final String DATATYPE_KEY="DATATYPE";
-	private static final Logger log = Logger.getLogger(ComponentMetadataService.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(ComponentMetadataService.class.getName());
 	private MeandreServerProxy meandreServerProxy;
-	private XStream xstream;
+	private final XStream xstream;
 	private RepositoryClientConnectionPool repositoryClientConnectionPool;
 	
     
@@ -93,7 +93,7 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 		
 	
 		if(ecd==null){
-			log.severe("component: " + component.getUri()+ " could not be found.");
+			LOGGER.severe("component: " + component.getUri()+ " could not be found.");
 			repositoryClientConnectionPool.returnToPool(rpi);
 			return null;
 		}
@@ -119,15 +119,16 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 			}else{
 				property.setValue(defaultValue);
 			}
-			property.setDefaultValue((Object)defaultValue);
+			property.setDefaultValue(defaultValue);
 			property.setDescription(description);
 			List<DataTypeBean> dataTypes = null;
 			if(!otherPropertyMap.isEmpty()){
-				Iterator<String> it1 = otherPropertyMap.keySet().iterator();
+				Iterator<Entry<String, String>> it1 = otherPropertyMap.entrySet().iterator();
 				while(it1.hasNext()){
-					String key = it1.next();
+					Entry<String, String> tmp = it1.next();
+					String key = tmp.getKey();
+					String value1 = tmp.getValue();
 					if(key.endsWith(propertyName+DATATYPE_KEY)){
-						String value1 =otherPropertyMap.get(key);
 						dataTypes = getDataTypeBeanFromJson(value1);
 						updatePropertyWithCollectionMetadata(property,dataTypes);
 						property.setDataTypeBeanList(dataTypes);
