@@ -40,10 +40,10 @@ public class EmailNotificationSender implements NotificationSender {
 
 	private SimpleMailMessage messageTemplate;
 
-	private Queue<Notification> mailQueue = new PriorityQueue<Notification>(16,
+	private final Queue<Notification> mailQueue = new PriorityQueue<Notification>(16,
 			new NotificationComparator());
 
-	private Lock mailQueueLock = new ReentrantLock();
+	private final Lock mailQueueLock = new ReentrantLock();
 
 	public EmailNotificationSender() {
 
@@ -75,7 +75,7 @@ public class EmailNotificationSender implements NotificationSender {
 		Session session = null;
 		List<Notification> unsent = null;
 		try {
-			dao.getSessionFactory().openSession();
+			session=dao.getSessionFactory().openSession();
 			dao.startManagedSession(session);
 			unsent = dao.getUnsentNotifications();
 			logger.warning("Successfully loaded unsent notifications.");
