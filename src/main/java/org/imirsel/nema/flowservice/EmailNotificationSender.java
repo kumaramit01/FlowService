@@ -25,6 +25,11 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 
+/**
+ * 
+ * @author shirk
+ * @since 0.5.0
+ */
 @ThreadSafe
 public class EmailNotificationSender implements NotificationSender {
 
@@ -128,7 +133,7 @@ public class EmailNotificationSender implements NotificationSender {
 					msg.setText(notification.getMessage());
 					try {
 						mailSender.send(msg);
-						logger.fine("Delivered notification to " + msg.getTo()
+						logger.fine("Delivered notification to " + msg.getTo()[0]
 								+ ".");
 						notification
 								.setDeliveryStatus(Notification.DeliveryStatus.SUCCESS);

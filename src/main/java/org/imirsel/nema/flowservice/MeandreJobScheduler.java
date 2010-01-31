@@ -34,7 +34,7 @@ import org.springframework.dao.DataAccessException;
  * Meandre servers.
  *
  * @author shirk
- * @since 1.0
+ * @since 0.4.0
  */
 @ThreadSafe
 public class MeandreJobScheduler implements JobScheduler {

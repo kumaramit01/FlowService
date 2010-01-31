@@ -9,6 +9,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Main class for the NEMA Flow Service.
  * 
  * @author shirk
+ * @since 0.4.0
  */
 public class FlowServiceApp {
 	private static final Logger logger = 
