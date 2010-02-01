@@ -7,10 +7,13 @@ import org.hibernate.criterion.Restrictions;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.model.Job;
 
+/**
+ * Hibernate-based implementation of a {@link Job} DAO.
+ * 
+ * @author shirk
+ * @since 0.4.0
+ */
 public class JobDaoImpl extends GenericDaoImpl<Job, Long>implements JobDao {
-
-	public JobDaoImpl() {
-	}
 
 	@Override
 	public List<Job> getJobsByOwnerId(long ownerId) {

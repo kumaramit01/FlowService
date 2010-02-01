@@ -30,8 +30,9 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
  * </p>
  *
  * @author Christian Bauer
- * @param <T> 
- * @param <ID> 
+ * @since 0.4.0
+ * @param <T> Type to be maintained by the DAO.
+ * @param <ID> The identity type.
  * @see HibernateDAOFactory
  */
 abstract public class GenericDaoImpl<T, ID extends Serializable>

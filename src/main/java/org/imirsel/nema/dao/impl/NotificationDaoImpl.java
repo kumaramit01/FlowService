@@ -7,10 +7,13 @@ import org.hibernate.criterion.Restrictions;
 import org.imirsel.nema.dao.NotificationDao;
 import org.imirsel.nema.model.Notification;
 
+/**
+ * Hibernate-based implementation of a {@link Notification} DAO.
+ * 
+ * @author shirk
+ * @since 0.4.0
+ */
 public class NotificationDaoImpl extends GenericDaoImpl<Notification, Long>implements NotificationDao {
-	
-	public NotificationDaoImpl() {
-	}
 
 	@Override
 	public List<Notification> getNotificationsByRecipientId(Long recipientId) {

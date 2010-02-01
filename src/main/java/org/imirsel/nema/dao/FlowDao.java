@@ -4,6 +4,12 @@ import java.util.List;
 
 import org.imirsel.nema.model.Flow;
 
+/**
+ * Interface for {@link Flow} Data Access Objects.
+ * 
+ * @author shirk
+ * @since 0.4.0
+ */
 public interface FlowDao extends GenericDao<Flow,Long>{
 
     /**
@@ -18,7 +24,7 @@ public interface FlowDao extends GenericDao<Flow,Long>{
     /**
      * Return the {@link Flow}s that are templates.
      * 
-     * @return List<Flow> List of flows
+     * @return A list of flows
      */
     public List<Flow> getFlowTemplates();
 

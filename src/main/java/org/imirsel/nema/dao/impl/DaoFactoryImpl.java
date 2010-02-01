@@ -7,10 +7,19 @@ import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.dao.JobResultDao;
 import org.imirsel.nema.dao.NotificationDao;
 
+/**
+ * Hibernate-based implementation of a Data Access Object factory.
+ * 
+ * @author shirk
+ * @since 0.4.0
+ */
 public class DaoFactoryImpl implements DaoFactory {
 
 	private SessionFactory sessionFactory;
 	
+	/**
+	 * @see DaoFactory#getFlowDao()
+	 */
 	@Override
 	public FlowDao getFlowDao() {
 		FlowDao flowDao = new FlowDaoImpl();
@@ -18,6 +27,9 @@ public class DaoFactoryImpl implements DaoFactory {
 		return flowDao;
 	}
 
+	/**
+    * @see DaoFactory#getJobDao()
+    */
 	@Override
 	public JobDao getJobDao() {
 		JobDao jobDao = new JobDaoImpl();
@@ -25,6 +37,9 @@ public class DaoFactoryImpl implements DaoFactory {
 		return jobDao;
 	}
 
+	/**
+    * @see DaoFactory#getJobResultDao()
+    */
 	@Override
 	public JobResultDao getJobResultDao() {
 		JobResultDao jobResultDao = new JobResultDaoImpl();
@@ -32,6 +47,9 @@ public class DaoFactoryImpl implements DaoFactory {
 		return jobResultDao;
 	}
 
+	/**
+    * @see DaoFactory#getNotificationDao()
+    */
 	@Override
 	public NotificationDao getNotificationDao() {
 		NotificationDao notificationDao = new NotificationDaoImpl();

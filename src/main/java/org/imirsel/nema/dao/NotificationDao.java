@@ -4,6 +4,12 @@ import java.util.List;
 
 import org.imirsel.nema.model.Notification;
 
+/**
+ * Interface for {@link Notification} Data Access Objects.
+ * 
+ * @author shirk
+ * @since 0.4.0
+ */
 public interface NotificationDao extends GenericDao<Notification, Long>{
 
     /**
