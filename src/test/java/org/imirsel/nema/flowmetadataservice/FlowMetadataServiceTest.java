@@ -2,16 +2,16 @@ package org.imirsel.nema.flowmetadataservice;
 
 import java.util.List;
 
-import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.flowmetadataservice.impl.FlowMetadataServiceImpl;
 import org.imirsel.nema.flowmetadataservice.impl.Repository;
+import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
+/**Tests for flowmetadataservice
  * 
  * @author kumaramit01
  * @since 0.5.0
@@ -44,13 +44,12 @@ public class FlowMetadataServiceTest{
 
 	
 	@Test
-	public void testGetComponents() throws TransmissionException{
+	public void testGetComponents() throws MeandreServerException{
 		String flowUri="http://test.org/datatypetest/";
 		List<Component>componentList=flowMetadataService.getComponents(flowUri);
 		for(int i=0;i< componentList.size();i++){
 			System.out.println("--> "+componentList.get(i).getInstanceUri());
 		}
-		//componentMetadataManager.getComponentPropertyDataType(componentId);
 	}
 	
 

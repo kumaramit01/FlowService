@@ -36,17 +36,12 @@ public class ComponentMetadataServiceTest{
 		String username ="admin";
 		int port = 11709;
 		int maxConcurrentJobs =1;
-		
 		MeandreServerProxyConfig config = new MeandreServerProxyConfig(
 				username,password,host,port,maxConcurrentJobs);
-		
 		meandreServerProxy = new MeandreServerProxy(config);
 		meandreServerProxy.init();
-		
 		repositoryClientConnectionPool = RepositoryClientConnectionPool.getInstance();
-		
 		componentMetadataManager.setMeandreServerProxy(meandreServerProxy);
-		
 		componentMetadataManager.setRepositoryClientConnectionPool(repositoryClientConnectionPool);
 	}
 	
@@ -54,12 +49,17 @@ public class ComponentMetadataServiceTest{
 
 	@Test
 	public void testGetComponentDataType() throws TransmissionException, SQLException{
-		String componentUri="meandre://seasr.org/components/datatypetestcomponent";
-		String instanceUri = "http://test.org/datatypetest/instance/datatypetestcomponent/1";
+		
+		
+		
+		String componentURI="meandre://seasr.org/components/testdatatypetestcomponent";
+		String instanceURI = "http://test.org/datatypetest/instance/testdatatypetestcomponent/0";
+		String flowURI = "http://test.org/datatypetest/";
 		Component component= new Component();
-		component.setInstanceUri(instanceUri);
-		component.setUri(componentUri);
-		Map<String, Property> map=componentMetadataManager.getComponentPropertyDataType(component, instanceUri);
+		component.setInstanceUri(instanceURI);
+		component.setUri(componentURI);
+		
+		Map<String, Property> map=componentMetadataManager.getComponentPropertyDataType(component, flowURI);
 		System.out.println("--> here "+ map.size());
 		Iterator<Entry<String,Property>> its = map.entrySet().iterator();
 		while(its.hasNext()){

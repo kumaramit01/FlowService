@@ -25,9 +25,7 @@ import org.imirsel.nema.model.Job;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
-import org.meandre.core.repository.RepositoryImpl;
 
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -84,7 +82,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 		this.meandreClient.setCredentials(meandreServerProxyConfig.getUsername(), meandreServerProxyConfig.getPassword());
 		cacheLock.lock();
 		try{
-		qrCached = new RepositoryImpl(ModelFactory.createDefaultModel());
+		this.qrCached = this.meandreClient.retrieveRepository();
 		}catch(Exception ex){
 			
 		}finally{

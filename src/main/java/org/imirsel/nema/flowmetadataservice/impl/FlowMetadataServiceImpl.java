@@ -52,9 +52,9 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 	 * @return List<Component> The list of components
 	 * @throws TransmissionException 
 	 */
-	public List<Component> getComponents(String flowUri) throws TransmissionException{
+	public List<Component> getComponents(String flowUri) throws MeandreServerException{
 		Map<String, FlowDescription> map=null;
-			map = meandreServerProxy.getAvailableFlowDescriptionsMap();
+		map = meandreServerProxy.getAvailableFlowDescriptionsMap();
 		if(map==null){
 			LOGGER.severe("Could not find components for the flowUri: "+ flowUri);
 			return null;

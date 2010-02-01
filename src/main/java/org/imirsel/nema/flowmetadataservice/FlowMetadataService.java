@@ -3,7 +3,6 @@ package org.imirsel.nema.flowmetadataservice;
 import java.util.HashMap;
 import java.util.List;
 
-import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.model.Component;
 
@@ -18,9 +17,9 @@ public interface FlowMetadataService {
 	 * 
 	 * @param flowUrl
 	 * @return List<Component> List of the Components
-	 * @throws TransmissionException 
+	 * @throws MeandreServerException 
 	 */
-	public List<Component> getComponents(String flowUrl) throws TransmissionException;
+	public List<Component> getComponents(String flowUrl) throws  MeandreServerException;
 
 	/**Returns the uri of the new flow this would create after
 	 * merging the flowUri and the parameterMap
@@ -29,7 +28,6 @@ public interface FlowMetadataService {
 	 * @param flowUri
 	 * @return URI The flow URI
 	 * @throws MeandreServerException 
-	 * @throws MeandreCommunicationException 
 	 * @throws CorruptedFlowException 
 	 */
 	public String createNewFlow(final HashMap<String, String> paramMap, String flowUri) throws MeandreServerException, CorruptedFlowException;
@@ -46,7 +44,6 @@ public interface FlowMetadataService {
 	 * 
 	 * @param URI
 	 * @return console The string 
-	 * @throws TransmissionException
 	 * @throws MeandreServerException 
 	 */
 	public String getConsole(String URI) throws  MeandreServerException;
