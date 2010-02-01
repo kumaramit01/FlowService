@@ -46,7 +46,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public class MeandreServerProxy implements JobStatusUpdateHandler { 
 
 	private static final Logger logger = 
-		Logger.getLogger(MeandreServerProxy.class.getName());
+	Logger.getLogger(MeandreServerProxy.class.getName());
 
 	private MeandreServerProxyConfig meandreServerProxyConfig = null;
 	private ComponentMetadataService componentMetadataService;
@@ -62,7 +62,8 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	private JobStatusMonitor jobStatusMonitor;
 	private MeandreClient meandreClient;
 
-	
+	/**A fair semaphore to control access to the cached query repository**/
+	private final Lock cacheLock = new ReentrantLock(true);
 	/** Cached repository */
 	private QueryableRepository qrCached;
 
@@ -77,11 +78,18 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	}
 
 	@PostConstruct
-	public void init() {
+	public void init(){
 		this.meandreClient = new MeandreClient(meandreServerProxyConfig.getHost(),meandreServerProxyConfig.getPort());
 		this.meandreClient.setLogger(logger);
 		this.meandreClient.setCredentials(meandreServerProxyConfig.getUsername(), meandreServerProxyConfig.getPassword());
+		cacheLock.lock();
+		try{
 		qrCached = new RepositoryImpl(ModelFactory.createDefaultModel());
+		}catch(Exception ex){
+			
+		}finally{
+			cacheLock.unlock();
+		}
 	}
 
 	public MeandreClient getMeandreClient() {
@@ -244,12 +252,14 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	 * Removes the flow resource pointed by uri
 	 * @param uri 
 	 * @return success
+	 * @throws MeandreServerException 
 	 */
-	public boolean removeResource(String uri) {
+	public boolean removeResource(String uri) throws MeandreServerException {
 		boolean success=Boolean.FALSE;
 		try {
 			success=this.meandreClient.removeResource(uri);
 		} catch (TransmissionException e) {
+			throw new MeandreServerException("Could not remove" + uri +"--"+e.getMessage());
 		}
 		flushRepository();
 		return success;
@@ -262,10 +272,6 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	 * @return The cached queryable repository 
 	 */
 	public QueryableRepository getRepository() {
-		try{
-			this.qrCached = this.meandreClient.retrieveRepository();
-		}catch(TransmissionException e){
-		}
 		return this.qrCached;
 	}
 	
@@ -275,18 +281,41 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	 * @return Map<String,FlowDescription> The Map of String and FlowDescription 
 	 */
 	public Map<String, FlowDescription> getAvailableFlowDescriptionsMap() {
-		QueryableRepository qp= getRepository();
-		Map<String, FlowDescription> map=qp.getAvailableFlowDescriptionsMap();
+		cacheLock.lock();
+		Map<String, FlowDescription> map=null;
+		try{
+			QueryableRepository qp= getRepository();
+			map=qp.getAvailableFlowDescriptionsMap();
+		}catch(Exception ex){
+		}finally{
+			cacheLock.unlock();
+		}
 		return map;
 	}
 
 
 	/** Flushes the cached repository.
+	 * @return success true/false
+	 * @throws MeandreServerException 
 	 * 
 	 */
-	public void flushRepository () {
+	public boolean flushRepository () throws MeandreServerException {
+		cacheLock.lock();
+		boolean success=false;
 		qrCached = null;
-		getRepository();
+		try{
+			if(this.meandreClient==null){
+				return false;
+			}
+			this.qrCached = this.meandreClient.retrieveRepository();
+			success=true;
+		}catch(Exception e){
+			success=false;
+			throw new MeandreServerException(e);
+		}finally{
+			cacheLock.unlock();
+		}
+		return success;
 	}
 
 	/**
@@ -294,26 +323,43 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	 * @return Set<Resource> The set of resource
 	 */
 	public Set<Resource> getAvailableFlows() {
+		cacheLock.lock();
+		Set<Resource> resources=null;
+		try{
 		QueryableRepository qp = this.getRepository();
-		Set<Resource> resources=qp.getAvailableFlows();
+		resources=qp.getAvailableFlows();
+		}catch(Exception ex){
+		}finally{
+			cacheLock.unlock();
+		}
 		return resources;
 	}
 
 
 	public ExecutableComponentDescription getExecutableComponentDescription(
 			Resource flowResource) {
+		cacheLock.lock();
+		ExecutableComponentDescription ecd=null;
+		try{
 		QueryableRepository qp = this.getRepository();
-		ExecutableComponentDescription ecd=qp.getExecutableComponentDescription(flowResource);
+		ecd=qp.getExecutableComponentDescription(flowResource);
+		}catch(Exception ex){
+		}finally{
+		cacheLock.unlock();
+		}
 		return ecd;
 	}
 	
 
 	public Set<URI> retrieveFlowUris() throws MeandreServerException {
+		cacheLock.lock();
 		Set<URI> set=null;
 		try {
-			this.meandreClient.retrieveFlowUris();
+			set=this.meandreClient.retrieveFlowUris();
 		} catch (TransmissionException e) {
 			throw new MeandreServerException(e);
+		}finally{
+			cacheLock.unlock();
 		}
 		
 		return set;
@@ -321,30 +367,43 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 
 
 	public FlowDescription getFlowDescription(Resource flowResource) {
+		cacheLock.lock();
+		FlowDescription fd=null;
+		try{
 		QueryableRepository qp = this.getRepository();
-		FlowDescription fd=qp.getFlowDescription(flowResource);
+		fd=qp.getFlowDescription(flowResource);
+		}catch(Exception ex){
+		}finally{
+		cacheLock.unlock();
+		}
 		return fd;
 	}
 
 
 	public ExecutableComponentDescription retrieveComponentDescriptor(
 			String componentURI) throws MeandreServerException {
+		cacheLock.lock();
 		ExecutableComponentDescription ecd=null;
 		try {
 			ecd=this.meandreClient.retrieveComponentDescriptor(componentURI);
 		} catch (TransmissionException e) {
 			throw new MeandreServerException(e);
+		}finally{
+		cacheLock.unlock();
 		}
 		return ecd;
 	}
 
 	
 	public FlowDescription retrieveFlowDescriptor(String flowURL) throws MeandreServerException {
+		cacheLock.lock();
 		FlowDescription fd=null;
 		 try {
 			fd= this.meandreClient.retrieveFlowDescriptor(flowURL);
 		} catch (TransmissionException e) {
 			throw new MeandreServerException(e);
+		}finally{
+			cacheLock.unlock();
 		}
 		return fd;
 	}
@@ -354,11 +413,14 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	}
 
 	public Set<URI> retrieveComponentUris() throws MeandreServerException {
+		cacheLock.lock();
 		Set<URI> set=null;
 		try {
 			set=this.meandreClient.retrieveComponentUris();
 		} catch (TransmissionException e) {
 			throw new MeandreServerException(e);
+		}finally{
+			cacheLock.unlock();
 		}
 		return set;
 	}

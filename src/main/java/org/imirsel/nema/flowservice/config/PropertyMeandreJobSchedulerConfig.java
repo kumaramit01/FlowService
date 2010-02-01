@@ -18,7 +18,7 @@ import org.springframework.core.io.Resource;
  * A {@link MeandreJobSchedulerConfig} intended to work in concert with a
  * Spring configuration file to inject the requisite properties.
  *
- * @author amitku
+ * @author kumaramit01
  * @since 0.5.0
  * 
  */
@@ -28,7 +28,7 @@ public class PropertyMeandreJobSchedulerConfig implements
 	private JobStatusMonitor jobStatusMonitor;
 	private Properties properties;
 	private MeandreServerProxy head;
-	private Set<MeandreServerProxy> proxySet = new HashSet<MeandreServerProxy>();
+	private final Set<MeandreServerProxy> proxySet = new HashSet<MeandreServerProxy>();
 	
 	public PropertyMeandreJobSchedulerConfig(){
 	

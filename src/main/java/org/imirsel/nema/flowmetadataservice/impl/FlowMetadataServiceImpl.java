@@ -151,10 +151,11 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 	
 	
 	/**This method removes a flow from meandre
+	 * @throws MeandreServerException 
 	 * 
 	 * @returns success
 	 */
-	public boolean removeFlow(String uri){
+	public boolean removeFlow(String uri) throws MeandreServerException{
 		boolean result=this.meandreServerProxy.removeResource(uri);
 		return result;
 	}

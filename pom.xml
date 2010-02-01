@@ -325,7 +325,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-			<mail.server>express-smtp.cites.uiuc.edu</mail.server>
+				<mail.server>express-smtp.cites.uiuc.edu</mail.server>
 			</properties>
 		</profile>
 		<profile>

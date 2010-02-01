@@ -1,9 +1,12 @@
 package org.imirsel.nema.flowmetadataservice.impl;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Set;
 
+import org.imirsel.nema.client.beans.repository.WBExecutableComponentDescription;
+import org.imirsel.nema.client.beans.repository.WBFlowDescription;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
@@ -11,6 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 /**
+ * Tests repository functions
  * 
  * @author kumaramit01
  * @since 0.5.0
@@ -40,47 +44,70 @@ public class RepositoryTest {
 
 	@Test
 	public void testRetrieveComponentUrls() {
+		Set<String> sets=null;
 		try {
-			Set<String> sets=repository.retrieveComponentUrls();
+			sets=repository.retrieveComponentUrls();
 		} catch (MeandreServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		assertTrue(sets!=null);
+		for(String val:sets){
+			System.out.println(val);
 		}
 	}
 
 	@Test
 	public void testRetrieveComponentDescriptor() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testRetrieveComponentDescriptors() {
-		fail("Not yet implemented");
+		String componentURI="meandre://seasr.org/components/input";
+		try {
+			WBExecutableComponentDescription ecd=repository.retrieveComponentDescriptor(componentURI);
+			assertTrue(ecd!=null);
+			assertTrue(ecd.getName().length()>0);
+		} catch (MeandreServerException e) {
+			fail(e.getMessage());
+		}
+		
 	}
 
 	@Test
 	public void testRetrieveFlowUrls() {
-		fail("Not yet implemented");
+		Set<String> flowURI=null;
+		try {
+			flowURI=this.repository.retrieveFlowUrls();
+		} catch (MeandreServerException e) {
+			fail(e.getMessage());
+		}
+		assertTrue(flowURI!=null);
+		
+		for(String uri:flowURI){
+			System.out.println(uri);
+		}
 	}
 
 	@Test
 	public void testRetrieveFlowDescriptor() {
-		fail("Not yet implemented");
+		String flowURI="http://test.org/datatypetest/";
+		try {
+			WBFlowDescription wfd=this.repository.retrieveFlowDescriptor(flowURI);
+			assertTrue(wfd!=null);
+		} catch (MeandreServerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	@Test
 	public void testRetrieveFlowDescriptors() {
-		fail("Not yet implemented");
+		try {
+			Set<WBFlowDescription> list=this.repository.retrieveFlowDescriptors();
+			assertTrue(list!=null);
+			assertTrue(list.size()>0);
+		} catch (MeandreServerException e) {
+			fail(e.getMessage());
+		}
 	}
 
-	@Test
-	public void testUploadFlow() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testRemoveResource() {
-		fail("Not yet implemented");
-	}
 
 }
