@@ -41,8 +41,8 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
  * along with the datatype information for the various component properties
  * that make the flow.
  * 
- * @author Amit Kumar
- *
+ * @author kumaramit01
+ * @since 0.5.0
  */
 public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 	

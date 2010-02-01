@@ -130,7 +130,7 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 	/**This method takes parameter map with custom properties that
 	 * the user has set based on a template flow and creates
 	 * a new flow.
-	 *  Returns the uri of the new flow.
+	 * @returns URI of the new flow.
 	 * @throws CorruptedFlowException 
 	 * @throws MeandreCommunicationException 
 	 * @throws CorruptedFlowException 
@@ -149,8 +149,10 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 	   return flowDesc.getFlowURI();
 	}
 	
+	
 	/**This method removes a flow from meandre
 	 * 
+	 * @returns success
 	 */
 	public boolean removeFlow(String uri){
 		boolean result=this.meandreServerProxy.removeResource(uri);

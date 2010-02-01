@@ -10,19 +10,19 @@ import org.imirsel.nema.model.Property;
 /** Returns the component metadata
  * 
  * @author kumaramit01
- *
+ * @since 0.5.0
  */
 public interface ComponentMetadataService{
 	
 	/**Returns the component property data types
 	 * 
 	 * @param component
-	 * @param flowUri 
+	 * @param flowURI the URI identifying the flow
 	 * @return HashMap of component properties and data type
 	 * @throws TransmissionException 
 	 * @throws SQLException 
 	 */
-	public Map<String,Property> getComponentPropertyDataType(final Component component, String flowUri) throws TransmissionException, SQLException;
+	public Map<String,Property> getComponentPropertyDataType(final Component component, String flowURI) throws TransmissionException, SQLException;
 	
 	
 }

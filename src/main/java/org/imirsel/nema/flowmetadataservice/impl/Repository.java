@@ -63,6 +63,7 @@ import com.hp.hpl.jena.rdf.model.Model;
  * Encapsulates the Flow Repository for a {@link MeandreServerProxy}
  * 
  * @author kumaramit01
+ * @since 0.5.0
  *
  */
 public class Repository {
@@ -70,6 +71,8 @@ public class Repository {
 	public MeandreServerProxy meandreServerProxy;
 
 
+
+	// Converts URI to string
 	private static final IBeanConverter<URI, String> UriStringConverter =
 		new IBeanConverter<URI, String>() {
 		public String convert(URI url) {
@@ -78,12 +81,11 @@ public class Repository {
 	};
 
 
-
 	public MeandreServerProxy getMeandreServerProxy() {
 		return meandreServerProxy;
 	}
 
-	public void setMeandreProxyWrapper(MeandreServerProxy meandreServerProxy) {
+	public void setMeandreServerProxy(MeandreServerProxy meandreServerProxy) {
 		this.meandreServerProxy = meandreServerProxy;
 	}
 
@@ -113,7 +115,6 @@ public class Repository {
 
 	public Set<String> retrieveFlowUrls()
 	throws  MeandreServerException {
-
 		return MeandreConverter.convert(getMeandreServerProxy().retrieveFlowUris(), UriStringConverter);
 	}
 
@@ -179,8 +180,8 @@ public class Repository {
 					new CorruptedFlowException(execStepMsg, e) : (CorruptedFlowException) e;
 			throw corruptedFlowException;
 		}
-		getMeandreServerProxy().uploadFlow(flow, overwrite);
-		return true;
+		boolean success=getMeandreServerProxy().uploadFlow(flow, overwrite);
+		return success;
 	}
 
 

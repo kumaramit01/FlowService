@@ -16,6 +16,8 @@ import net.jcip.annotations.ThreadSafe;
 import org.imirsel.meandre.client.ExecResponse;
 import org.imirsel.meandre.client.MeandreClient;
 import org.imirsel.meandre.client.TransmissionException;
+import org.imirsel.nema.flowmetadataservice.ComponentMetadataService;
+import org.imirsel.nema.flowmetadataservice.FlowMetadataService;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
 import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
@@ -47,6 +49,9 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 		Logger.getLogger(MeandreServerProxy.class.getName());
 
 	private MeandreServerProxyConfig meandreServerProxyConfig = null;
+	private ComponentMetadataService componentMetadataService;
+	private FlowMetadataService flowMetadataService;
+
 
 	private final Set<Job> runningJobs = new HashSet<Job>(8);
 	private final Lock runningLock = new ReentrantLock();
@@ -57,19 +62,13 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	private JobStatusMonitor jobStatusMonitor;
 	private MeandreClient meandreClient;
 
-	/** Cached roles */
-	private Set<String> mapRoles;
-
+	
 	/** Cached repository */
 	private QueryableRepository qrCached;
 
 
 	public MeandreServerProxy(MeandreServerProxyConfig config) {
 		this.meandreServerProxyConfig = config;
-		this.meandreClient = new MeandreClient(config.getHost(),config.getPort());
-		this.meandreClient.setLogger(logger);
-		this.meandreClient.setCredentials(config.getUsername(), config.getPassword());
-		qrCached = new RepositoryImpl(ModelFactory.createDefaultModel());
 	}
 
 	@SuppressWarnings("unused")
@@ -82,7 +81,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 		this.meandreClient = new MeandreClient(meandreServerProxyConfig.getHost(),meandreServerProxyConfig.getPort());
 		this.meandreClient.setLogger(logger);
 		this.meandreClient.setCredentials(meandreServerProxyConfig.getUsername(), meandreServerProxyConfig.getPassword());
-
+		qrCached = new RepositoryImpl(ModelFactory.createDefaultModel());
 	}
 
 	public MeandreClient getMeandreClient() {
@@ -270,32 +269,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 		return this.qrCached;
 	}
 	
-	/**
-	 * Returns the list of Flows available as resource
-	 * @return Set<Resource> The set of resource
-	 */
-	public Set<Resource> getAvailableFlows() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	
-
-	public ExecutableComponentDescription getExecutableComponentDescription(
-			Resource createResource) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-
-	public FlowDescription getFlowDescription(Resource createResource) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	
+		
 	/**
 	 * 
 	 * @return Map<String,FlowDescription> The Map of String and FlowDescription 
@@ -315,53 +289,109 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 		getRepository();
 	}
 
-	/** Return the roles for the user of this proxy.
-	 * 
-	 * @return The set of granted role for the proxy user
+	/**
+	 * Returns the list of Flows available as resource
+	 * @return Set<Resource> The set of resource
 	 */
-	private Set<String> getRoles() {
-		if ( mapRoles==null ) {
-			try{
-				//Set<String> roles = this.client.retrieveUserRoles();
-				this.mapRoles=this.meandreClient.retrieveUserRoles();
-			}catch(TransmissionException e){
-			}           
-		}
-		return mapRoles;
+	public Set<Resource> getAvailableFlows() {
+		QueryableRepository qp = this.getRepository();
+		Set<Resource> resources=qp.getAvailableFlows();
+		return resources;
+	}
+
+
+	public ExecutableComponentDescription getExecutableComponentDescription(
+			Resource flowResource) {
+		QueryableRepository qp = this.getRepository();
+		ExecutableComponentDescription ecd=qp.getExecutableComponentDescription(flowResource);
+		return ecd;
 	}
 	
 
-	public ExecutableComponentDescription retrieveComponentDescriptor(
-			String componentURL) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Set<URI> retrieveFlowUris() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public FlowDescription retrieveFlowDescriptor(String flowURL) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void uploadFlow(FlowDescription flow, boolean overwrite) {
-		// TODO Auto-generated method stub
+	public Set<URI> retrieveFlowUris() throws MeandreServerException {
+		Set<URI> set=null;
+		try {
+			this.meandreClient.retrieveFlowUris();
+		} catch (TransmissionException e) {
+			throw new MeandreServerException(e);
+		}
 		
-	}
-
-	public Set<URI> retrieveComponentUris() {
-		// TODO Auto-generated method stub
-		return null;
+		return set;
 	}
 
 
+	public FlowDescription getFlowDescription(Resource flowResource) {
+		QueryableRepository qp = this.getRepository();
+		FlowDescription fd=qp.getFlowDescription(flowResource);
+		return fd;
+	}
 
 
+	public ExecutableComponentDescription retrieveComponentDescriptor(
+			String componentURI) throws MeandreServerException {
+		ExecutableComponentDescription ecd=null;
+		try {
+			ecd=this.meandreClient.retrieveComponentDescriptor(componentURI);
+		} catch (TransmissionException e) {
+			throw new MeandreServerException(e);
+		}
+		return ecd;
+	}
+
+	
+	public FlowDescription retrieveFlowDescriptor(String flowURL) throws MeandreServerException {
+		FlowDescription fd=null;
+		 try {
+			fd= this.meandreClient.retrieveFlowDescriptor(flowURL);
+		} catch (TransmissionException e) {
+			throw new MeandreServerException(e);
+		}
+		return fd;
+	}
+
+	public boolean uploadFlow(FlowDescription flow, boolean overwrite) {
+		return false;
+	}
+
+	public Set<URI> retrieveComponentUris() throws MeandreServerException {
+		Set<URI> set=null;
+		try {
+			set=this.meandreClient.retrieveComponentUris();
+		} catch (TransmissionException e) {
+			throw new MeandreServerException(e);
+		}
+		return set;
+	}
 
 
+	/**
+	 * @return the componentMetadataService
+	 */
+	public ComponentMetadataService getComponentMetadataService() {
+		return componentMetadataService;
+	}
+
+	/**
+	 * @param componentMetadataService the componentMetadataService to set
+	 */
+	public void setComponentMetadataService(
+			ComponentMetadataService componentMetadataService) {
+		this.componentMetadataService = componentMetadataService;
+	}
+
+	/**
+	 * @return the flowMetadataService
+	 */
+	public FlowMetadataService getFlowMetadataService() {
+		return flowMetadataService;
+	}
+
+	/**
+	 * @param flowMetadataService the flowMetadataService to set
+	 */
+	public void setFlowMetadataService(FlowMetadataService flowMetadataService) {
+		this.flowMetadataService = flowMetadataService;
+	}
 
 	@Override
 	public int hashCode() {

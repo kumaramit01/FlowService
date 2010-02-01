@@ -13,6 +13,9 @@ import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Property;
+import org.imirsel.nema.repository.RepositoryClientConnectionPool;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * 
@@ -20,16 +23,18 @@ import org.imirsel.nema.model.Property;
  * @since 0.5.0
  *
  */
-public class ComponentMetadataServiceTest extends BaseManagerTestCase{
+public class ComponentMetadataServiceTest{
 	
 	private final ComponentMetadataServiceImpl componentMetadataManager = new ComponentMetadataServiceImpl();
-	private final MeandreServerProxy meandreServerProxy;
+	private MeandreServerProxy meandreServerProxy;
+	private RepositoryClientConnectionPool repositoryClientConnectionPool;
 	
-	public ComponentMetadataServiceTest(){
-		String host ="128.174.154.145";
+	@Before
+	public void setup(){
+		String host ="nema.lis.uiuc.edu";
 		String password = "admin";
 		String username ="admin";
-		int port = 1714;
+		int port = 11709;
 		int maxConcurrentJobs =1;
 		
 		MeandreServerProxyConfig config = new MeandreServerProxyConfig(
@@ -37,12 +42,17 @@ public class ComponentMetadataServiceTest extends BaseManagerTestCase{
 		
 		meandreServerProxy = new MeandreServerProxy(config);
 		meandreServerProxy.init();
+		
+		repositoryClientConnectionPool = RepositoryClientConnectionPool.getInstance();
+		
 		componentMetadataManager.setMeandreServerProxy(meandreServerProxy);
+		
+		componentMetadataManager.setRepositoryClientConnectionPool(repositoryClientConnectionPool);
 	}
 	
 
 
-	
+	@Test
 	public void testGetComponentDataType() throws TransmissionException, SQLException{
 		String componentUri="meandre://seasr.org/components/datatypetestcomponent";
 		String instanceUri = "http://test.org/datatypetest/instance/datatypetestcomponent/1";
