@@ -69,12 +69,8 @@ public class FlowMetadataServiceTest{
 			assertTrue(fileName.length()>0);
 		} catch (MeandreServerException e) {
 			fail(e.getMessage());
-		} catch (CorruptedFlowException e) {
-			fail(e.getMessage());
 		}
 		System.out.println("filename is: " + fileName);
-		//http://test.org/datatypetest/instance/datatypetestcomponent/0
-		 //meandre://seasr.org/components/testdatatypetestcomponent
 	}
 	
 

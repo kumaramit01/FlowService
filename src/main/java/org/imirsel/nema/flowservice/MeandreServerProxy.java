@@ -406,10 +406,6 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 		return fd;
 	}
 
-	public boolean uploadFlow(FlowDescription flow, boolean overwrite) {
-		return false;
-	}
-
 	public Set<URI> retrieveComponentUris() throws MeandreServerException {
 		cacheLock.lock();
 		Set<URI> set=null;

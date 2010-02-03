@@ -30,7 +30,7 @@ public interface FlowMetadataService {
 	 * @throws MeandreServerException 
 	 * @throws CorruptedFlowException 
 	 */
-	public String createNewFlow(final HashMap<String, String> paramMap, String flowUri) throws MeandreServerException, CorruptedFlowException;
+	public String createNewFlow(final HashMap<String, String> paramMap, String flowUri) throws MeandreServerException;
 	
 	/** Removes the flow
 	 * 

@@ -1,9 +1,12 @@
 package org.imirsel.nema.flowservice;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Property;
@@ -30,31 +33,66 @@ public class MeandreFlowStore {
 		return meandreJobSchedulerConfig;
 	}
 
-	 
-	public List<Component> getComponents(String url) {
-		// TODO Auto-generated method stub
-		return null;
+	/**Returns list of flow components
+	 *  
+	 * @param flowURI
+	 * @return list of components
+	 * @throws MeandreServerException 
+	 */
+	public List<Component> getComponents(String flowURI) throws MeandreServerException {
+		return this.getMeandreJobSchedulerConfig().getHead().getFlowMetadataService().getComponents(flowURI);
 	}
 
-	public String getConsole(String uri) {
-		// TODO Auto-generated method stub
-		return null;
+	/** Returns console as string
+	 * 
+	 * @param URI
+	 * @return the console as string
+	 * @throws MeandreServerException 
+	 */
+	public String getConsole(String URI) throws MeandreServerException {
+		return this.getMeandreJobSchedulerConfig().getHead().getFlowMetadataService().getConsole(URI);
 	}
 
-	public boolean removeFlow(String url) {
-		// TODO Auto-generated method stub
-		return false;
+	/**Removes the flow
+	 * 
+	 * @param URI
+	 * @return the success true/false
+	 * @throws MeandreServerException
+	 */
+	public boolean removeFlow(String URI) throws MeandreServerException {
+		return this.getMeandreJobSchedulerConfig().getHead().getFlowMetadataService().removeFlow(URI);
 	}
 
-	public String createNewFlow(HashMap<String, String> paramMap, String flowURI) {
-		// TODO Auto-generated method stub
-		return null;
+	/** Returns the new flow
+	 * 
+	 * @param paramMap
+	 * @param flowURI
+	 * @return the file path to the flow in the nt format
+ 	 * @throws MeandreServerException
+	 * @throws CorruptedFlowException
+	 */
+	public String createNewFlow(HashMap<String, String> paramMap, String flowURI) throws MeandreServerException {
+		return this.getMeandreJobSchedulerConfig().getHead().
+		getFlowMetadataService().createNewFlow(paramMap, flowURI);
 	}
 
-	public HashMap<String, Property> getComponentPropertyDataType(
-			Component component, String url) {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * 
+	 * @param component
+	 * @param flowURI
+	 * @return The Map of Component property names and the data types
+	 * @throws MeandreServerException
+	 */
+	public Map<String, Property> getComponentPropertyDataType(
+			Component component, String flowURI) throws MeandreServerException {
+		try {
+			return this.getMeandreJobSchedulerConfig().getHead().getComponentMetadataService().getComponentPropertyDataType(component, flowURI);
+		} catch (TransmissionException e) {
+			throw new MeandreServerException(e.getMessage());
+		} catch (SQLException e) {
+			throw new MeandreServerException(e.getMessage());
+		}
+		
 	}
 	 
 		

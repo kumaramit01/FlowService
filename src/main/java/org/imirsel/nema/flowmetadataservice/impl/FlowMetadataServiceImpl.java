@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 
 import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.client.beans.repository.WBFlowDescription;
-import org.imirsel.nema.flowmetadataservice.CorruptedFlowException;
 import org.imirsel.nema.flowmetadataservice.FlowMetadataService;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
@@ -110,7 +109,7 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 	 * @throws MeandreCommunicationException 
 	 * @throws CorruptedFlowException 
 	 */
-	public synchronized String createNewFlow(HashMap<String, String> paramMap,  String flowUri) throws MeandreServerException, CorruptedFlowException {
+	public synchronized String createNewFlow(HashMap<String, String> paramMap,  String flowUri) throws MeandreServerException{
 		WBFlowDescription flowDesc=this.getRepository().retrieveFlowDescriptor(flowUri);
 		String name = flowDesc.getName();
 		name = name + System.currentTimeMillis();

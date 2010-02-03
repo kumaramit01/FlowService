@@ -3,6 +3,7 @@ package org.imirsel.nema.flowservice;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -193,29 +194,29 @@ public class NemaFlowService implements FlowService {
 
 
 	@Override
-	public String createNewFlow(HashMap<String, String> paramMap, String flowURI) {
+	public String createNewFlow(HashMap<String, String> paramMap, String flowURI) throws MeandreServerException{
 		return this.getMeandreFlowStore().createNewFlow(paramMap, flowURI);
 	}
 
 	@Override
-	public HashMap<String, Property> getComponentPropertyDataType(
-			Component component, String url) {
+	public Map<String, Property> getComponentPropertyDataType(
+			Component component, String url) throws MeandreServerException {
 		return  this.getMeandreFlowStore().getComponentPropertyDataType(component, url);
 	}
 
 	@Override
-	public List<Component> getComponents(String url) {
+	public List<Component> getComponents(String url) throws MeandreServerException {
 		return  this.getMeandreFlowStore().getComponents(url);
 	}
 
 	@Override
-	public String getConsole(String uri) {
+	public String getConsole(String uri) throws MeandreServerException {
 		return this.getMeandreFlowStore().getConsole(uri);
 	}
 
 	@Override
-	public boolean removeFlow(String url) {
-		return this.getMeandreFlowStore().removeFlow(url);
+	public boolean removeFlow(String URI) throws MeandreServerException {
+		return this.getMeandreFlowStore().removeFlow(URI);
 	}
 	
 	/**

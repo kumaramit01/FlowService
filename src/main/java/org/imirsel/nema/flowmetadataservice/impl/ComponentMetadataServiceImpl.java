@@ -85,8 +85,6 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 
 	public Map<String, Property> getComponentPropertyDataType(Component component, String flowUri) throws TransmissionException, SQLException {
 		RepositoryClientInterface rpi=this.getRepositoryClient();
-		//List<NEMADataset> nemaDatasets = rpi.getDatasets();
-		//QueryableRepository qp= meandreServerProxy.getRepository();
 		Model model =getEmptyModel();
 		ExecutableComponentDescription ecd=meandreServerProxy.getExecutableComponentDescription(model.createResource(component.getUri()));//qp.getExecutableComponentDescription(model.createResource(component.getUri()));
 		FlowDescription fd= meandreServerProxy.getFlowDescription(model.createResource(flowUri));//qp.getFlowDescription(model.createResource(flowUri));

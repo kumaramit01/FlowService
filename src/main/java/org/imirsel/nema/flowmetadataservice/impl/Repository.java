@@ -52,7 +52,6 @@ import org.imirsel.nema.client.beans.converters.IBeanConverter;
 import org.imirsel.nema.client.beans.converters.MeandreConverter;
 import org.imirsel.nema.client.beans.repository.WBExecutableComponentDescription;
 import org.imirsel.nema.client.beans.repository.WBFlowDescription;
-import org.imirsel.nema.flowmetadataservice.CorruptedFlowException;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.meandre.core.repository.FlowDescription;
@@ -144,7 +143,7 @@ public class Repository {
 	 * @throws CorruptedFlowException
 	 */
 	public String saveFlow(WBFlowDescription wbFlow)
-	throws  MeandreServerException, CorruptedFlowException {
+	throws  MeandreServerException {
 		FlowDescription flow = MeandreConverter.WBFlowDescriptionConverter.convert(wbFlow);
 		String flowURI = flow.getFlowComponent().getURI();
 		logger.info("Saving flow " + flowURI);
@@ -178,12 +177,12 @@ public class Repository {
 			execStepMsg = "STEP3: Getting flow";
 			flow = flows.iterator().next();
 			if (flow == null)
-				throw new CorruptedFlowException("The flow obtained is null!");
+				throw new MeandreServerException("The flow obtained is null!");
 		}
 		catch (Exception e) {
-			CorruptedFlowException corruptedFlowException = (execStepMsg != null) ?
-					new CorruptedFlowException(execStepMsg, e) : (CorruptedFlowException) e;
-			throw corruptedFlowException;
+			MeandreServerException mException = (execStepMsg != null) ?
+					new MeandreServerException(execStepMsg, e) : (MeandreServerException) e;
+			throw mException;
 		}finally{
 			
 				try {
