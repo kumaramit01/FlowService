@@ -155,7 +155,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 		runningLock.lock();
 		try {
 			assert meandreClient!=null:"Meandre client null";
-			meandreClient.runAsyncFlow(job.getFlow().getUrl(), job.getToken(), probes);
+			meandreClient.runAsyncModel(job.getFlow().getUrl(), job.getToken(), probes);
 			response = meandreClient.getFlowExecutionInstanceId(job.getToken());
 
 			logger.fine("Job " + job.getId() +

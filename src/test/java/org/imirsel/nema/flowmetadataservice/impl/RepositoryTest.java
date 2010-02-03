@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.imirsel.nema.client.beans.repository.WBExecutableComponentDescription;
 import org.imirsel.nema.client.beans.repository.WBFlowDescription;
+import org.imirsel.nema.flowmetadataservice.BaseManagerTestCase;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
@@ -19,9 +20,12 @@ import org.junit.Test;
  * @author kumaramit01
  * @since 0.5.0
  */
-public class RepositoryTest {
+public class RepositoryTest extends BaseManagerTestCase {
 	private MeandreServerProxy meandreServerProxy;
 	private Repository repository;
+
+
+	
 
 	@Before
 	public void setUp() throws Exception {
@@ -38,6 +42,7 @@ public class RepositoryTest {
 		repository.setMeandreServerProxy(meandreServerProxy);
 	}
 
+	
 	@After
 	public void tearDown() throws Exception {
 	}

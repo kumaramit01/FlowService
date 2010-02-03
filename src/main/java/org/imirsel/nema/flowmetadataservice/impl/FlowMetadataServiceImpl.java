@@ -20,8 +20,6 @@ import org.imirsel.nema.model.Component;
 import org.meandre.core.repository.ExecutableComponentInstanceDescription;
 import org.meandre.core.repository.FlowDescription;
 
-import com.hp.hpl.jena.rdf.model.Resource;
-
 
 /**This class encapsulated all the flow related services and provides
  * an injectable implementation of the FlowMetadataService to the flow service
@@ -104,29 +102,6 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 		return false;
 	}
 	
-	private String[] getFlowUriList() throws TransmissionException{
-		Set<Resource> resources = meandreServerProxy.getAvailableFlows();
-		
-		if(resources==null){
-			LOGGER.warning("Did not find any flow resources.");
-			return null;
-		}
-		LOGGER.info("Number of flows found: " + resources.size());
-		int size = resources.size();
-		if(size==0){
-			return null;
-		}
-		String[] flowList = new String[size];
-		int count=0;
-		Iterator<Resource> itr=resources.iterator();
-		while(itr.hasNext()){
-			Resource resource=itr.next();
-			flowList[count]= resource.getURI();
-			count++;
-		}
-		return flowList;
-	}
-
 	/**This method takes parameter map with custom properties that
 	 * the user has set based on a template flow and creates
 	 * a new flow.
@@ -144,9 +119,9 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 		flowDesc.setRights("owned by user");
 		flowDesc.setCreationDate(new Date());
 		flowDesc.updateParameters(flowUri,paramMap);
-        boolean uploadSuccess=this.repository.uploadFlow(flowDesc, false);
-        LOGGER.info("upload was "+ uploadSuccess);
-	   return flowDesc.getFlowURI();
+        String fileLocation=this.repository.saveFlow(flowDesc);
+        LOGGER.info("file Location:  "+ fileLocation);
+        return fileLocation;//flowDesc.getFlowURI();
 	}
 	
 	

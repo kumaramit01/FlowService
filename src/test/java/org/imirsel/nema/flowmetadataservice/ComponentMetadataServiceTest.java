@@ -49,9 +49,6 @@ public class ComponentMetadataServiceTest{
 
 	@Test
 	public void testGetComponentDataType() throws TransmissionException, SQLException{
-		
-		
-		
 		String componentURI="meandre://seasr.org/components/testdatatypetestcomponent";
 		String instanceURI = "http://test.org/datatypetest/instance/testdatatypetestcomponent/0";
 		String flowURI = "http://test.org/datatypetest/";
@@ -67,11 +64,12 @@ public class ComponentMetadataServiceTest{
 			Property property =tmp.getValue();
 			List<DataTypeBean> ltb = property.getDataTypeBeanList();
 			System.out.println(property.getName() + "  " + property.getDefaultValue());
-			 Iterator<DataTypeBean> itb = ltb.iterator();
+			Iterator<DataTypeBean> itb = ltb.iterator();
 			while(itb.hasNext()){
 				DataTypeBean dt = itb.next();
 				System.out.println("class Name:"+ dt.getClass().getName());
 				System.out.println("Renderer: "+dt.getRenderer());
+				
 			}
 			System.out.println("---------------------");
 		}
