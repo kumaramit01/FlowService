@@ -73,7 +73,7 @@ public class PropertyMeandreJobSchedulerConfig implements
 		
 		SimpleMeandreServerProxyConfig configuration = new SimpleMeandreServerProxyConfig(
 				headUsername,headPassword,headServer,headServerPort, headMaxCurrentJobs);
-		head = new MeandreServerProxy(configuration);
+		head = new MeandreServerProxy((MeandreServerProxyConfig)configuration);
 		head.setJobStatusMonitor(jobStatusMonitor);
 		head.init();
 		
@@ -102,7 +102,7 @@ public class PropertyMeandreJobSchedulerConfig implements
 					int maxConcurrentJob = Integer.parseInt(maxConcurrentJobList[count]);
 					String username = usernameList[count];
 					String password = passwordList[count];
-					MeandreServerProxyConfig config = new 
+					SimpleMeandreServerProxyConfig config = new 
 					SimpleMeandreServerProxyConfig(username,password,host,port,maxConcurrentJob);
 					MeandreServerProxy proxy = new MeandreServerProxy(config);
 					proxy.setJobStatusMonitor(jobStatusMonitor);
