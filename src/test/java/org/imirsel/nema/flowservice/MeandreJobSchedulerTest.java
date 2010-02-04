@@ -4,7 +4,6 @@ package org.imirsel.nema.flowservice;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.junit.After;
 import org.junit.AfterClass;

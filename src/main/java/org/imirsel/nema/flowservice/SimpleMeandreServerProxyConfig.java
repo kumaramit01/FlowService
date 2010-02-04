@@ -1,19 +1,24 @@
 package org.imirsel.nema.flowservice;
 
-public class MeandreServerProxyConfig {
+import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
+
+public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig{
 	private String host;
 	private int port;
 	private int maxConcurrentJobs;
 	private String username;
 	private String password;
 
-	public MeandreServerProxyConfig(int maxConcurrentJobs, String username,
+	public SimpleMeandreServerProxyConfig(int maxConcurrentJobs, String username,
 			String password) {
 		this.maxConcurrentJobs = maxConcurrentJobs;
 		this.username = username;
 		this.password = password;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.imirsel.nema.flowservice.MeandreServerProxyConfig#getHost()
+	 */
 	public String getHost() {
 		return host;
 	}
@@ -22,6 +27,9 @@ public class MeandreServerProxyConfig {
 		this.host = host;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.imirsel.nema.flowservice.MeandreServerProxyConfig#getPort()
+	 */
 	public int getPort() {
 		return port;
 	}
@@ -30,6 +38,9 @@ public class MeandreServerProxyConfig {
 		this.port = port;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.imirsel.nema.flowservice.MeandreServerProxyConfig#getMaxConcurrentJobs()
+	 */
 	public int getMaxConcurrentJobs() {
 		return maxConcurrentJobs;
 	}
@@ -38,6 +49,9 @@ public class MeandreServerProxyConfig {
 		this.maxConcurrentJobs = maxConcurrentJobs;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.imirsel.nema.flowservice.MeandreServerProxyConfig#getUsername()
+	 */
 	public String getUsername() {
 		return username;
 	}

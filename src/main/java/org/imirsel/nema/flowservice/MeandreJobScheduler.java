@@ -23,7 +23,6 @@ import org.hibernate.Transaction;
 import org.imirsel.meandre.client.ExecResponse;
 import org.imirsel.nema.dao.DaoFactory;
 import org.imirsel.nema.dao.JobDao;
-import org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.Job.JobStatus;
 import org.springframework.dao.DataAccessException;

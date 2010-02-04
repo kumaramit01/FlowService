@@ -45,9 +45,7 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 	
 	/**For the given flowUrl return the list of components urls that make the flow.
 	 * 
-	 * @param flowUrl
 	 * @return List<Component> The list of components
-	 * @throws TransmissionException 
 	 */
 	public List<Component> getComponents(String flowUri) throws MeandreServerException{
 		Map<String, FlowDescription> map=null;
@@ -105,9 +103,6 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 	 * the user has set based on a template flow and creates
 	 * a new flow.
 	 * @returns URI of the new flow.
-	 * @throws CorruptedFlowException 
-	 * @throws MeandreCommunicationException 
-	 * @throws CorruptedFlowException 
 	 */
 	public synchronized String createNewFlow(HashMap<String, String> paramMap,  String flowUri) throws MeandreServerException{
 		WBFlowDescription flowDesc=this.getRepository().retrieveFlowDescriptor(flowUri);

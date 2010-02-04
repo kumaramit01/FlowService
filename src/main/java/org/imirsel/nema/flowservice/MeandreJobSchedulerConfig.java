@@ -1,9 +1,7 @@
-package org.imirsel.nema.flowservice.config;
+package org.imirsel.nema.flowservice;
 
 import java.util.Set;
 
-import org.imirsel.nema.flowservice.MeandreJobScheduler;
-import org.imirsel.nema.flowservice.MeandreServerProxy;
 
 /**
  * Configuration instructions for a {@link MeandreJobScheduler}.

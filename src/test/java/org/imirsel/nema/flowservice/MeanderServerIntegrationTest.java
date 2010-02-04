@@ -9,11 +9,9 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.context.ManagedSessionContext;
 import org.imirsel.nema.dao.impl.FlowDaoImpl;
 import org.imirsel.nema.dao.impl.JobDaoImpl;
+import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.model.Flow;
 import org.imirsel.nema.model.Job;
-import org.imirsel.nema.flowservice.MeandreServerException;
-import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
-import org.imirsel.util.FlowTypeUtils;
 
 public class MeanderServerIntegrationTest {
 
@@ -25,7 +23,7 @@ public class MeanderServerIntegrationTest {
 	    .addAnnotatedClass(org.imirsel.nema.model.JobResult.class)
 	    .addAnnotatedClass(org.imirsel.nema.model.Job.class)
 	    .addAnnotatedClass(org.imirsel.nema.model.Flow.class)
-	    .setProperty("hibernate.connection.url", "jdbc:mysql://128.174.154.145:3306/flowservice?autoReconnect=true")
+	    .setProperty("hibernate.connection.url", "jdbc:mysql://nema.lis.uiuc.edu:3306/flowservice?autoReconnect=true")
 	    .setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
 	    .setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver")
 	    .setProperty("hibernate.connection.username", "nema_user")
@@ -42,10 +40,10 @@ public class MeanderServerIntegrationTest {
 	}
 	
 	public static void main(String[] args) throws MeandreServerException {
-		String host ="128.174.154.145";
+		String host ="nema.lis.uiuc.edu";
 		String password = "admin";
 		String username ="admin";
-		int port = 1714;
+		int port = 11709;
 		int maxConcurrentJobs =1;
 		
 		MeandreServerProxyConfig config = new MeandreServerProxyConfig(

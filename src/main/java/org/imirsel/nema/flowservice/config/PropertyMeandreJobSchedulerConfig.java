@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.imirsel.nema.flowservice.MeandreJobSchedulerConfig;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
 import org.springframework.core.io.ClassPathResource;

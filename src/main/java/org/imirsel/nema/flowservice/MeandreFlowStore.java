@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.imirsel.meandre.client.TransmissionException;
-import org.imirsel.nema.flowservice.config.MeandreJobSchedulerConfig;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Property;
 
