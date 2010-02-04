@@ -103,7 +103,7 @@ public class PropertyMeandreJobSchedulerConfig implements
 					String username = usernameList[count];
 					String password = passwordList[count];
 					MeandreServerProxyConfig config = new 
-					MeandreServerProxyConfig(username,password,host,port,maxConcurrentJob);
+					SimpleMeandreServerProxyConfig(username,password,host,port,maxConcurrentJob);
 					MeandreServerProxy proxy = new MeandreServerProxy(config);
 					proxy.setJobStatusMonitor(jobStatusMonitor);
 					proxy.init();
