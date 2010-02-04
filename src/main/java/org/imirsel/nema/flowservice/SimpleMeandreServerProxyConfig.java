@@ -9,11 +9,14 @@ public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig{
 	private String username;
 	private String password;
 
-	public SimpleMeandreServerProxyConfig(int maxConcurrentJobs, String username,
-			String password) {
+	public SimpleMeandreServerProxyConfig(String username,String password, String host,
+			int port, int maxConcurrentJobs) {
+		this.host = host;
 		this.maxConcurrentJobs = maxConcurrentJobs;
 		this.username = username;
 		this.password = password;
+		this.port = port;
+		this.maxConcurrentJobs = maxConcurrentJobs;
 	}
 
 	/* (non-Javadoc)

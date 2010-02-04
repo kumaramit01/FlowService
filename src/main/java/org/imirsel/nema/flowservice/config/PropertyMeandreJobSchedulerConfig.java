@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 
 import org.imirsel.nema.flowservice.MeandreJobSchedulerConfig;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
+import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -70,7 +71,7 @@ public class PropertyMeandreJobSchedulerConfig implements
 		int headServerPort = Integer.parseInt(_headServerPort);
 		int headMaxCurrentJobs= Integer.parseInt(_headMaxCurrentJobs);
 		
-		MeandreServerProxyConfig configuration = new MeandreServerProxyConfig(
+		SimpleMeandreServerProxyConfig configuration = new SimpleMeandreServerProxyConfig(
 				headUsername,headPassword,headServer,headServerPort, headMaxCurrentJobs);
 		head = new MeandreServerProxy(configuration);
 		head.setJobStatusMonitor(jobStatusMonitor);
