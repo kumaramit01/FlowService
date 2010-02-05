@@ -40,7 +40,7 @@ public class PropertyMeandreJobSchedulerConfigTest {
 		} catch (MeandreServerProxyConfigException e) {
 			fail(e.getMessage());
 		}
-		assertEquals(pmc.getHead().getMeandreServerProxyConfig().getHost().equalsIgnoreCase("nema.lis.uiuc.edu"),true);
+		assertEquals(pmc.getHead().getMeandreServerProxyConfig().getHost().equalsIgnoreCase("128.174.154.145"),true);
 	}
 
 	/**

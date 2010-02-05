@@ -117,6 +117,7 @@ public class PropertyMeandreJobSchedulerConfig implements
 					String password = passwordList[count];
 					SimpleMeandreServerProxyConfig config = new 
 					SimpleMeandreServerProxyConfig(username,password,host,port,maxConcurrentJob);
+					System.out.println("Server: " + config.getHost() +":"+ config.getPort());
 					MeandreServerProxy proxy = new MeandreServerProxy(config);
 					proxy.setJobStatusMonitor(jobStatusMonitor);
 					proxy.init();
