@@ -117,6 +117,7 @@ public class MeandreJobScheduler implements JobScheduler {
     */
    @PostConstruct
    public void init() {
+	  System.out.println("CAME HERE IN INIT...");
 	  assert config!=null:"No configuration was provided to the job scheduler.";
       workers = config.getServers();
       for (MeandreServerProxy server : workers) {
