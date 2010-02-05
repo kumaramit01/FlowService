@@ -10,6 +10,7 @@ import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.annotatons.parser.beans.DataTypeBean;
 import org.imirsel.nema.flowmetadataservice.impl.ComponentMetadataServiceImpl;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
+import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Property;
@@ -36,7 +37,7 @@ public class ComponentMetadataServiceTest{
 		String username ="admin";
 		int port = 11709;
 		int maxConcurrentJobs =1;
-		MeandreServerProxyConfig config = new MeandreServerProxyConfig(
+		SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
 				username,password,host,port,maxConcurrentJobs);
 		meandreServerProxy = new MeandreServerProxy(config);
 		meandreServerProxy.init();

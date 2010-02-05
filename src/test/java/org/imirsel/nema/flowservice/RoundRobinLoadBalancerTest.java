@@ -40,14 +40,14 @@ public class RoundRobinLoadBalancerTest {
       int maxConcurrentJobs =1;
 
       MeandreServerProxyConfig config = new 
-      MeandreServerProxyConfig(username,password,host,port,maxConcurrentJobs);
+      SimpleMeandreServerProxyConfig(username,password,host,port,maxConcurrentJobs);
 
       MeandreServerProxyConfig config1 = new 
-      MeandreServerProxyConfig(username,password,host1,port,maxConcurrentJobs);
+      SimpleMeandreServerProxyConfig(username,password,host1,port,maxConcurrentJobs);
       MeandreServerProxyConfig config2 = new 
-      MeandreServerProxyConfig(username,password,host2,port,maxConcurrentJobs);
+      SimpleMeandreServerProxyConfig(username,password,host2,port,maxConcurrentJobs);
       MeandreServerProxyConfig config3 = new 
-      MeandreServerProxyConfig(username,password,host3,port,maxConcurrentJobs);
+      SimpleMeandreServerProxyConfig(username,password,host3,port,maxConcurrentJobs);
 
 		
       

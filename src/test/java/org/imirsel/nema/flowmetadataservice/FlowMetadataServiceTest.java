@@ -10,6 +10,7 @@ import org.imirsel.nema.flowmetadataservice.impl.FlowMetadataServiceImpl;
 import org.imirsel.nema.flowmetadataservice.impl.Repository;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
+import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
 import org.junit.Before;
@@ -34,7 +35,7 @@ public class FlowMetadataServiceTest{
 		String username ="admin";
 		int port = 11709;
 		int maxConcurrentJobs =1;
-		MeandreServerProxyConfig config = new MeandreServerProxyConfig(
+		SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
 				username,password,host,port,maxConcurrentJobs);
 		meandreServerProxy = new MeandreServerProxy(config);
 		meandreServerProxy.init();

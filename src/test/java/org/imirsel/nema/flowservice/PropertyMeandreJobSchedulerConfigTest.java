@@ -9,7 +9,6 @@ import static org.junit.Assert.fail;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfigException;
 import org.imirsel.nema.flowservice.config.PropertyMeandreJobSchedulerConfig;
 import org.junit.Test;
-
 /**
  * @author kumaramit01
  * @since 0.5.0

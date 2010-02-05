@@ -10,6 +10,7 @@ import org.imirsel.nema.client.beans.repository.WBFlowDescription;
 import org.imirsel.nema.flowmetadataservice.BaseManagerTestCase;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
+import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.junit.After;
 import org.junit.Before;
@@ -34,7 +35,7 @@ public class RepositoryTest extends BaseManagerTestCase {
 		String username ="admin";
 		int port = 11709;
 		int maxConcurrentJobs =1;
-		MeandreServerProxyConfig config = new MeandreServerProxyConfig(
+		SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
 				username,password,host,port,maxConcurrentJobs);
 		meandreServerProxy = new MeandreServerProxy(config);
 		meandreServerProxy.init();

@@ -46,7 +46,7 @@ public class MeanderServerIntegrationTest {
 		int port = 11709;
 		int maxConcurrentJobs =1;
 		
-		MeandreServerProxyConfig config = new MeandreServerProxyConfig(
+		SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
 				username,password,host,port,maxConcurrentJobs);
 				
         MeandreServerProxy server = new MeandreServerProxy(config);
