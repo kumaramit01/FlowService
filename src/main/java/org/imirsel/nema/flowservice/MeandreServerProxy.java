@@ -13,15 +13,20 @@ import javax.annotation.PostConstruct;
 
 import net.jcip.annotations.ThreadSafe;
 
+
 import org.imirsel.meandre.client.ExecResponse;
 import org.imirsel.meandre.client.MeandreClient;
 import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.flowmetadataservice.ComponentMetadataService;
 import org.imirsel.nema.flowmetadataservice.FlowMetadataService;
+import org.imirsel.nema.flowmetadataservice.impl.ComponentMetadataServiceImpl;
+import org.imirsel.nema.flowmetadataservice.impl.FlowMetadataServiceImpl;
+import org.imirsel.nema.flowmetadataservice.impl.Repository;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
 import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
 import org.imirsel.nema.model.Job;
+import org.imirsel.nema.repository.RepositoryClientConnectionPool;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
@@ -47,8 +52,10 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	Logger.getLogger(MeandreServerProxy.class.getName());
 
 	private MeandreServerProxyConfig meandreServerProxyConfig = null;
-	private ComponentMetadataService componentMetadataService;
-	private FlowMetadataService flowMetadataService;
+	private ComponentMetadataServiceImpl componentMetadataService = null;
+	private FlowMetadataServiceImpl flowMetadataService = null;
+	private RepositoryClientConnectionPool repositoryClientConnectionPool = null;
+	private Repository repository = null;
 
 
 	private final Set<Job> runningJobs = new HashSet<Job>(8);
@@ -88,6 +95,15 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 		}finally{
 			cacheLock.unlock();
 		}
+		repository = new Repository();
+		repository.setMeandreServerProxy(this);
+		componentMetadataService = new ComponentMetadataServiceImpl();
+		componentMetadataService.setMeandreServerProxy(this);
+		componentMetadataService.setRepositoryClientConnectionPool(repositoryClientConnectionPool);
+		flowMetadataService = new FlowMetadataServiceImpl();
+		flowMetadataService.setMeandreServerProxy(this);
+		flowMetadataService.setRepository(repository);
+		
 	}
 
 	public MeandreClient getMeandreClient() {
@@ -427,13 +443,6 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 		return componentMetadataService;
 	}
 
-	/**
-	 * @param componentMetadataService the componentMetadataService to set
-	 */
-	public void setComponentMetadataService(
-			ComponentMetadataService componentMetadataService) {
-		this.componentMetadataService = componentMetadataService;
-	}
 
 	/**
 	 * @return the flowMetadataService
@@ -442,11 +451,15 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 		return flowMetadataService;
 	}
 
-	/**
-	 * @param flowMetadataService the flowMetadataService to set
-	 */
-	public void setFlowMetadataService(FlowMetadataService flowMetadataService) {
-		this.flowMetadataService = flowMetadataService;
+
+
+	public RepositoryClientConnectionPool getRepositoryClientConnectionPool() {
+		return repositoryClientConnectionPool;
+	}
+
+	public void setRepositoryClientConnectionPool(
+			RepositoryClientConnectionPool repositoryClientConnectionPool) {
+		this.repositoryClientConnectionPool = repositoryClientConnectionPool;
 	}
 
 	@Override

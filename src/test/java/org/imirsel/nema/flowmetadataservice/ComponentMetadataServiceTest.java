@@ -11,7 +11,6 @@ import org.imirsel.nema.annotatons.parser.beans.DataTypeBean;
 import org.imirsel.nema.flowmetadataservice.impl.ComponentMetadataServiceImpl;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
-import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Property;
 import org.imirsel.nema.repository.RepositoryClientConnectionPool;
@@ -33,8 +32,8 @@ public class ComponentMetadataServiceTest{
 	@Before
 	public void setup(){
 		String host ="nema.lis.uiuc.edu";
-		String password = "admin";
-		String username ="admin";
+		String password="admin";
+		String username="admin";
 		int port = 11709;
 		int maxConcurrentJobs =1;
 		SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(

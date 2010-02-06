@@ -12,6 +12,7 @@ import org.imirsel.nema.flowservice.MeandreJobSchedulerConfig;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
+import org.imirsel.nema.repository.RepositoryClientConnectionPool;
 import org.springframework.core.io.ClassPathResource;
 
 
@@ -27,6 +28,8 @@ public class PropertyMeandreJobSchedulerConfig implements
 		MeandreJobSchedulerConfig {
 	
 	private JobStatusMonitor jobStatusMonitor;
+	private RepositoryClientConnectionPool repositoryClientConnectionPool;
+	
 	private Properties properties;
 	private MeandreServerProxy head;
 	private final Set<MeandreServerProxy> proxySet = new HashSet<MeandreServerProxy>();
@@ -120,6 +123,7 @@ public class PropertyMeandreJobSchedulerConfig implements
 					System.out.println("Server: " + config.getHost() +":"+ config.getPort());
 					MeandreServerProxy proxy = new MeandreServerProxy(config);
 					proxy.setJobStatusMonitor(jobStatusMonitor);
+					proxy.setRepositoryClientConnectionPool(repositoryClientConnectionPool);
 					proxy.init();
 					proxySet.add(proxy);
 					count++;
@@ -154,5 +158,15 @@ public class PropertyMeandreJobSchedulerConfig implements
 	public void setJobStatusMonitor(JobStatusMonitor jobStatusMonitor) {
 		this.jobStatusMonitor = jobStatusMonitor;
 	}
+
+	public RepositoryClientConnectionPool getRepositoryClientConnectionPool() {
+		return repositoryClientConnectionPool;
+	}
+
+	public void setRepositoryClientConnectionPool(
+			RepositoryClientConnectionPool repositoryClientConnectionPool) {
+		this.repositoryClientConnectionPool = repositoryClientConnectionPool;
+	}
+
 
 }

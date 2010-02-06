@@ -130,9 +130,19 @@
 		<property name="meandreJobSchedulerConfig" ref="jobSchedulerConfig" />
 	</bean>
 
+	<bean id="repositoryClientConnectionPool" class="org.imirsel.nema.repository.RepositoryClientConnectionPool">
+        </bean>
+
+
+
+	<bean id="meandreFlowStore" class="org.imirsel.nema.flowservice.MeandreFlowStore">
+		<property name="meandreJobSchedulerConfig" ref="jobSchedulerConfig"/>
+	</bean>
+	
 	<bean id="flowService" class="org.imirsel.nema.flowservice.NemaFlowService">
 		<property name="jobScheduler" ref="jobScheduler" />
 		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
+		<property name="meandreFlowStore" ref="meandreFlowStore"/>
 		<property name="daoFactory" ref="daoFactory" />
 		<property name="notificationSender" ref="notificationSender"/>
 	</bean>
