@@ -37,6 +37,8 @@ import com.hp.hpl.jena.vocabulary.XSD;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
+import org.junit.Assert;
+
 /**This service implementation provides component metadata definition
  * along with the datatype information for the various component properties
  * that make the flow.
@@ -60,6 +62,7 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 
 
 	public RepositoryClientInterface getRepositoryClient() {
+		Assert.assertTrue(repositoryClientConnectionPool != null);
 		return repositoryClientConnectionPool.getFromPool();
 	}
 
@@ -68,6 +71,7 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 
 
 	public void setMeandreServerProxy(MeandreServerProxy meandreServerProxy) {
+		Assert.assertTrue(meandreServerProxy != null);
 		this.meandreServerProxy = meandreServerProxy;
 	}
 
@@ -79,6 +83,7 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 
 	public void setRepositoryClientConnectionPool(
 			RepositoryClientConnectionPool repositoryClientConnectionPool) {
+			Assert.assertTrue(repositoryClientConnectionPool != null);
 		this.repositoryClientConnectionPool = repositoryClientConnectionPool;
 	}
 

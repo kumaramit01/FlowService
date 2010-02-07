@@ -91,6 +91,7 @@ public class PropertyMeandreJobSchedulerConfig implements
 				headUsername,headPassword,headServer,headServerPort, headMaxCurrentJobs);
 		head = new MeandreServerProxy((MeandreServerProxyConfig)configuration);
 		head.setJobStatusMonitor(jobStatusMonitor);
+		head.setRepositoryClientConnectionPool(repositoryClientConnectionPool);
 		head.init();
 		
 		
