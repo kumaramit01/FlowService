@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.imirsel.meandre.client.TransmissionException;
-import org.imirsel.nema.annotatons.parser.beans.DataTypeBean;
+import org.imirsel.nema.annotations.parser.beans.DataTypeBean;
 import org.imirsel.nema.flowmetadataservice.impl.ComponentMetadataServiceImpl;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;

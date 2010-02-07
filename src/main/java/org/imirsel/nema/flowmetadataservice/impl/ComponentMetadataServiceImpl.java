@@ -12,8 +12,8 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.imirsel.meandre.client.TransmissionException;
-import org.imirsel.nema.annotatons.parser.beans.DataTypeBean;
-import org.imirsel.nema.annotatons.parser.beans.StringDataTypeBean;
+import org.imirsel.nema.annotations.parser.beans.DataTypeBean;
+import org.imirsel.nema.annotations.parser.beans.StringDataTypeBean;
 import org.imirsel.nema.flowmetadataservice.ComponentMetadataService;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.model.Component;
@@ -36,8 +36,6 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
-
-import org.junit.Assert;
 
 /**This service implementation provides component metadata definition
  * along with the datatype information for the various component properties
@@ -62,7 +60,6 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 
 
 	public RepositoryClientInterface getRepositoryClient() {
-		Assert.assertTrue(repositoryClientConnectionPool != null);
 		return repositoryClientConnectionPool.getFromPool();
 	}
 
@@ -71,7 +68,6 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 
 
 	public void setMeandreServerProxy(MeandreServerProxy meandreServerProxy) {
-		Assert.assertTrue(meandreServerProxy != null);
 		this.meandreServerProxy = meandreServerProxy;
 	}
 
@@ -83,7 +79,6 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 
 	public void setRepositoryClientConnectionPool(
 			RepositoryClientConnectionPool repositoryClientConnectionPool) {
-			Assert.assertTrue(repositoryClientConnectionPool != null);
 		this.repositoryClientConnectionPool = repositoryClientConnectionPool;
 	}
 
