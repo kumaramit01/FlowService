@@ -34,6 +34,7 @@ public class NemaFlowServiceTest {
 				e.printStackTrace();
 			}
 			
+			
 			flowService.executeJob(UUID.randomUUID().toString(), 
 					"Test: " + new Date().toString(), "Test job " + i, 
 					1, 1L, "shirk@uiuc.edu");
