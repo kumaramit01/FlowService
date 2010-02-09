@@ -10,8 +10,7 @@ import org.imirsel.nema.flowservice.MeandreServerProxy;
  * Spring configuration file to inject the requisite properties.
  * 
  * @author shirk
- * @since 1.0
- *
+ * @since 0.4.0
  */
 public class SimpleMeandreJobSchedulerConfig implements
 		MeandreJobSchedulerConfig {
