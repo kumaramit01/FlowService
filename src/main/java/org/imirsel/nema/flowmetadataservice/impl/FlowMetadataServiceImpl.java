@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.client.beans.repository.WBFlowDescription;
 import org.imirsel.nema.flowmetadataservice.FlowMetadataService;
 import org.imirsel.nema.flowservice.MeandreServerException;
@@ -45,19 +44,20 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 	
 	/**For the given flowUrl return the list of components urls that make the flow.
 	 * 
-	 * @return List<Component> The list of components
+	 * @return List of {@Component} The list of components
+	 * @throws {@MeandreServerException}
 	 */
 	public List<Component> getComponents(String flowUri) throws MeandreServerException{
 		Map<String, FlowDescription> map=null;
 		map = meandreServerProxy.getAvailableFlowDescriptionsMap();
 		if(map==null){
 			LOGGER.severe("Could not find components for the flowUri: "+ flowUri);
-			return null;
+			throw new MeandreServerException("Could not find components for the flowUri: "+ flowUri);
 		}
 		FlowDescription fdesc = map.get(flowUri);
 		if(fdesc==null){
 			LOGGER.severe("Could not find components for the flowUri: "+ flowUri);
-			return null;
+			throw new MeandreServerException("Could not find components for the flowUri: "+ flowUri);
 		}
 		Set<ExecutableComponentInstanceDescription> se = fdesc.getExecutableComponentInstances();
 		ArrayList<Component> list = new ArrayList<Component>(se.size());
@@ -104,7 +104,7 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 	 * a new flow.
 	 * @returns URI of the new flow.
 	 */
-	public synchronized String createNewFlow(HashMap<String, String> paramMap,  String flowUri) throws MeandreServerException{
+	public synchronized String createNewFlow(HashMap<String, String> paramMap,  String flowUri, long userId) throws MeandreServerException{
 		WBFlowDescription flowDesc=this.getRepository().retrieveFlowDescriptor(flowUri);
 		String name = flowDesc.getName();
 		name = name + System.currentTimeMillis();
@@ -113,7 +113,7 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 		flowDesc.setRights("owned by user");
 		flowDesc.setCreationDate(new Date());
 		flowDesc.updateParameters(flowUri,paramMap);
-        String fileLocation=this.repository.saveFlow(flowDesc);
+        String fileLocation=this.repository.saveFlow(flowDesc, userId);
         LOGGER.info("file Location:  "+ fileLocation);
         return fileLocation;//flowDesc.getFlowURI();
 	}

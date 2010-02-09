@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.imirsel.meandre.client.TransmissionException;
+import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Property;
 
@@ -21,8 +22,9 @@ public interface ComponentMetadataService{
 	 * @return HashMap of component properties and data type
 	 * @throws TransmissionException 
 	 * @throws SQLException 
+	 * @throws MeandreServerException 
 	 */
-	public Map<String,Property> getComponentPropertyDataType(final Component component, String flowURI) throws TransmissionException, SQLException;
+	public Map<String,Property> getComponentPropertyDataType(final Component component, String flowURI) throws TransmissionException, SQLException, MeandreServerException;
 	
 	
 }

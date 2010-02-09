@@ -96,6 +96,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 			cacheLock.unlock();
 		}
 		repository = new Repository();
+		repository.init();
 		repository.setMeandreServerProxy(this);
 		componentMetadataService = new ComponentMetadataServiceImpl();
 		componentMetadataService.setMeandreServerProxy(this);

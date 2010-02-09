@@ -194,8 +194,8 @@ public class NemaFlowService implements FlowService {
 
 
 	@Override
-	public String createNewFlow(HashMap<String, String> paramMap, String flowURI) throws MeandreServerException{
-		return this.getMeandreFlowStore().createNewFlow(paramMap, flowURI);
+	public String createNewFlow(HashMap<String, String> paramMap, String flowURI, long userId) throws MeandreServerException{
+		return this.getMeandreFlowStore().createNewFlow(paramMap, flowURI, userId);
 	}
 
 	@Override

@@ -26,11 +26,12 @@ public interface FlowMetadataService {
 	 * 
 	 * @param paramMap
 	 * @param flowUri
+	 * @param userId 
 	 * @return URI The flow URI
 	 * @throws MeandreServerException 
 	 * @throws CorruptedFlowException 
 	 */
-	public String createNewFlow(final HashMap<String, String> paramMap, String flowUri) throws MeandreServerException;
+	public String createNewFlow(final HashMap<String, String> paramMap, String flowUri, long userId) throws MeandreServerException;
 	
 	/** Removes the flow
 	 * 

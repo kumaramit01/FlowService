@@ -42,11 +42,15 @@
 
 package org.imirsel.nema.flowmetadataservice.impl;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import javax.annotation.PostConstruct;
 
 import org.imirsel.nema.client.beans.converters.IBeanConverter;
 import org.imirsel.nema.client.beans.converters.MeandreConverter;
@@ -57,6 +61,7 @@ import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
+import org.springframework.core.io.ClassPathResource;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
@@ -71,6 +76,42 @@ public class Repository {
 
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 	public MeandreServerProxy meandreServerProxy;
+	private String repositoryLocation;
+	
+	@PostConstruct
+	public void init() {
+		ClassPathResource resource = new ClassPathResource("flowrepository.properties");
+		if(resource!=null){
+			Properties properties = new Properties();
+			try {
+				properties.load(resource.getInputStream());
+				setRepositoryLocation(properties.getProperty("flowresource.location","repository"));
+			} catch (IOException e) {
+				logger.warning("flowrepository.properties file not found -using the default properties");
+				setRepositoryLocation("repository");
+			}
+		}else{
+			logger.warning("fowrepository.properties file not found -using the default properties");
+			setRepositoryLocation("repository");
+		}
+		File file = new File(this.getRepositoryLocation());
+		if(!file.exists()){
+			boolean success=file.mkdirs();
+			if(!success){
+				throw new RuntimeException("Could not create flow repository location " + file.getAbsolutePath());
+			}
+		}
+	}
+
+	
+
+	public void setRepositoryLocation(String repositoryLocation) {
+		this.repositoryLocation = repositoryLocation;
+	}
+
+	public String getRepositoryLocation() {
+		return repositoryLocation;
+	}
 
 
 
@@ -138,11 +179,12 @@ public class Repository {
 	 * Returns the file path to the new flow
 	 * 
 	 * @param wbFlow
+	 * @param userId 
 	 * @return File Path to the new flow
 	 * @throws MeandreServerException
 	 * @throws CorruptedFlowException
 	 */
-	public String saveFlow(WBFlowDescription wbFlow)
+	public String saveFlow(WBFlowDescription wbFlow, long userId)
 	throws  MeandreServerException {
 		FlowDescription flow = MeandreConverter.WBFlowDescriptionConverter.convert(wbFlow);
 		String flowURI = flow.getFlowComponent().getURI();
@@ -155,7 +197,14 @@ public class Repository {
 			Model flowModel = flow.getModel();
 
 			String fName = flowURI.replaceAll(":|/", "_");
-			String tempFolder = System.getProperty("java.io.tmpdir");
+			String tempFolder = this.getRepositoryLocation()+ File.separator+"x"+userId;//System.getProperty("java.io.tmpdir");
+			File file = new File(tempFolder);
+			if(!file.exists()){
+			boolean success=file.mkdir();
+				if(!success){
+					throw new RuntimeException("Error could not create user directory " + file.getAbsolutePath());
+				}
+			}
 			
 			if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
 				tempFolder += System.getProperty("file.separator");
@@ -176,10 +225,10 @@ public class Repository {
 			Set<FlowDescription> flows = repository.getAvailableFlowDescriptions();
 			execStepMsg = "STEP3: Getting flow";
 			flow = flows.iterator().next();
-			if (flow == null)
+			if (flow == null){
 				throw new MeandreServerException("The flow obtained is null!");
-		}
-		catch (Exception e) {
+			}
+		}catch (Exception e) {
 			MeandreServerException mException = (execStepMsg != null) ?
 					new MeandreServerException(execStepMsg, e) : (MeandreServerException) e;
 			throw mException;

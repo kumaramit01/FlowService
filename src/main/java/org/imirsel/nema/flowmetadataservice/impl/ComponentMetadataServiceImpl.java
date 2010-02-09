@@ -15,6 +15,7 @@ import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.annotations.parser.beans.DataTypeBean;
 import org.imirsel.nema.annotations.parser.beans.StringDataTypeBean;
 import org.imirsel.nema.flowmetadataservice.ComponentMetadataService;
+import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.NEMADataset;
@@ -83,7 +84,7 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 	}
 
 
-	public Map<String, Property> getComponentPropertyDataType(Component component, String flowUri) throws TransmissionException, SQLException {
+	public Map<String, Property> getComponentPropertyDataType(Component component, String flowUri) throws TransmissionException, SQLException, MeandreServerException {
 		RepositoryClientInterface rpi=this.getRepositoryClient();
 		Model model =getEmptyModel();
 		ExecutableComponentDescription ecd=meandreServerProxy.getExecutableComponentDescription(model.createResource(component.getUri()));//qp.getExecutableComponentDescription(model.createResource(component.getUri()));
@@ -93,7 +94,7 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 		if(ecd==null){
 			LOGGER.severe("component: " + component.getUri()+ " could not be found.");
 			repositoryClientConnectionPool.returnToPool(rpi);
-			return null;
+			throw new MeandreServerException("component: " + component.getUri()+ " could not be found.");
 		}
 		Model m = this.getEmptyModel();
 		ExecutableComponentInstanceDescription ecid = fd.getExecutableComponentInstanceDescription(m.createResource(component.getInstanceUri()));

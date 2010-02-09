@@ -66,13 +66,14 @@ public class MeandreFlowStore {
 	 * 
 	 * @param paramMap
 	 * @param flowURI
+	 * @param userId 
 	 * @return the file path to the flow in the nt format
  	 * @throws MeandreServerException
 	 * @throws CorruptedFlowException
 	 */
-	public String createNewFlow(HashMap<String, String> paramMap, String flowURI) throws MeandreServerException {
+	public String createNewFlow(HashMap<String, String> paramMap, String flowURI, long userId) throws MeandreServerException {
 		return this.getMeandreJobSchedulerConfig().getHead().
-		getFlowMetadataService().createNewFlow(paramMap, flowURI);
+		getFlowMetadataService().createNewFlow(paramMap, flowURI, userId);
 	}
 
 	/**
