@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.annotations.parser.beans.DataTypeBean;
 import org.imirsel.nema.flowmetadataservice.impl.ComponentMetadataServiceImpl;
+import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
@@ -48,7 +49,7 @@ public class ComponentMetadataServiceTest{
 
 
 	@Test
-	public void testGetComponentDataType() throws TransmissionException, SQLException{
+	public void testGetComponentDataType() throws TransmissionException, SQLException, MeandreServerException{
 		String componentURI="meandre://seasr.org/components/testdatatypetestcomponent";
 		String instanceURI = "http://test.org/datatypetest/instance/testdatatypetestcomponent/0";
 		String flowURI = "http://test.org/datatypetest/";

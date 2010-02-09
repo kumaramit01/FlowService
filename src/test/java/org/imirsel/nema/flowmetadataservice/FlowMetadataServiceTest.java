@@ -65,7 +65,7 @@ public class FlowMetadataServiceTest{
 		paramMap.put("datatypetestcomponent_0_mfcc","false");
 		String fileName=null;
 		try {
-			fileName=flowMetadataService.createNewFlow(paramMap, flowURI);
+			fileName=flowMetadataService.createNewFlow(paramMap, flowURI, 0l);
 			assertTrue(fileName!=null);
 			assertTrue(fileName.length()>0);
 		} catch (MeandreServerException e) {
