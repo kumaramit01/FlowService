@@ -30,9 +30,7 @@ import java.util.logging.Logger;
  * A job monitor that polls the database for status updates.
  *
  * @author shirk
- * @since 1.0
- * @proposedRating red TODO: author
- * @acceptedRating red TODO: reviewer
+ * @since 0.4.0
  */
 @ThreadSafe
 public class PollingJobStatusMonitor implements JobStatusMonitor {
@@ -154,10 +152,8 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    /**
     * Runs each time the monitor wakes up to get updated job statuses.
     *
-    * @author TODO: author
-    * @since TODO: version
-    * @proposedRating red TODO: author
-    * @acceptedRating red TODO: reviewer
+    * @author shirk
+    * @since 0.4.0
     */
    private class StatusUpdateDetector implements Runnable {
       public void run() {

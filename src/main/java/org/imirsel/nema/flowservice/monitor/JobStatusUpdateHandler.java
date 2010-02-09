@@ -6,7 +6,7 @@ import org.imirsel.nema.model.Job;
  * Interface for objects that want to be notified of {@link Job} status updates.
  * 
  * @author shirk
- * @since 1.0
+ * @since 0.4.0
  */
 public interface JobStatusUpdateHandler {
 

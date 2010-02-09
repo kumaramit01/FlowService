@@ -7,7 +7,7 @@ import org.imirsel.nema.model.Job;
  * Interface for monitoring running jobs.
  *
  * @author shirk
- * @since 1.0
+ * @since 0.4.0
  */
 public interface JobStatusMonitor {
 
