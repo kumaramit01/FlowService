@@ -206,7 +206,7 @@
 				<version>1.0-beta-3</version>
 				<configuration>
 					<dataTypeFactoryName>${dbunit.dataTypeFactoryName}</dataTypeFactoryName>
-					<driver>${jdbc.driverClassName}</driver>
+					<driver>${flowservice.jdbc.driverClassName}</driver>
 					<username>${flowservice.jdbc.username}</username>
 					<password>${flowservice.jdbc.password}</password>
 					<url>${flowservice.jdbc.url}</url>
@@ -325,7 +325,39 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
+			    <!-- mail.properties -->
 				<mail.server>express-smtp.cites.uiuc.edu</mail.server>
+				
+				<!-- RepositoryProperties.properties -->
+				<db.locator>${repository.db.locator}</db.locator>
+				<db.username>${repository.db.username}</db.username>
+				<db.password>${repository.db.password}</db.password>
+				<db.name>${repository.db.name}</db.name>
+				
+				<!-- flowrepository.properties -->
+				<flowrepository.location>${flowrepository.store.location}</flowrepository.location>
+			
+				<!-- jdbc.properties -->
+				<jdbc.url>${flowservice.jdbc.url}</jdbc.url>
+				<jdbc.username>${flowservice.jdbc.username}</jdbc.username>
+				<jdbc.password>${flowservice.jdbc.password}</jdbc.password>
+				<jdbc.driverClassName>${flowservice.jdbc.driverClassName}</jdbc.driverClassName>
+				<jdbc.maxActive>${flowservice.jdbc.maxActive}</jdbc.maxActive>
+				
+				<!--meandreserver.properties-->
+				<headserver.host>${meandre.headserver.host}</headserver.host>
+				<headserver.port>${meandre.headserver.port}</headserver.port>
+				<headserver.username>${meandre.headserver.username}</headserver.username>
+				<headserver.password>${meandre.headserver.password}</headserver.password>
+				<headserver.maxConcurrentJobs>${meandre.headserver.maxConcurrentJobs}</headserver.maxConcurrentJobs>
+				<workerserver.hosts>${meandre.workerserver.hosts}</workerserver.hosts>
+				<workerserver.ports>${meandre.workerserver.ports}</workerserver.ports>
+				<workerserver.usernames>${meandre.workerserver.usernames}</workerserver.usernames>
+				<workerserver.passwords>${meandre.workerserver.passwords}</workerserver.passwords>
+				<workerserver.maxConcurrentJobs>${meandre.workerserver.maxConcurrentJobs}</workerserver.maxConcurrentJobs>
+				
+			
+				
 			</properties>
 		</profile>
 		<profile>
@@ -334,7 +366,39 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
+				<!-- mail.properties -->
 				<mail.server>express-smtp.cites.uiuc.edu</mail.server>
+				
+				<!-- RepositoryProperties.properties -->
+				<db.locator>${repository.db.locator}</db.locator>
+				<db.username>${repository.db.username}</db.username>
+				<db.password>${repository.db.password}</db.password>
+				<db.name>${repository.db.name}</db.name>
+				
+				<!-- flowrepository.properties -->
+				<flowrepository.location>${flowrepository.store.location}</flowrepository.location>
+			
+				<!-- jdbc.properties -->
+				<jdbc.url>${flowservice.jdbc.url}</jdbc.url>
+				<jdbc.username>${flowservice.jdbc.username}</jdbc.username>
+				<jdbc.password>${flowservice.jdbc.password}</jdbc.password>
+				<jdbc.driverClassName>${flowservice.jdbc.driverClassName}</jdbc.driverClassName>
+				<jdbc.maxActive>${flowservice.jdbc.maxActive}</jdbc.maxActive>
+				
+				<!--meandreserver.properties-->
+				<headserver.host>${meandre.headserver.host}</headserver.host>
+				<headserver.port>${meandre.headserver.port}</headserver.port>
+				<headserver.username>${meandre.headserver.username}</headserver.username>
+				<headserver.password>${meandre.headserver.password}</headserver.password>
+				<headserver.maxConcurrentJobs>${meandre.headserver.maxConcurrentJobs}</headserver.maxConcurrentJobs>
+				<workerserver.hosts>${meandre.workerserver.hosts}</workerserver.hosts>
+				<workerserver.ports>${meandre.workerserver.ports}</workerserver.ports>
+				<workerserver.usernames>${meandre.workerserver.usernames}</workerserver.usernames>
+				<workerserver.passwords>${meandre.workerserver.passwords}</workerserver.passwords>
+				<workerserver.maxConcurrentJobs>${meandre.workerserver.maxConcurrentJobs}</workerserver.maxConcurrentJobs>
+								
+			
+			
 			</properties>
 		</profile>
 
