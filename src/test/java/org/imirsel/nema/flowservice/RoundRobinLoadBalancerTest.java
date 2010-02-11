@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * Test cases to exercise the methods of the {@link RoundRobinLoadBalancer}.
  * 
  * @author shirk
  * @since 0.4.0
@@ -27,9 +28,6 @@ public class RoundRobinLoadBalancerTest {
    public void setUp() throws Exception {
       loadBalancer = new RoundRobinLoadBalancer();
       
-      Set<MeandreServerProxy> servers = new HashSet<MeandreServerProxy>();
-      
-      
       String host ="192.168.0.1";
       String host1 ="192.168.0.2";
       String host2 ="192.168.0.3";
@@ -41,7 +39,6 @@ public class RoundRobinLoadBalancerTest {
 
       MeandreServerProxyConfig config = new 
       SimpleMeandreServerProxyConfig(username,password,host,port,maxConcurrentJobs);
-
       MeandreServerProxyConfig config1 = new 
       SimpleMeandreServerProxyConfig(username,password,host1,port,maxConcurrentJobs);
       MeandreServerProxyConfig config2 = new 
@@ -49,9 +46,6 @@ public class RoundRobinLoadBalancerTest {
       MeandreServerProxyConfig config3 = new 
       SimpleMeandreServerProxyConfig(username,password,host3,port,maxConcurrentJobs);
 
-		
-      
-      
       server1 = new MeandreServerProxy(config);
       server2 = new MeandreServerProxy(config1);
       server3 = new MeandreServerProxy(config2);
