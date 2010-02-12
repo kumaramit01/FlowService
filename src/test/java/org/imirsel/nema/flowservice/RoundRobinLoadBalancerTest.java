@@ -15,8 +15,6 @@ import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.matchers.JUnitMatchers.*;
 
-
-
 /**
  * 
  * @author shirk
@@ -34,9 +32,6 @@ public class RoundRobinLoadBalancerTest {
    public void setUp() throws Exception {
       loadBalancer = new RoundRobinLoadBalancer();
       
-      Set<MeandreServerProxy> servers = new HashSet<MeandreServerProxy>();
-      
-      
       String host ="192.168.0.1";
       String host1 ="192.168.0.2";
       String host2 ="192.168.0.3";
@@ -48,7 +43,6 @@ public class RoundRobinLoadBalancerTest {
 
       MeandreServerProxyConfig config = new 
       SimpleMeandreServerProxyConfig(username,password,host,port,maxConcurrentJobs);
-
       MeandreServerProxyConfig config1 = new 
       SimpleMeandreServerProxyConfig(username,password,host1,port,maxConcurrentJobs);
       MeandreServerProxyConfig config2 = new 
@@ -106,6 +100,21 @@ public class RoundRobinLoadBalancerTest {
    }
 
    @Test
+   public void testRemoveServerWhenBalancerIsEmpty() {
+      assertTrue(loadBalancer.size()==0);
+      loadBalancer.removeServer(server1);
+      assertTrue(loadBalancer.size()==0);
+   }
+   
+   @Test
+   public void testRemoveServerAbsentFromBalancer() {
+      loadBalancer.addServer(server1);
+      assertTrue(loadBalancer.size()==1);
+      loadBalancer.removeServer(server2);
+      assertTrue(loadBalancer.size()==1);
+   }
+   
+   @Test
    public void testNextAvailableServer() {
       loadBalancer.addServer(server1);
       loadBalancer.addServer(server2);
@@ -154,7 +163,7 @@ public class RoundRobinLoadBalancerTest {
    }
 
    @Test
-   public void testLIFOServerAvailable(){
+   public void testLifoServerAvailable(){
 	   loadBalancer.addServer(server1);
 	   loadBalancer.addServer(server2);
 	   loadBalancer.addServer(server3);
