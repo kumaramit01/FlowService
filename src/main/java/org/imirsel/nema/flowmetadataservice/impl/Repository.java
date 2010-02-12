@@ -61,7 +61,8 @@ import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
@@ -80,7 +81,8 @@ public class Repository {
 	
 	@PostConstruct
 	public void init() {
-		ClassPathResource resource = new ClassPathResource("flowrepository.properties");
+		DefaultResourceLoader drl = new DefaultResourceLoader();
+		Resource resource=drl.getResource("flowrepository.properties");
 		if(resource!=null){
 			Properties properties = new Properties();
 			try {

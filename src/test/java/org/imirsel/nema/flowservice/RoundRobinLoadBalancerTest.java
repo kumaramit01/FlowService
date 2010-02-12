@@ -7,11 +7,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.matchers.JUnitMatchers.*;
+
+
+
 /**
- * Test cases to exercise the methods of the {@link RoundRobinLoadBalancer}.
  * 
  * @author shirk
  * @since 0.4.0
@@ -28,6 +34,9 @@ public class RoundRobinLoadBalancerTest {
    public void setUp() throws Exception {
       loadBalancer = new RoundRobinLoadBalancer();
       
+      Set<MeandreServerProxy> servers = new HashSet<MeandreServerProxy>();
+      
+      
       String host ="192.168.0.1";
       String host1 ="192.168.0.2";
       String host2 ="192.168.0.3";
@@ -39,6 +48,7 @@ public class RoundRobinLoadBalancerTest {
 
       MeandreServerProxyConfig config = new 
       SimpleMeandreServerProxyConfig(username,password,host,port,maxConcurrentJobs);
+
       MeandreServerProxyConfig config1 = new 
       SimpleMeandreServerProxyConfig(username,password,host1,port,maxConcurrentJobs);
       MeandreServerProxyConfig config2 = new 
@@ -46,6 +56,7 @@ public class RoundRobinLoadBalancerTest {
       MeandreServerProxyConfig config3 = new 
       SimpleMeandreServerProxyConfig(username,password,host3,port,maxConcurrentJobs);
 
+		
       server1 = new MeandreServerProxy(config);
       server2 = new MeandreServerProxy(config1);
       server3 = new MeandreServerProxy(config2);
@@ -142,4 +153,24 @@ public class RoundRobinLoadBalancerTest {
       assertTrue(loadBalancer.hasAvailableServer());
    }
 
+   @Test
+   public void testLIFOServerAvailable(){
+	   loadBalancer.addServer(server1);
+	   loadBalancer.addServer(server2);
+	   loadBalancer.addServer(server3);
+	   loadBalancer.addServer(server4);
+	   
+	  
+	   assertThat(loadBalancer.nextAvailableServer(),anyOf(is(server1),is(server2),is(server3),is(server4)) );
+	   loadBalancer.removeServer(server1);
+	   assertThat(loadBalancer.nextAvailableServer(), is(not(server1)));
+	   loadBalancer.removeServer(server2);
+	   assertThat(loadBalancer.nextAvailableServer(), is(not(anyOf(is(server2),is(server1)))));
+	   loadBalancer.removeServer(server3);
+	   assertThat(loadBalancer.nextAvailableServer(), is(server4));
+	   loadBalancer.removeServer(server4);
+	   assertThat(loadBalancer.nextAvailableServer(), is(nullValue()));
+   
+   
+   }
 }

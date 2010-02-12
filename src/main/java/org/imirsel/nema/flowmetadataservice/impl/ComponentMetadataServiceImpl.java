@@ -92,13 +92,17 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 		
 	
 		if(ecd==null){
-			LOGGER.severe("component: " + component.getUri()+ " could not be found.");
+			LOGGER.severe("component : " + component.getUri()+ " could not be found.");
 			repositoryClientConnectionPool.returnToPool(rpi);
 			throw new MeandreServerException("component: " + component.getUri()+ " could not be found.");
 		}
 		Model m = this.getEmptyModel();
 		ExecutableComponentInstanceDescription ecid = fd.getExecutableComponentInstanceDescription(m.createResource(component.getInstanceUri()));
-		
+		if(ecid==null){
+			LOGGER.severe("component instance: " + component.getInstanceUri()+ " could not be found.");
+			repositoryClientConnectionPool.returnToPool(rpi);
+			throw new MeandreServerException("component instance : " + component.getInstanceUri()+ " could not be found.");
+		}
 		PropertiesDescriptionDefinition propertiesDefn=ecd.getProperties();
 		Set<String> propertiesSet=propertiesDefn.getKeys();
 		Iterator<String> it = propertiesSet.iterator();

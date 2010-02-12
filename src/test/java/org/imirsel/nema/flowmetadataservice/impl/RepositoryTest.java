@@ -7,11 +7,10 @@ import java.util.Set;
 
 import org.imirsel.nema.client.beans.repository.WBExecutableComponentDescription;
 import org.imirsel.nema.client.beans.repository.WBFlowDescription;
-import org.imirsel.nema.flowmetadataservice.BaseManagerTestCase;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
-import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
+import org.imirsel.nema.test.BaseManagerTestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,10 +29,10 @@ public class RepositoryTest extends BaseManagerTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		String host ="nema.lis.uiuc.edu";
-		String password = "admin";
-		String username ="admin";
-		int port = 11709;
+		String host =getAsString("host");
+		String password=getAsString("password");
+		String username=getAsString("username");
+		int port = getAsInteger("port");
 		int maxConcurrentJobs =1;
 		SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
 				username,password,host,port,maxConcurrentJobs);
@@ -63,18 +62,22 @@ public class RepositoryTest extends BaseManagerTestCase {
 		}
 	}
 
-	@Test
-	public void testRetrieveComponentDescriptor() {
+	@Test(expected=MeandreServerException.class)
+	public void testRetrieveComponentDescriptorDoesNotExist() throws MeandreServerException {
 		String componentURI="meandre://seasr.org/components/input";
-		try {
 			WBExecutableComponentDescription ecd=repository.retrieveComponentDescriptor(componentURI);
 			assertTrue(ecd!=null);
 			assertTrue(ecd.getName().length()>0);
-		} catch (MeandreServerException e) {
-			fail(e.getMessage());
-		}
-		
 	}
+	
+	@Test
+	public void testRetrieveComponentDescriptorExists() throws MeandreServerException {
+		String componentURI="meandre://seasr.org/components/input";
+			WBExecutableComponentDescription ecd=repository.retrieveComponentDescriptor(componentURI);
+			assertTrue(ecd!=null);
+			assertTrue(ecd.getName().length()>0);
+	}
+
 
 	@Test
 	public void testRetrieveFlowUrls() {
