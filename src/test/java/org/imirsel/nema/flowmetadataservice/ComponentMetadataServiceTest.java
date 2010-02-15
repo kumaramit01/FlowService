@@ -38,10 +38,10 @@ public class ComponentMetadataServiceTest extends BaseManagerTestCase{
 	@Before
 	public void beforeClass(){
 		this.getLogger().setLevel(Level.SEVERE);
-		String host =getAsString("host");//"nema.lis.uiuc.edu";
-		String password=getAsString("password");
-		String username=getAsString("username");
-		int port = getAsInteger("port");
+		String host = getPropertyAsString("host");//"nema.lis.uiuc.edu";
+		String password = getPropertyAsString("password");
+		String username = getPropertyAsString("username");
+		int port = getPropertyAsInteger("port");
 		int maxConcurrentJobs =1;
 		SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
 				username,password,host,port,maxConcurrentJobs);

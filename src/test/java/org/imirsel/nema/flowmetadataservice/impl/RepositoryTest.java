@@ -29,10 +29,10 @@ public class RepositoryTest extends BaseManagerTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		String host =getAsString("host");
-		String password=getAsString("password");
-		String username=getAsString("username");
-		int port = getAsInteger("port");
+		String host =getPropertyAsString("host");
+		String password=getPropertyAsString("password");
+		String username=getPropertyAsString("username");
+		int port = getPropertyAsInteger("port");
 		int maxConcurrentJobs =1;
 		SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
 				username,password,host,port,maxConcurrentJobs);
