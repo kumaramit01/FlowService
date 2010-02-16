@@ -29,8 +29,8 @@ public class FlowMetadataServiceTest{
 	private Repository repository;
 
 	@Before
-	public void setup(){
-		String host ="nema.lis.uiuc.edu";
+	public void setup() throws MeandreServerException{
+		String host ="128.174.154.145";
 		String password = "admin";
 		String username ="admin";
 		int port = 11709;
@@ -38,10 +38,11 @@ public class FlowMetadataServiceTest{
 		SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
 				username,password,host,port,maxConcurrentJobs);
 		meandreServerProxy = new MeandreServerProxy(config);
-		meandreServerProxy.init();
 		repository = new Repository();
 		repository.setMeandreServerProxy(meandreServerProxy);
+		repository.init();
 		flowMetadataService.setRepository(repository);
+		meandreServerProxy.init();
 		flowMetadataService.setMeandreServerProxy(meandreServerProxy);
 		
 	}
@@ -57,6 +58,7 @@ public class FlowMetadataServiceTest{
 		}
 		
 	}
+	
 	
 	@Test 
 	public void testcreateNewFlow(){
