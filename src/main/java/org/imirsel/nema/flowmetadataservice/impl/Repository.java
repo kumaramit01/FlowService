@@ -208,8 +208,8 @@ public class Repository {
 				}
 			}
 			
-			if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
-				tempFolder += System.getProperty("file.separator");
+			//if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
+			//	tempFolder += System.getProperty("file.separator");
 			
 			fileName = tempFolder +  System.getProperty("file.separator")+ fName + ".nt";
 			logger.info(fileName);
