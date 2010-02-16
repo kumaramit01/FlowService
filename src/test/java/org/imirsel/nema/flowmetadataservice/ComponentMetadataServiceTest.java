@@ -36,7 +36,7 @@ public class ComponentMetadataServiceTest extends BaseManagerTestCase{
 	private RepositoryClientConnectionPool repositoryClientConnectionPool;
 	
 	@Before
-	public void beforeClass(){
+	public void beforeClass() throws MeandreServerException{
 		this.getLogger().setLevel(Level.SEVERE);
 		String host = getPropertyAsString("host");//"nema.lis.uiuc.edu";
 		String password = getPropertyAsString("password");

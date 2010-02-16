@@ -167,19 +167,25 @@ public class RoundRobinLoadBalancerTest {
 	   loadBalancer.addServer(server1);
 	   loadBalancer.addServer(server2);
 	   loadBalancer.addServer(server3);
-	   loadBalancer.addServer(server4);
+	   loadBalancer.addServer(server1);
 	   
-	  
-	   assertThat(loadBalancer.nextAvailableServer(),anyOf(is(server1),is(server2),is(server3),is(server4)) );
+	   
+	   
+	   assertThat(loadBalancer.nextAvailableServer(),    anyOf(is(server1),is(server2),is(server3),is(server4))     );
+	   
+	   
 	   loadBalancer.removeServer(server1);
 	   assertThat(loadBalancer.nextAvailableServer(), is(not(server1)));
+	   
+	   
+	   
 	   loadBalancer.removeServer(server2);
 	   assertThat(loadBalancer.nextAvailableServer(), is(not(anyOf(is(server2),is(server1)))));
+	   
 	   loadBalancer.removeServer(server3);
 	   assertThat(loadBalancer.nextAvailableServer(), is(server4));
 	   loadBalancer.removeServer(server4);
 	   assertThat(loadBalancer.nextAvailableServer(), is(nullValue()));
-   
-   
    }
+   
 }

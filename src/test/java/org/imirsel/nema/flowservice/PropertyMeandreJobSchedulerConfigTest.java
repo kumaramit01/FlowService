@@ -26,6 +26,9 @@ public class PropertyMeandreJobSchedulerConfigTest {
 			pmc.init();
 		} catch (MeandreServerProxyConfigException e) {
 			fail(e.getMessage());
+		} catch (MeandreServerException e) {
+			fail(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -39,6 +42,9 @@ public class PropertyMeandreJobSchedulerConfigTest {
 			pmc.init();
 		} catch (MeandreServerProxyConfigException e) {
 			fail(e.getMessage());
+		} catch (MeandreServerException e) {
+			fail(e.getMessage());
+			e.printStackTrace();
 		}
 		assertEquals(pmc.getHead().getMeandreServerProxyConfig().getHost().equalsIgnoreCase("128.174.154.145"),true);
 	}
@@ -53,6 +59,9 @@ public class PropertyMeandreJobSchedulerConfigTest {
 			pmc.init();
 		} catch (MeandreServerProxyConfigException e) {
 			fail(e.getMessage());
+		} catch (MeandreServerException e) {
+			fail(e.getMessage());
+			e.printStackTrace();
 		}
 		assertEquals(pmc.getServers().size(),2);
 	}

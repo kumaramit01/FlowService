@@ -45,28 +45,30 @@ public class MeandreJobSchedulerTest {
 	                Set<MeandreServerProxy> servers = new HashSet<MeandreServerProxy>();
 	                
 	                
-	                String host ="192.168.0.1";
-	                String host1 ="192.168.0.2";
-	                String host2 ="192.168.0.3";
-	                String host3 ="192.168.0.4";
+	                String host ="128.174.154.145";
+	                String host1 ="128.174.154.145";
+	                String host2 ="128.174.154.145";
+	                String host3 ="128.174.154.145";
             		String password = "admin";
             		String username ="admin";
-            		int port = 1714;
+            		int port1 = 11709;
+            		int port2 = 11514;
+            		int port3= 11614;
             		int maxConcurrentJobs =1;
             		
             		MeandreServerProxyConfig config = new 
-            		SimpleMeandreServerProxyConfig(username,password,host,port,maxConcurrentJobs);
+            		SimpleMeandreServerProxyConfig(username,password,host,port1,maxConcurrentJobs);
             		MeandreServerProxyConfig config1 = new 
-            		SimpleMeandreServerProxyConfig(username,password,host1,port,maxConcurrentJobs);
+            		SimpleMeandreServerProxyConfig(username,password,host1,port2,maxConcurrentJobs);
             		MeandreServerProxyConfig config2 = new 
-            		SimpleMeandreServerProxyConfig(username,password,host2,port,maxConcurrentJobs);
-            		MeandreServerProxyConfig config3 = new 
-            		SimpleMeandreServerProxyConfig(username,password,host3,port,maxConcurrentJobs);
+            		SimpleMeandreServerProxyConfig(username,password,host3,port3,maxConcurrentJobs);
+            		//MeandreServerProxyConfig config3 = new 
+            		//SimpleMeandreServerProxyConfig(username,password,host3,port,maxConcurrentJobs);
     
             		servers.add(new MeandreServerProxy(config));
 	                servers.add(new MeandreServerProxy(config1));
 	                servers.add(new MeandreServerProxy(config2));
-	                servers.add(new MeandreServerProxy(config3));
+	                //servers.add(new MeandreServerProxy(config3));
 	                return servers;
 	             }
 	          };
