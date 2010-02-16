@@ -80,7 +80,7 @@ public class Repository {
 	private String repositoryLocation;
 	
 	@PostConstruct
-	public void init() {
+	public void init() throws MeandreServerException {
 		DefaultResourceLoader drl = new DefaultResourceLoader();
 		Resource resource=drl.getResource("flowrepository.properties");
 		if(resource!=null){
@@ -100,7 +100,7 @@ public class Repository {
 		if(!file.exists()){
 			boolean success=file.mkdirs();
 			if(!success){
-				throw new RuntimeException("Could not create flow repository location " + file.getAbsolutePath());
+				throw new MeandreServerException("Could not create flow repository location " + file.getAbsolutePath());
 			}
 		}
 	}

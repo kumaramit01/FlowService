@@ -113,6 +113,7 @@ public class FlowMetadataServiceImpl implements FlowMetadataService {
 		flowDesc.setRights("owned by user");
 		flowDesc.setCreationDate(new Date());
 		flowDesc.updateParameters(flowUri,paramMap);
+		System.out.println(this.repository.getRepositoryLocation());
         String fileLocation=this.repository.saveFlow(flowDesc, userId);
         LOGGER.info("file Location:  "+ fileLocation);
         return fileLocation;//flowDesc.getFlowURI();

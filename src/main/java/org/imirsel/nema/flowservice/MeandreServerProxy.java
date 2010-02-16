@@ -83,7 +83,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 	}
 
 	@PostConstruct
-	public void init(){
+	public void init() throws MeandreServerException{
 		this.meandreClient = new MeandreClient(meandreServerProxyConfig.getHost(),meandreServerProxyConfig.getPort());
 		this.meandreClient.setLogger(logger);
 		this.meandreClient.setCredentials(meandreServerProxyConfig.getUsername(), meandreServerProxyConfig.getPassword());

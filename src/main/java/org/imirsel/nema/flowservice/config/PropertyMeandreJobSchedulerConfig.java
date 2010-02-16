@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.imirsel.nema.flowservice.MeandreJobSchedulerConfig;
+import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
@@ -42,6 +43,9 @@ public class PropertyMeandreJobSchedulerConfig implements
 		} catch (MeandreServerProxyConfigException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (MeandreServerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 	}
@@ -52,7 +56,7 @@ public class PropertyMeandreJobSchedulerConfig implements
 	}
 	
 	@PostConstruct
-	public void init() throws MeandreServerProxyConfigException{
+	public void init() throws MeandreServerProxyConfigException, MeandreServerException{
 		ClassPathResource resource=new ClassPathResource("meandreserver.properties");
 		if(resource==null){
 			throw new MeandreServerProxyConfigException("could not find meandreserver.properties");
