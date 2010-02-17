@@ -26,6 +26,7 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 
 /**
+ * Sends {@link Notification}s to recipients via email.
  * 
  * @author shirk
  * @since 0.5.0
