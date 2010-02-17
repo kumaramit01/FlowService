@@ -120,7 +120,9 @@ public class EmailNotificationSender implements NotificationSender {
 		   // Currently, notifications are not being sent directly to this class.
 		   // Rather, they are always loaded from the database.
 		   loadUnsentNotifications();
-		   
+		   if(mailQueue.size()==0) {
+		      return;
+		   }
 			logger.fine("Preparing to deliver " + mailQueue.size()
 					+ " email notifications...");
 			NotificationDao dao = daoFactory.getNotificationDao();
