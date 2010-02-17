@@ -27,11 +27,10 @@ import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.Job.JobStatus;
 import org.springframework.dao.DataAccessException;
 
-
 /**
  * Receives {@link Job} execution requests and distributes them to a set of
  * Meandre servers.
- *
+ * 
  * @author shirk
  * @since 0.4.0
  */
@@ -40,11 +39,11 @@ public class MeandreJobScheduler implements JobScheduler {
 
    private static final int POLL_PERIOD = 5;
 
-   private static final Logger logger = 
-		Logger.getLogger(MeandreJobScheduler.class.getName());
-	
+   private static final Logger logger = Logger
+         .getLogger(MeandreJobScheduler.class.getName());
+
    private static final int MAX_EXECUTION_TRIES = 5;
-	
+
    //~ Instance fields ---------------------------------------------------------
 
    /** The configuration for this job scheduler. */
@@ -70,7 +69,7 @@ public class MeandreJobScheduler implements JobScheduler {
    private Set<MeandreServerProxy> workers;
 
    private DaoFactory daoFactory;
-   
+
    /**
     * Lock for both the set of workers and the load balancer which contains
     * references to the workers.
@@ -81,10 +80,10 @@ public class MeandreJobScheduler implements JobScheduler {
 
    {
       ScheduledExecutorService executor = Executors
-         .newSingleThreadScheduledExecutor();
+            .newSingleThreadScheduledExecutor();
 
-      runJobsFuture = executor.scheduleWithFixedDelay(
-         new RunQueuedJobs(), 15, POLL_PERIOD, TimeUnit.SECONDS);
+      runJobsFuture = executor.scheduleWithFixedDelay(new RunQueuedJobs(), 15,
+            POLL_PERIOD, TimeUnit.SECONDS);
    }
 
    //~ Constructors ------------------------------------------------------------
@@ -97,12 +96,12 @@ public class MeandreJobScheduler implements JobScheduler {
 
    /**
     * Creates a new instance given a configuration and a load balancer.
-    *
+    * 
     * @param config The configuration details for this job scheduler.
     * @param balancer The load balancer to use for distributing jobs.
     */
-   public MeandreJobScheduler(
-      MeandreJobSchedulerConfig config, MeandreLoadBalancer balancer) {
+   public MeandreJobScheduler(MeandreJobSchedulerConfig config,
+         MeandreLoadBalancer balancer) {
       loadBalancer = balancer;
       workers = config.getServers();
       for (MeandreServerProxy server : workers) {
@@ -117,7 +116,7 @@ public class MeandreJobScheduler implements JobScheduler {
     */
    @PostConstruct
    public void init() {
-	  assert config!=null:"No configuration was provided to the job scheduler.";
+      assert config != null : "No configuration was provided to the job scheduler.";
       workers = config.getServers();
       for (MeandreServerProxy server : workers) {
          loadBalancer.addServer(server);
@@ -130,27 +129,28 @@ public class MeandreJobScheduler implements JobScheduler {
    public void abortJob(Job job) {
       MeandreServerProxy executingServer = findExecutingServer(job);
       try {
-		executingServer.abortJob(job);
-	} catch (MeandreServerException e) {
-		// TODO Perhaps do something more intelligent here
-		throw new RuntimeException(e);
-	}
+         executingServer.abortJob(job);
+      } catch (MeandreServerException e) {
+         // TODO Perhaps do something more intelligent here
+         throw new RuntimeException(e);
+      }
    }
 
    /**
     * Find the server that is executing the given {@link Job}.
-    *
+    * 
     * @param job The {@link Job} to find the executing server instance for.
-    * @return The {@link MeandreServerProxy} that is currently executing the job, or
-    * <code>null</code> if no known server is executing the job.
+    * @return The {@link MeandreServerProxy} that is currently executing the
+    *         job, or <code>null</code> if no known server is executing the job.
     */
    private MeandreServerProxy findExecutingServer(Job job) {
       workersLock.lock();
       try {
          for (MeandreServerProxy server : workers) {
-            if (
-               job.getHost().equals(server.getMeandreServerProxyConfig().getHost()) &&
-               job.getPort().equals(server.getMeandreServerProxyConfig().getPort())) {
+            if (job.getHost().equals(
+                  server.getMeandreServerProxyConfig().getHost())
+                  && job.getPort().equals(
+                        server.getMeandreServerProxyConfig().getPort())) {
                return server;
             }
          }
@@ -176,11 +176,11 @@ public class MeandreJobScheduler implements JobScheduler {
     * Attempt to run any queued jobs.
     */
    public void runJobs() {
-       Session session = null;
-       JobDao jobDao = daoFactory.getJobDao();
-       try {
-    	  queueLock.lock();
-          workersLock.lock();
+      Session session = null;
+      JobDao jobDao = daoFactory.getJobDao();
+      try {
+         queueLock.lock();
+         workersLock.lock();
          if (jobQueue.size() < 1) {
             logger.fine("No queued jobs.");
             return;
@@ -189,44 +189,44 @@ public class MeandreJobScheduler implements JobScheduler {
             logger.fine("Found " + jobQueue.size() + " queued jobs.");
             MeandreServerProxy server = loadBalancer.nextAvailableServer();
             if (server == null) {
-               logger.info(
-                  "All servers are busy. Will try again in " + POLL_PERIOD + " seconds.");
+               logger.info("All servers are busy. Will try again in "
+                     + POLL_PERIOD + " seconds.");
                return;
             }
             logger.fine("Server " + server + " is available for processing.");
-            
+
             Job job = jobQueue.peek();
-            
+
             job.incrementNumTries();
             job.setJobStatus(JobStatus.SUBMITTED);
             job.setSubmitTimestamp(new Date());
-            
-            logger.fine("Preparing to update job " + job.getId() + " as submitted.");
-            
+
+            logger.fine("Preparing to update job " + job.getId()
+                  + " as submitted.");
+
             session = jobDao.getSessionFactory().openSession();
             jobDao.startManagedSession(session);
             Transaction transaction = session.beginTransaction();
-        	transaction.begin();
+            transaction.begin();
+
             try {
-            	// Load job in DB here
-				jobDao.makePersistent(job);
-				transaction.commit();
-				logger.fine("Job " + job.getId() + " updated.");
-			} catch (HibernateException e) {
-				logger.warning("Data access exception: "  + e.getMessage());
-				rollback(transaction);
-			} catch (DataAccessException e) {
-				logger.warning("Data access exception: "  + e.getMessage());
-				rollback(transaction);
-			} catch (Exception e) {
-				logger.warning(e.getMessage());
-				rollback(transaction);
-			}
-            
+               jobDao.makePersistent(job);
+               transaction.commit();
+               logger.fine("Job " + job.getId() + " updated.");
+            } catch (HibernateException e) {
+               logger.warning("Data access exception: " + e.getMessage());
+               rollback(transaction);
+            } catch (DataAccessException e) {
+               logger.warning("Data access exception: " + e.getMessage());
+               rollback(transaction);
+            } catch (Exception e) {
+               logger.warning(e.getMessage());
+               rollback(transaction);
+            }
+
             try {
-               logger.fine(
-                  "Attempting to contact server " + server +
-                  " to execute job.");
+               logger.fine("Attempting to contact server " + server
+                     + " to execute job.");
 
                ExecResponse response = server.executeJob(job);
                logger.fine("Execution response received.");
@@ -236,7 +236,9 @@ public class MeandreJobScheduler implements JobScheduler {
                job.setPort(server.getMeandreServerProxyConfig().getPort());
                job.setExecPort(response.getPort());
                job.setExecutionInstanceId(response.getUri());
-
+               // shirk: added on 2.17.2010 as stop gap fix for race condition
+               job.setJobStatus(JobStatus.STARTED);
+               
                transaction = session.beginTransaction();
                transaction.begin();
                try {
@@ -244,54 +246,54 @@ public class MeandreJobScheduler implements JobScheduler {
                   transaction.commit();
                   logger.fine("Job execution response recorded in database.");
                   jobQueue.remove();
-   			   } catch (HibernateException e) {
-				  logger.warning("Data access exception: "  + e.getMessage());
-				  rollback(transaction);
-			   } catch (DataAccessException e) {
-				  logger.warning("Data access exception: "  + e.getMessage());
-				  rollback(transaction);
-			   } catch (Exception e) {
-				  logger.warning(e.getMessage());
-				  rollback(transaction);
-			   }
+               } catch (HibernateException e) {
+                  logger.warning("Data access exception: " + e.getMessage());
+                  rollback(transaction);
+               } catch (DataAccessException e) {
+                  logger.warning("Data access exception: " + e.getMessage());
+                  rollback(transaction);
+               } catch (Exception e) {
+                  logger.warning(e.getMessage());
+                  rollback(transaction);
+               }
             } catch (MeandreServerException serverException) {
                logger.warning(serverException.getMessage());
                job.setSubmitTimestamp(null);
                job.setJobStatus(JobStatus.SCHEDULED);
 
                if (job.getNumTries() == MAX_EXECUTION_TRIES) {
-            	  logger.info("Unsuccessfully tried " + MAX_EXECUTION_TRIES + 
-            			  " times to execute job " + 
-            			  job.getId() + ". Will mark job as failed.");
+                  logger.info("Unsuccessfully tried " + MAX_EXECUTION_TRIES
+                        + " times to execute job " + job.getId()
+                        + ". Will mark job as failed.");
                   job.setJobStatus(JobStatus.FAILED);
                   job.setEndTimestamp(new Date());
                   job.setUpdateTimestamp(new Date());
                   jobQueue.remove();
                }
-               
+
                transaction = session.beginTransaction();
                transaction.begin();
                try {
                   jobDao.makePersistent(job);
                   transaction.commit();
-   			   } catch (HibernateException e) {
-				  logger.warning("Data access exception: "  + e.getMessage());
-			      rollback(transaction);
-			   } catch (DataAccessException e) {
-				  logger.warning("Data access exception: "  + e.getMessage());
-				  rollback(transaction);
-			   } catch (Exception e) {
-				  logger.warning(e.getMessage());
-				  rollback(transaction);
-			   }
+               } catch (HibernateException e) {
+                  logger.warning("Data access exception: " + e.getMessage());
+                  rollback(transaction);
+               } catch (DataAccessException e) {
+                  logger.warning("Data access exception: " + e.getMessage());
+                  rollback(transaction);
+               } catch (Exception e) {
+                  logger.warning(e.getMessage());
+                  rollback(transaction);
+               }
             }
          }
       } catch (Exception e) {
-    	  e.printStackTrace();
+         e.printStackTrace();
       } finally {
          workersLock.unlock();
          queueLock.unlock();
-         if(session!=null) {
+         if (session != null) {
             try {
                jobDao.endManagedSession();
                session.close();
@@ -304,7 +306,7 @@ public class MeandreJobScheduler implements JobScheduler {
 
    /**
     * TODO: Description of method {@link $class.name$#rollback}.
-    *
+    * 
     * @param transaction TODO: Description of parameter transaction.
     */
    private void rollback(Transaction transaction) {
@@ -318,7 +320,7 @@ public class MeandreJobScheduler implements JobScheduler {
 
    /**
     * Add a server to the job scheduler.
-    *
+    * 
     * @param server Server to add.
     */
    public void addServer(MeandreServerProxy server) {
@@ -333,7 +335,7 @@ public class MeandreJobScheduler implements JobScheduler {
 
    /**
     * Remove a server from the job scheduler.
-    *
+    * 
     * @param server Server to remove.
     */
    public void removeServer(MeandreServerProxy server) {
@@ -348,7 +350,7 @@ public class MeandreJobScheduler implements JobScheduler {
 
    /**
     * Return the number of servers the scheduler is managing.
-    *
+    * 
     * @return Number of servers the scheduler is managing.
     */
    public int numServers() {
@@ -362,14 +364,16 @@ public class MeandreJobScheduler implements JobScheduler {
 
    /**
     * Return the {@link MeandreLoadBalancer} currently in use.
-    *
+    * 
     * @return The load balancer currently in use.
     */
-   public MeandreLoadBalancer getLoadBalancer() { return loadBalancer; }
+   public MeandreLoadBalancer getLoadBalancer() {
+      return loadBalancer;
+   }
 
    /**
     * Set the {@link MeandreLoadBalancer} to use.
-    *
+    * 
     * @param loadBalancer The {@link MeandreLoadBalancer} to use.
     */
    public void setLoadBalancer(MeandreLoadBalancer loadBalancer) {
@@ -378,7 +382,7 @@ public class MeandreJobScheduler implements JobScheduler {
 
    /**
     * Return the {@link MeandreJobSchedulerConfig} currently in use.
-    *
+    * 
     * @return The {@link MeandreJobSchedulerConfig} currently in use.
     */
    public MeandreJobSchedulerConfig getMeandreJobSchedulerConfig() {
@@ -387,7 +391,7 @@ public class MeandreJobScheduler implements JobScheduler {
 
    /**
     * Set the {@link MeandreJobSchedulerConfig} to use.
-    *
+    * 
     * @param config The {@link MeandreJobSchedulerConfig} to use.
     */
    public void setMeandreJobSchedulerConfig(MeandreJobSchedulerConfig config) {
@@ -400,18 +404,18 @@ public class MeandreJobScheduler implements JobScheduler {
     * @param daoFactory The {@link DaoFactory} implementation to use.
     */
    public void setDaoFactory(DaoFactory daoFactory) {
-	   this.daoFactory = daoFactory;
+      this.daoFactory = daoFactory;
    }
-   
+
    /**
     * Return the {@link DaoFactory} implementation currently in use.
     * 
     * @return {@link DaoFactory} implementation currently in use.
     */
    public DaoFactory getDaoFactory() {
-	   return daoFactory;
+      return daoFactory;
    }
-   
+
    //~ Inner Classes -----------------------------------------------------------
 
    private class RunQueuedJobs implements Runnable {
