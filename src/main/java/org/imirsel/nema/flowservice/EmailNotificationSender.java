@@ -75,7 +75,7 @@ public class EmailNotificationSender implements NotificationSender {
 	}
 
 	private void loadUnsentNotifications() {
-		//logger.warning("Preparing to load unsent notifications.");
+		logger.fine("Preparing to load unsent notifications.");
 		NotificationDao dao = daoFactory.getNotificationDao();
 		Session session = null;
 		List<Notification> unsent = null;
@@ -83,9 +83,9 @@ public class EmailNotificationSender implements NotificationSender {
 			session=dao.getSessionFactory().openSession();
 			dao.startManagedSession(session);
 			unsent = dao.getUnsentNotifications();
-		//	logger.warning("Successfully loaded unsent notifications.");
+			logger.fine("Successfully loaded unsent notifications.");
 		} catch (Exception e) {
-			logger.warning("Failed to load unsent notifications: " + e.getMessage());
+			logger.fine("Failed to load unsent notifications: " + e.getMessage());
 		} finally {
 			dao.endManagedSession();
 			if (session != null) {
@@ -121,7 +121,6 @@ public class EmailNotificationSender implements NotificationSender {
 			NotificationDao dao = daoFactory.getNotificationDao();
 			mailQueueLock.lock();
 			try {
-				loadUnsentNotifications();
 				while (!mailQueue.isEmpty()) {
 
 					Notification notification = mailQueue.peek();
@@ -140,6 +139,7 @@ public class EmailNotificationSender implements NotificationSender {
 					} catch (MailException e) {
 						logger.warning("Failed to deliver notification: "
 								+ e.getMessage());
+						notification.setErrorMessage(e.getMessage());
 						notification
 								.setDeliveryStatus(Notification.DeliveryStatus.FAILURE);
 					}
