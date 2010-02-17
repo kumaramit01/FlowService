@@ -117,6 +117,10 @@ public class EmailNotificationSender implements NotificationSender {
 
 	private class MailDeliveryTask implements Runnable {
 		public void run() {
+		   // Currently, notifications are not being sent directly to this class.
+		   // Rather, they are always loaded from the database.
+		   loadUnsentNotifications();
+		   
 			logger.fine("Preparing to deliver " + mailQueue.size()
 					+ " email notifications...");
 			NotificationDao dao = daoFactory.getNotificationDao();
