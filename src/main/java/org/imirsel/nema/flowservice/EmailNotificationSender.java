@@ -76,7 +76,6 @@ public class EmailNotificationSender implements NotificationSender {
 	}
 
 	private void loadUnsentNotifications() {
-		logger.fine("Preparing to load unsent notifications.");
 		NotificationDao dao = daoFactory.getNotificationDao();
 		Session session = null;
 		List<Notification> unsent = null;
@@ -84,9 +83,8 @@ public class EmailNotificationSender implements NotificationSender {
 			session=dao.getSessionFactory().openSession();
 			dao.startManagedSession(session);
 			unsent = dao.getUnsentNotifications();
-			logger.fine("Successfully loaded unsent notifications.");
 		} catch (Exception e) {
-			logger.fine("Failed to load unsent notifications: " + e.getMessage());
+			logger.warning("Failed to load unsent notifications: " + e.getMessage());
 		} finally {
 			dao.endManagedSession();
 			if (session != null) {
@@ -118,7 +116,8 @@ public class EmailNotificationSender implements NotificationSender {
 	private class MailDeliveryTask implements Runnable {
 		public void run() {
 		   // Currently, notifications are not being sent directly to this class.
-		   // Rather, they are always loaded from the database.
+		   // Rather, they are always loaded from the database. Therefore, the
+		   // following method must be called each time the thread wakes up.
 		   loadUnsentNotifications();
 		   if(mailQueue.size()==0) {
 		      return;
