@@ -185,6 +185,10 @@ public class MeandreJobScheduler implements JobScheduler {
             logger.fine("No queued jobs.");
             return;
          }
+         
+         session = jobDao.getSessionFactory().openSession();
+         jobDao.startManagedSession(session);
+         
          while (!jobQueue.isEmpty()) {
             logger.fine("Found " + jobQueue.size() + " queued jobs.");
             MeandreServerProxy server = loadBalancer.nextAvailableServer();
@@ -204,11 +208,8 @@ public class MeandreJobScheduler implements JobScheduler {
             logger.fine("Preparing to update job " + job.getId()
                   + " as submitted.");
 
-            session = jobDao.getSessionFactory().openSession();
-            jobDao.startManagedSession(session);
             Transaction transaction = session.beginTransaction();
             transaction.begin();
-
             try {
                jobDao.makePersistent(job);
                transaction.commit();
@@ -216,12 +217,15 @@ public class MeandreJobScheduler implements JobScheduler {
             } catch (HibernateException e) {
                logger.warning("Data access exception: " + e.getMessage());
                rollback(transaction);
+               return;
             } catch (DataAccessException e) {
                logger.warning("Data access exception: " + e.getMessage());
                rollback(transaction);
+               return;
             } catch (Exception e) {
                logger.warning(e.getMessage());
                rollback(transaction);
+               return;
             }
 
             try {
@@ -230,14 +234,23 @@ public class MeandreJobScheduler implements JobScheduler {
 
                ExecResponse response = server.executeJob(job);
                logger.fine("Execution response received.");
-
+               
+               // If the executeJob() method above succeeded, the Meandre
+               // server will have (most likely) changed the job status to
+               // "started". If the status changes, the NEMA probe running
+               // on the Meandre server will have written the new status to
+               // the same database the flow service uses. Therefore, we
+               // want to refresh the state of the job here to pick up the
+               // status change. Otherwise, the old status (submitted) will
+               // be rewritten to the database, and the "started" state
+               // will be lost.
+               session.refresh(job);
+               
                logger.fine("Attempting to record job execution response.");
                job.setHost(server.getMeandreServerProxyConfig().getHost());
                job.setPort(server.getMeandreServerProxyConfig().getPort());
                job.setExecPort(response.getPort());
                job.setExecutionInstanceId(response.getUri());
-               // shirk: added on 2.17.2010 as stop gap fix for race condition
-               job.setJobStatus(JobStatus.STARTED);
                
                transaction = session.beginTransaction();
                transaction.begin();
@@ -249,12 +262,15 @@ public class MeandreJobScheduler implements JobScheduler {
                } catch (HibernateException e) {
                   logger.warning("Data access exception: " + e.getMessage());
                   rollback(transaction);
+                  return;
                } catch (DataAccessException e) {
                   logger.warning("Data access exception: " + e.getMessage());
                   rollback(transaction);
+                  return;
                } catch (Exception e) {
                   logger.warning(e.getMessage());
                   rollback(transaction);
+                  return;
                }
             } catch (MeandreServerException serverException) {
                logger.warning(serverException.getMessage());
@@ -279,12 +295,15 @@ public class MeandreJobScheduler implements JobScheduler {
                } catch (HibernateException e) {
                   logger.warning("Data access exception: " + e.getMessage());
                   rollback(transaction);
+                  return;
                } catch (DataAccessException e) {
                   logger.warning("Data access exception: " + e.getMessage());
                   rollback(transaction);
+                  return;
                } catch (Exception e) {
                   logger.warning(e.getMessage());
                   rollback(transaction);
+                  return;
                }
             }
          }
