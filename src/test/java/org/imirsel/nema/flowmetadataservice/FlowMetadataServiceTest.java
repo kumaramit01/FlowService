@@ -11,7 +11,6 @@ import org.imirsel.nema.flowmetadataservice.impl.Repository;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
-import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
 import org.junit.Before;
 import org.junit.Test;

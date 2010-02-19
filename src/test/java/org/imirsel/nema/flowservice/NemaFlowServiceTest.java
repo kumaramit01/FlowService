@@ -1,9 +1,11 @@
 package org.imirsel.nema.flowservice;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import org.imirsel.nema.model.Flow;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -26,7 +28,12 @@ public class NemaFlowServiceTest {
 	    ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 	    
 		FlowService flowService = (FlowService)ctx.getBean("flowService");
+		Set<Flow> flowSet=flowService.getFlowTemplates();
 		
+		for(Flow flow:flowSet){
+			System.out.println(flow.getType().getName());
+		}
+		/*
 		for(int i=0; i<50; i++) {
 			try {
 				Thread.sleep(100);
@@ -39,6 +46,7 @@ public class NemaFlowServiceTest {
 					"Test: " + new Date().toString(), "Test job " + i, 
 					1, 1L, "shirk@uiuc.edu");
 		}
+		*/
 
 	}
 

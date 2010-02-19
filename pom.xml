@@ -9,27 +9,24 @@
 	<url>http://maven.apache.org</url>
 
 	<prerequisites>
-		<maven>2.0.6</maven>
+		<maven>2.0.9</maven>
 	</prerequisites>
-<distributionManagement>
-		<!-- use the following if you're not using a snapshot version. -->
+	<distributionManagement>
 		<repository>
 			<name>IMIRSEL Releases</name>
 			<id>nema.lis.uiuc.edu-releases</id>
 			<url>dav:http://nema.lis.uiuc.edu/artifactory/libs-releases-local/</url>
-			
+
 		</repository>
-		<!-- use the following if you ARE using a snapshot version. -->
-		
-			<snapshotRepository>
-				<id>nema.lis.uiuc.edu-snapshots</id>
-				<name>IMIRSEL Snapshots</name>
-				<url>dav:http://nema.lis.uiuc.edu/artifactory/libs-snapshots-local</url>
-			</snapshotRepository>
-		
+		<snapshotRepository>
+			<id>nema.lis.uiuc.edu-snapshots</id>
+			<name>IMIRSEL Snapshots</name>
+			<url>dav:http://nema.lis.uiuc.edu/artifactory/libs-snapshots-local</url>
+		</snapshotRepository>
+
 		<downloadUrl>http://nema.lis.uiuc.edu/artifactory/</downloadUrl>
 	</distributionManagement>
-	
+
 
 	<scm>
 		<connection>scm:svn:https://nemadiy.googlecode.com/svn/flowservice/trunk</connection>
@@ -151,45 +148,46 @@
 			<artifactId>imirsel-meandre-client</artifactId>
 			<version>${imirsel-meandre-client.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.imirsel</groupId>
 			<artifactId>nema-flowservice-api</artifactId>
 			<version>0.5.0-SNAPSHOT</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.imirsel</groupId>
 			<artifactId>nema-repositoryservice</artifactId>
 			<version>0.1.0-SNAPSHOT</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.imirsel</groupId>
 			<artifactId>nema-annotations</artifactId>
 			<version>0.5.0-SNAPSHOT</version>
 		</dependency>
-		
-		
-	<dependency>
-    	<groupId>org.imirsel.nema.test</groupId>
-    	<artifactId>test-api</artifactId>
-    	<version>0.1.0-SNAPSHOT</version>
-	</dependency>
-		
-		
-		
-		
+
+
+		<dependency>
+			<groupId>org.imirsel.nema.test</groupId>
+			<artifactId>test-api</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+
+
+
+
 	</dependencies>
 	<properties>
 		<imirsel-nema-core.version>0.5.0-SNAPSHOT</imirsel-nema-core.version>
 		<imirsel-meandre-client.version>0.5.0-SNAPSHOT</imirsel-meandre-client.version>
 		<meandre-server.version>1.4.8</meandre-server.version>
 		<spring-framework.version>2.5.6</spring-framework.version>
-                <jdbc.groupId>mysql</jdbc.groupId>
-                <jdbc.artifactId>mysql-connector-java</jdbc.artifactId>
-                <jdbc.version>5.0.5</jdbc.version>
-                <jdbc.driverClassName>com.mysql.jdbc.Driver</jdbc.driverClassName>
+		<jdbc.groupId>mysql</jdbc.groupId>
+		<jdbc.artifactId>mysql-connector-java</jdbc.artifactId>
+		<jdbc.version>5.0.5</jdbc.version>
+		<jdbc.driverClassName>com.mysql.jdbc.Driver</jdbc.driverClassName>
 	</properties>
 	<build>
 		<plugins>
@@ -202,11 +200,11 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-                 <plugin>
-                      <groupId>org.mortbay.jetty</groupId>
-                      <artifactId>maven-jetty-plugin</artifactId>
-                      <version>6.1.10</version>
-                </plugin>  
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>maven-jetty-plugin</artifactId>
+				<version>6.1.10</version>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>dbunit-maven-plugin</artifactId>
@@ -284,20 +282,63 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3</version>
-				<!--
-					This plugin is used to create the jar file used by the nema-webapp
-					The webapp does not need the applicationContext file. It only needs
-					the models and the interfaces
-				-->
 				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<Implementation-Build>${buildNumber}</Implementation-Build>
+						</manifestEntries>
+					</archive>
+
 					<excludes>
+						<exclude>**/*.xml</exclude>
+						<exclude>**/*.properties</exclude>
 						<exclude>**/applicationContext.xml</exclude>
+						<exclude>**/*.sh</exclude>
 					</excludes>
 				</configuration>
 
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-5</version>
+				<configuration>
+					<descriptors>
+						<descriptor>src/assemblies/production-assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<configuration>
+					<format>{0,number}.{1,number}.{2,number}</format>
+					<items>
+						<item>buildNumber0</item>
+						<item>buildNumber1</item>
+						<item>buildNumber2</item>
+					</items>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+
 
 		</plugins>
+
+
+
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -305,6 +346,7 @@
 				<includes>
 					<include>**/*.xml</include>
 					<include>**/*.properties</include>
+					<include>**/*.sh</include>
 				</includes>
 			</resource>
 		</resources>
@@ -332,25 +374,25 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-			    <!-- mail.properties -->
+				<!-- mail.properties -->
 				<mail.server>express-smtp.cites.uiuc.edu</mail.server>
-				
+
 				<!-- RepositoryProperties.properties -->
 				<db.locator>${repository.db.locator}</db.locator>
 				<db.username>${repository.db.username}</db.username>
 				<db.password>${repository.db.password}</db.password>
 				<db.name>${repository.db.name}</db.name>
-				
+
 				<!-- flowrepository.properties -->
 				<flowrepository.location>${flowrepository.store.location}</flowrepository.location>
-			
+
 				<!-- jdbc.properties -->
 				<jdbc.url>${flowservice.jdbc.url}</jdbc.url>
 				<jdbc.username>${flowservice.jdbc.username}</jdbc.username>
 				<jdbc.password>${flowservice.jdbc.password}</jdbc.password>
 				<jdbc.driverClassName>${flowservice.jdbc.driverClassName}</jdbc.driverClassName>
 				<jdbc.maxActive>${flowservice.jdbc.maxActive}</jdbc.maxActive>
-				
+
 				<!--meandreserver.properties-->
 				<headserver.host>${meandre.headserver.host}</headserver.host>
 				<headserver.port>${meandre.headserver.port}</headserver.port>
@@ -362,9 +404,9 @@
 				<workerserver.usernames>${meandre.workerserver.usernames}</workerserver.usernames>
 				<workerserver.passwords>${meandre.workerserver.passwords}</workerserver.passwords>
 				<workerserver.maxConcurrentJobs>${meandre.workerserver.maxConcurrentJobs}</workerserver.maxConcurrentJobs>
-				
-			
-				
+
+
+
 			</properties>
 		</profile>
 		<profile>
@@ -375,23 +417,23 @@
 			<properties>
 				<!-- mail.properties -->
 				<mail.server>express-smtp.cites.uiuc.edu</mail.server>
-				
+
 				<!-- RepositoryProperties.properties -->
 				<db.locator>${repository.db.locator}</db.locator>
 				<db.username>${repository.db.username}</db.username>
 				<db.password>${repository.db.password}</db.password>
 				<db.name>${repository.db.name}</db.name>
-				
+
 				<!-- flowrepository.properties -->
 				<flowrepository.location>${flowrepository.store.location}</flowrepository.location>
-			
+
 				<!-- jdbc.properties -->
 				<jdbc.url>${flowservice.jdbc.url}</jdbc.url>
 				<jdbc.username>${flowservice.jdbc.username}</jdbc.username>
 				<jdbc.password>${flowservice.jdbc.password}</jdbc.password>
 				<jdbc.driverClassName>${flowservice.jdbc.driverClassName}</jdbc.driverClassName>
 				<jdbc.maxActive>${flowservice.jdbc.maxActive}</jdbc.maxActive>
-				
+
 				<!--meandreserver.properties-->
 				<headserver.host>${meandre.headserver.host}</headserver.host>
 				<headserver.port>${meandre.headserver.port}</headserver.port>
@@ -403,9 +445,9 @@
 				<workerserver.usernames>${meandre.workerserver.usernames}</workerserver.usernames>
 				<workerserver.passwords>${meandre.workerserver.passwords}</workerserver.passwords>
 				<workerserver.maxConcurrentJobs>${meandre.workerserver.maxConcurrentJobs}</workerserver.maxConcurrentJobs>
-								
-			
-			
+
+
+
 			</properties>
 		</profile>
 
