@@ -21,6 +21,11 @@ public class FlowServiceApp {
 	 * @param args Arguments for the application.
 	 */
 	public static void main(String[] args) {
+		String title=FlowServiceApp.class.getPackage().getImplementationTitle();
+		String version = FlowServiceApp.class.getPackage().getImplementationVersion();
+		if(!(title==null || version==null)){
+		System.out.println("Starting: " +  title  + " Implementation Version: " + version);
+		}
 		try {
 			try {
 		            java.rmi.registry.LocateRegistry.createRegistry(1099);

@@ -11,6 +11,8 @@
 	<prerequisites>
 		<maven>2.0.9</maven>
 	</prerequisites>
+	
+	
 	<distributionManagement>
 		<repository>
 			<name>IMIRSEL Releases</name>
@@ -316,11 +318,9 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
 				<configuration>
-					<format>{0,number}.{1,number}.{2,number}</format>
+					<format>{0,number}</format>
 					<items>
-						<item>buildNumber0</item>
-						<item>buildNumber1</item>
-						<item>buildNumber2</item>
+						<item>buildNumber</item>
 					</items>
 				</configuration>
 				<executions>
@@ -332,6 +332,28 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0-beta-3</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>true</doCheck>
+					<doUpdate>true</doUpdate>
+					<providerImplementations>
+						<svn>javasvn</svn>
+					</providerImplementations>
+				</configuration>
+			</plugin>
+
 
 
 
@@ -452,4 +474,7 @@
 		</profile>
 
 	</profiles>
+	
+>
+	
 </project>
