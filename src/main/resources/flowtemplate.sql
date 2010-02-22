@@ -1,8 +1,8 @@
--- MySQL dump 10.11
+-- MySQL dump 10.10
 --
--- Host: localhost    Database: flowservice
+-- Host: localhost    Database: flowservice060
 -- ------------------------------------------------------
--- Server version	5.0.51a-3ubuntu5.4
+-- Server version	5.0.22
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -16,53 +16,50 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `flowservice`
+-- Current Database: `flowservice060`
 --
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `flowservice` /*!40100 DEFAULT CHARACTER SET latin1 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `flowservice060` /*!40100 DEFAULT CHARACTER SET latin1 */;
 
-USE `flowservice`;
+USE `flowservice060`;
 
 --
 -- Table structure for table `flow`
 --
 
 DROP TABLE IF EXISTS `flow`;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
 CREATE TABLE `flow` (
   `id` bigint(20) NOT NULL auto_increment,
   `creatorId` bigint(20) NOT NULL,
   `dateCreated` datetime NOT NULL,
-  `description` text NOT NULL,
+  `description` text,
   `keyWords` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `isTemplate` bit(1) NOT NULL,
+  `type` varchar(255) NOT NULL,
   `url` varchar(255) NOT NULL,
   `instanceOf` bigint(20) default NULL,
   `typeName` varchar(255) default NULL,
   PRIMARY KEY  (`id`),
   KEY `FK30012E4E20E557` (`instanceOf`)
-) ENGINE=MyISAM AUTO_INCREMENT=132 DEFAULT CHARSET=latin1;
-SET character_set_client = @saved_cs_client;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `flow`
 --
 
-LOCK TABLES `flow` WRITE;
+
 /*!40000 ALTER TABLE `flow` DISABLE KEYS */;
-INSERT INTO `flow` VALUES (2,-2,'2010-01-23 12:21:37','This algorithm performs structural segmentation (e.g. segmenting music into verse, chorus, bridge, etc) on music. It was submitted to the 2009 iteration of MIREX. This flow performs the segmentation of the music, and subsequently evaluates the algorithms ','analysis, structure, segmentation, evaluation, mirex','Classification: Andreas F. Ehmann','','http://test.org/datatypetest/',NULL,'Classification'),(3,-2,'2010-01-23 12:21:37','','extraction jAudio','Feature Extraction using jAudio','','http://test.org/datatypetest/',NULL,'Feature Extraction'),(4,-2,'2010-01-23 12:21:37','This flow executes George Tzanetakis\'s marsyas program to classify audio files. Features are first extracted from audio files. A classifier is then trained on a training set and used to classify unknown music files. The classification performance is evalu','classification, evaluation, mirex','Classification: Marsyas','','http://test.org/datatypetest/',NULL,'Classification'),(5,-2,'2010-01-23 12:21:37','This algorithm extracts the frequency contour of the main melody in a piece of polyphonic music. It was submitted to the 2009 iteration of MIREX. This flow runs Dressler\'s algorithm on a piece of music, and plots the extracted melody contour against a hum','analysis, melody, evaluation, mirex','Melody Extraction using Dressler','','http://test.org/datatypetest/',NULL,'Feature Extraction'),(6,-2,'2010-01-23 12:21:37','This algorithm extracts the frequency contour of the main melody in a piece of polyphonic music. It was submitted to the 2009 iteration of MIREX. This flow runs Durrieu\'s SIMM algorithm on a piece of music, and plots the extracted melody contour against a','analysis, melody, evaluation, mirex','Melody Extraction using Durrieu','','http://test.org/datatypetest/',NULL,'Feature Extraction'),(7,-2,'2010-01-23 12:21:37','This flow performs phase vocoder analysis. The fundamental frequency of the input is assumed to be not changing much over time. Hence, this analysis is most appropriate for individual notes. The analysis frequency is estimated by performing a monophonic p','phase-vocoder analysis','Phase Vocoder Analysis','','http://test.org/datatypetest/',NULL,'Analysis'),(8,-2,'2010-01-23 12:21:37','This algorithm performs structural segmentation (e.g. segmenting music into verse, chorus, bridge, etc) on music. It was submitted to the 2009 iteration of MIREX. This flow performs the segmentation of the music, and subsequently evaluates the algorithms ','analysis, structure, segmentation, evaluation, mirex','Structural Segmentation by Mauch','','http://test.org/datatypetest/',NULL,'Analysis'),(10,-2,'2010-01-23 12:21:37','Updates the MIREX evaluation results to the task you are submitting to.','mirex evaluation','Update MIREX Evaluation Results','','http://test.org/datatypetest/',NULL,'Analysis'),(11,-2,'2010-01-23 12:21:37','This flow executes Klaus Seyerlehner and Markus Schedle to classify audio files. Features are first extracted from audio files. A classifier is then trained on a training set and used to classify unknown music files. The classification performance is eval','classification, evaluation, mirex','Classification: Seyerlehner','','http://test.org/datatypetest/',NULL,'Classification');
-/*!40000 ALTER TABLE `flow` ENABLE KEYS */;
+LOCK TABLES `flow` WRITE;
+INSERT INTO `flow` VALUES (2,-2,'2010-01-23 12:21:37','This algorithm performs structural segmentation (e.g. segmenting music into verse, chorus, bridge, etc) on music. It was submitted to the 2009 iteration of MIREX. This flow performs the segmentation of the music, and subsequently evaluates the algorithms ','analysis, structure, segmentation, evaluation, mirex','Classification: Andreas F. Ehmann','','Classification: Andreas F. Ehmann','http://imirsel.org/classification/classification_ehmann/',NULL,NULL),(3,-2,'2010-01-23 12:21:37','','extraction jAudio','Feature Extraction using jAudio','','Feature Extraction using jAudio','http://imirsel.org/feature_extraction/jaudio_feature_extractor/',NULL,NULL),(4,-2,'2010-01-23 12:21:37','This flow executes George Tzanetakis\'s marsyas program to classify audio files. Features are first extracted from audio files. A classifier is then trained on a training set and used to classify unknown music files. The classification performance is evalu','classification, evaluation, mirex','Classification: Marsyas','','Classification: Marsyas','http://imirsel.org/classification/classification_marsyas/',NULL,NULL),(5,-2,'2010-01-23 12:21:37','This algorithm extracts the frequency contour of the main melody in a piece of polyphonic music. It was submitted to the 2009 iteration of MIREX. This flow runs Dressler\'s algorithm on a piece of music, and plots the extracted melody contour against a hum','analysis, melody, evaluation, mirex','Melody Extraction using Dressler','','Melody Extraction using Dressler','http://imirsel.org/analysis/melody/melody_dressler/',NULL,NULL),(6,-2,'2010-01-23 12:21:37','This algorithm extracts the frequency contour of the main melody in a piece of polyphonic music. It was submitted to the 2009 iteration of MIREX. This flow runs Durrieu\'s SIMM algorithm on a piece of music, and plots the extracted melody contour against a','analysis, melody, evaluation, mirex','Melody Extraction using Durrieu','','Melody Extraction using Durrieu','http://imirsel.org/analysis/melody/melody_durrieu/',NULL,NULL),(7,-2,'2010-01-23 12:21:37','This flow performs phase vocoder analysis. The fundamental frequency of the input is assumed to be not changing much over time. Hence, this analysis is most appropriate for individual notes. The analysis frequency is estimated by performing a monophonic p','phase-vocoder analysis','Phase Vocoder Analysis','','Phase Vocoder Analysis','http://imirsel.org/analysis/phase_vocoder/phase_vocoder/',NULL,NULL),(8,-2,'2010-01-23 12:21:37','This algorithm performs structural segmentation (e.g. segmenting music into verse, chorus, bridge, etc) on music. It was submitted to the 2009 iteration of MIREX. This flow performs the segmentation of the music, and subsequently evaluates the algorithms ','analysis, structure, segmentation, evaluation, mirex','Structural Segmentation by Mauch','','Structural Segmentation by Mauch','http://imirsel.org/analysis/structure/structure_mauch/',NULL,NULL),(10,-2,'2010-01-23 12:21:37','Updates the MIREX evaluation results to the task you are submitting to.','mirex evaluation','Update MIREX Evaluation Results','','Evaluation: MIREX','http://imirsel.org/evaluation/mirex_evaluation/',NULL,NULL),(11,-2,'2010-01-23 12:21:37','This flow executes Klaus Seyerlehner and Markus Schedle to classify audio files. Features are first extracted from audio files. A classifier is then trained on a training set and used to classify unknown music files. The classification performance is eval','classification, evaluation, mirex','Classification: Seyerlehner','','Classification: Seyerlehner','http://imirsel.org/classification/classification_seyerlehner/',NULL,NULL);
 UNLOCK TABLES;
+/*!40000 ALTER TABLE `flow` ENABLE KEYS */;
 
 --
 -- Table structure for table `job`
 --
 
 DROP TABLE IF EXISTS `job`;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
 CREATE TABLE `job` (
   `id` bigint(20) NOT NULL auto_increment,
   `description` longtext,
@@ -84,24 +81,22 @@ CREATE TABLE `job` (
   PRIMARY KEY  (`id`),
   KEY `FK19BBD781BC449` (`flowInstanceId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-SET character_set_client = @saved_cs_client;
 
 --
 -- Dumping data for table `job`
 --
 
-LOCK TABLES `job` WRITE;
+
 /*!40000 ALTER TABLE `job` DISABLE KEYS */;
-/*!40000 ALTER TABLE `job` ENABLE KEYS */;
+LOCK TABLES `job` WRITE;
 UNLOCK TABLES;
+/*!40000 ALTER TABLE `job` ENABLE KEYS */;
 
 --
 -- Table structure for table `jobResult`
 --
 
 DROP TABLE IF EXISTS `jobResult`;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
 CREATE TABLE `jobResult` (
   `id` bigint(20) NOT NULL auto_increment,
   `resultType` varchar(255) NOT NULL,
@@ -111,45 +106,44 @@ CREATE TABLE `jobResult` (
   KEY `FK40CDCE3A40A162B8` (`jobId`),
   KEY `FK40CDCE3A3A97C23B` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-SET character_set_client = @saved_cs_client;
 
 --
 -- Dumping data for table `jobResult`
 --
 
-LOCK TABLES `jobResult` WRITE;
+
 /*!40000 ALTER TABLE `jobResult` DISABLE KEYS */;
-/*!40000 ALTER TABLE `jobResult` ENABLE KEYS */;
+LOCK TABLES `jobResult` WRITE;
 UNLOCK TABLES;
+/*!40000 ALTER TABLE `jobResult` ENABLE KEYS */;
 
 --
 -- Table structure for table `notification`
 --
 
 DROP TABLE IF EXISTS `notification`;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
 CREATE TABLE `notification` (
   `id` bigint(20) NOT NULL auto_increment,
   `dateCreated` datetime NOT NULL,
   `message` longtext NOT NULL,
   `recipientEmail` varchar(255) NOT NULL,
   `recipientId` bigint(20) NOT NULL,
+  `sent` bit(1) NOT NULL,
   `deliveryStatusCode` int(11) default NULL,
   `errorMessage` varchar(255) default NULL,
   `subject` varchar(255) default NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-SET character_set_client = @saved_cs_client;
 
 --
 -- Dumping data for table `notification`
 --
 
-LOCK TABLES `notification` WRITE;
+
 /*!40000 ALTER TABLE `notification` DISABLE KEYS */;
-/*!40000 ALTER TABLE `notification` ENABLE KEYS */;
+LOCK TABLES `notification` WRITE;
 UNLOCK TABLES;
+/*!40000 ALTER TABLE `notification` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -160,4 +154,3 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-02-09 20:39:49

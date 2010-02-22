@@ -50,8 +50,13 @@
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </file>
-           <file>
+     <file>
       <source>${project.basedir}/src/main/resources/applicationContext.xml</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+    <file>
+      <source>${project.basedir}/src/main/resources/flowtemplate.sql</source>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </file>
