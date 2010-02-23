@@ -3,6 +3,7 @@
 CLASSPATH=.:${project.build.finalName}.jar
 MAIN_CLASS=org.imirsel.nema.flowservice.FlowServiceApp
 CWD=`pwd`
+HOST=${nema.deployment.hostname}
 FLAG="-Dava.rmi.server.logCalls=true -Djava.rmi.server.codebase=file:///$CWD/lib -Djava.rmi.server.hostname=nema.lis.uiuc.edu -Djava.util.logging.config.file=logging.properties"
 mkdir -p log
 jarList=`find $CWD/lib -name '*.jar'`

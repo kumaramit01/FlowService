@@ -4,7 +4,7 @@
 	<groupId>org.imirsel</groupId>
 	<artifactId>nema-flow-service</artifactId>
 	<packaging>jar</packaging>
-	<version>0.6.0-SNAPSHOT</version>
+	<version>0.5.1-SNAPSHOT</version>
 	<name>nema-flow-service</name>
 	<url>http://maven.apache.org</url>
 
@@ -255,7 +255,7 @@
 						</component>
 					</components>
 					<componentProperties>
-						<drop>true</drop>
+						<update>true</update>
 						<jdk5>true</jdk5>
 						<propertyfile>target/test-classes/jdbc.properties</propertyfile>
 						<configurationfile>/src/test/resources/hibernate.cfg.xml</configurationfile>

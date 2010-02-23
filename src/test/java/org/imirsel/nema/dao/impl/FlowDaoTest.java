@@ -20,6 +20,10 @@ public class FlowDaoTest extends BaseDaoTestCase {
 	@Test
 	public void testFlowDaoTemplateGet(){
 		List<Flow> flowList=this.getFlowDao().getFlowTemplates();
+		
+		for(Flow flow: flowList){
+			System.out.println(flow.getTypeName());
+		}
 		assertTrue(flowList.size()==1);
 	}
 	

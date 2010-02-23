@@ -23,7 +23,7 @@ public class MeanderServerIntegrationTest {
 	    .addAnnotatedClass(org.imirsel.nema.model.JobResult.class)
 	    .addAnnotatedClass(org.imirsel.nema.model.Job.class)
 	    .addAnnotatedClass(org.imirsel.nema.model.Flow.class)
-	    .setProperty("hibernate.connection.url", "jdbc:mysql://nema.lis.uiuc.edu:3306/flowservice?autoReconnect=true")
+	    .setProperty("hibernate.connection.url", "jdbc:mysql://128.174.154.145:3306/flowservice?autoReconnect=true")
 	    .setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
 	    .setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver")
 	    .setProperty("hibernate.connection.username", "nema_user")
@@ -61,6 +61,7 @@ public class MeanderServerIntegrationTest {
         flow.setKeyWords("test flow");
         flow.setTemplate(false);
         flow.setType(Flow.FlowType.INHERITS);
+        flow.setTypeName(Flow.FlowType.INHERITS.getName());
 
         Session currentSession = sessionFactory.getCurrentSession();
         Transaction transaction = currentSession.beginTransaction();

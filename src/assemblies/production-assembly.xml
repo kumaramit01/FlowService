@@ -26,6 +26,11 @@
       <filtered>true</filtered>
     </file>
     <file>
+      <source>run-console.sh</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+    <file>
       <source>${project.basedir}/src/main/resources/flowrepository.properties</source>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>

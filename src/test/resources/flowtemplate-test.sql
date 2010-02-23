@@ -19,9 +19,9 @@
 -- Current Database: `flowservice`
 --
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `flowservice` /*!40100 DEFAULT CHARACTER SET latin1 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `flowservice051` /*!40100 DEFAULT CHARACTER SET latin1 */;
 
-USE `flowservice`;
+USE `flowservice051`;
 
 --
 -- Table structure for table `flow`
