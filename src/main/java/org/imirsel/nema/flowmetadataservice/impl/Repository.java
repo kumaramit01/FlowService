@@ -211,13 +211,15 @@ public class Repository {
 			//if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
 			//	tempFolder += System.getProperty("file.separator");
 			
-			fileName = tempFolder +  System.getProperty("file.separator")+ fName + ".nt";
+			String fsep=System.getProperty("file.separator");
+			fileName = tempFolder + fsep + fName + ".nt";
+			
 			logger.info(fileName);
-			ntStream = new FileOutputStream(tempFolder + fName + ".nt");
+			ntStream = new FileOutputStream(tempFolder + fsep + fName + ".nt");
 			flowModel.write(ntStream, "N-TRIPLE");
-			ttlStream = new FileOutputStream(tempFolder + fName + ".ttl");
+			ttlStream = new FileOutputStream(tempFolder + fsep +fName + ".ttl");
 			flowModel.write(ttlStream, "TTL");
-			rdfStream = new FileOutputStream(tempFolder + fName + ".rdf");
+			rdfStream = new FileOutputStream(tempFolder + fsep +fName + ".rdf");
 			flowModel.write(rdfStream, "RDF/XML-ABBREV");
 			
 
