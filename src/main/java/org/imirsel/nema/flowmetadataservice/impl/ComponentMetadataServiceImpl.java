@@ -18,7 +18,7 @@ import org.imirsel.nema.flowmetadataservice.ComponentMetadataService;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
 import org.imirsel.nema.model.Component;
-import org.imirsel.nema.model.NEMADataset;
+import org.imirsel.nema.model.NemaDataset;
 import org.imirsel.nema.model.Property;
 import org.imirsel.nema.renderers.CollectionRenderer;
 import org.imirsel.nema.repository.RepositoryClientConnectionPool;
@@ -167,8 +167,8 @@ public class ComponentMetadataServiceImpl implements ComponentMetadataService {
 					ArrayList<Object> valueList = new ArrayList<Object>();
 					RepositoryClientInterface rpi=this.getRepositoryClient();
 					try {
-						List<NEMADataset> ltb=rpi.getDatasets();
-						for(NEMADataset dataset:ltb){
+						List<NemaDataset> ltb=rpi.getDatasets();
+						for(NemaDataset dataset:ltb){
 							String label=dataset.getName();
 							int value=dataset.getId();
 							labelList.add(label);
