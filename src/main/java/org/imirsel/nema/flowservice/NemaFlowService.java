@@ -277,11 +277,15 @@ public class NemaFlowService implements FlowService {
 		MeandreServerProxyStatus proxyStatus = new MeandreServerProxyStatus();
 		proxyStatus.setNumRunning(head.getNumJobsRunning());
 		proxyStatus.setNumAborting(head.getNumJobsAborting());
+		proxyStatus.setHead(true);
+		proxyStatus.setMaxConcurrentJobs(head.getMeandreServerProxyConfig().getMaxConcurrentJobs());
 		map.put(head.getMeandreServerProxyConfig(), proxyStatus);
 		for(MeandreServerProxy serverProxy:this.getJobScheduler().getJobSchedulerConfig().getServers()){
 			proxyStatus = new MeandreServerProxyStatus();
 			proxyStatus.setNumRunning(serverProxy.getNumJobsRunning());
 			proxyStatus.setNumAborting(serverProxy.getNumJobsAborting());
+			proxyStatus.setMaxConcurrentJobs(head.getMeandreServerProxyConfig().getMaxConcurrentJobs());
+			proxyStatus.setHead(false);
 			map.put(serverProxy.getMeandreServerProxyConfig(),proxyStatus);
 		}
 		return map;
@@ -292,7 +296,8 @@ public class NemaFlowService implements FlowService {
 			int port) {
 		MeandreServerProxy head=this.getJobScheduler().getJobSchedulerConfig().getHead();
 		if(head.getMeandreServerProxyConfig().getHost().equalsIgnoreCase(host) && head.getMeandreServerProxyConfig().getPort()== port){
-			return new MeandreServerProxyStatus(head.getNumJobsRunning(), head.getNumJobsAborting(), head.getMeandreServerProxyConfig().getMaxConcurrentJobs());
+			return new MeandreServerProxyStatus(head.getNumJobsRunning(), head.getNumJobsAborting(), 
+					head.getMeandreServerProxyConfig().getMaxConcurrentJobs(), true);
 		}
 		for(MeandreServerProxy serverProxy:this.getJobScheduler().getJobSchedulerConfig().getServers()){
 			if(serverProxy.getMeandreServerProxyConfig().getHost().equalsIgnoreCase(host) && serverProxy.getMeandreServerProxyConfig().getPort()== port){
@@ -300,6 +305,7 @@ public class NemaFlowService implements FlowService {
 				proxyStatus.setNumRunning(serverProxy.getNumJobsRunning());
 				proxyStatus.setNumAborting(serverProxy.getNumJobsAborting());
 				proxyStatus.setMaxConcurrentJobs(serverProxy.getMeandreServerProxyConfig().getMaxConcurrentJobs());
+				proxyStatus.setHead(false);
 				return proxyStatus;
 			}
 		}
