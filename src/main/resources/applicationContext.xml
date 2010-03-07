@@ -128,7 +128,7 @@
 	<bean id="jobScheduler" class="org.imirsel.nema.flowservice.MeandreJobScheduler">
 		<property name="loadBalancer" ref="loadBalancer" />
 		<property name="daoFactory" ref="daoFactory" />
-		<property name="meandreJobSchedulerConfig" ref="jobSchedulerConfig" />
+		<property name="jobSchedulerConfig" ref="jobSchedulerConfig" />
 	</bean>
 
 	<bean id="repositoryClientConnectionPool" class="org.imirsel.nema.repository.RepositoryClientConnectionPool">
