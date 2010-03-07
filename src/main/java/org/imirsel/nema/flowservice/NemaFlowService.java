@@ -1,5 +1,6 @@
 package org.imirsel.nema.flowservice;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -270,22 +271,50 @@ public class NemaFlowService implements FlowService {
 	}
 
 	@Override
-	public HashMap<MeandreServerProxyConfig, MeandreServerProxyStatus> getMeandreServerProxyStatus() {
-		// TODO Auto-generated method stub
-		return null;
+	public Map<MeandreServerProxyConfig, MeandreServerProxyStatus> getMeandreServerProxyStatus() {
+		MeandreServerProxy head=this.getJobScheduler().getJobSchedulerConfig().getHead();
+		HashMap<MeandreServerProxyConfig, MeandreServerProxyStatus> map = new HashMap<MeandreServerProxyConfig, MeandreServerProxyStatus>();
+		MeandreServerProxyStatus proxyStatus = new MeandreServerProxyStatus();
+		proxyStatus.setNumRunning(head.getNumJobsRunning());
+		proxyStatus.setNumAborting(head.getNumJobsAborting());
+		map.put(head.getMeandreServerProxyConfig(), proxyStatus);
+		for(MeandreServerProxy serverProxy:this.getJobScheduler().getJobSchedulerConfig().getServers()){
+			proxyStatus = new MeandreServerProxyStatus();
+			proxyStatus.setNumRunning(serverProxy.getNumJobsRunning());
+			proxyStatus.setNumAborting(serverProxy.getNumJobsAborting());
+			map.put(serverProxy.getMeandreServerProxyConfig(),proxyStatus);
+		}
+		return map;
 	}
 
 	@Override
 	public MeandreServerProxyStatus getMeandreServerProxyStatus(String host,
 			int port) {
-		// TODO Auto-generated method stub
-		return null;
+		MeandreServerProxy head=this.getJobScheduler().getJobSchedulerConfig().getHead();
+		if(head.getMeandreServerProxyConfig().getHost().equalsIgnoreCase(host) && head.getMeandreServerProxyConfig().getPort()== port){
+			return new MeandreServerProxyStatus(head.getNumJobsRunning(), head.getNumJobsAborting());
+		}
+		for(MeandreServerProxy serverProxy:this.getJobScheduler().getJobSchedulerConfig().getServers()){
+			if(serverProxy.getMeandreServerProxyConfig().getHost().equalsIgnoreCase(host) && serverProxy.getMeandreServerProxyConfig().getPort()== port){
+				MeandreServerProxyStatus proxyStatus = new MeandreServerProxyStatus();
+				proxyStatus.setNumRunning(serverProxy.getNumJobsRunning());
+				proxyStatus.setNumAborting(serverProxy.getNumJobsAborting());
+				return proxyStatus;
+			}
+		}
+			return null;
 	}
 
 	@Override
 	public List<MeandreServerProxyConfig> getSchedulerConfig() {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<MeandreServerProxyConfig> list = new ArrayList<MeandreServerProxyConfig>();
+		MeandreServerProxy head=this.getJobScheduler().getJobSchedulerConfig().getHead();
+		list.add(head.getMeandreServerProxyConfig());
+		
+		for(MeandreServerProxy serverProxy:this.getJobScheduler().getJobSchedulerConfig().getServers()){
+			list.add(serverProxy.getMeandreServerProxyConfig());
+		}
+		return list;
 	}
 
 }

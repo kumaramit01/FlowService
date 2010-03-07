@@ -27,4 +27,8 @@ public interface JobScheduler {
     * @param job The job to halt execution for.
     */
    public void abortJob(Job job);
+   
+   
+   public MeandreJobSchedulerConfig getJobSchedulerConfig();
+   
 }

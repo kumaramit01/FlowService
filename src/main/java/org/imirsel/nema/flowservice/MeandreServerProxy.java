@@ -515,5 +515,14 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 		return meandreServerProxyConfig.getHost()+":"+meandreServerProxyConfig.getPort();
 	}
 
+	public int getNumJobsAborting() {
+		abortingLock.lock();
+		try {
+			return abortPending.size();
+		} finally {
+			abortingLock.unlock();
+		}
+	}
+
 
 }

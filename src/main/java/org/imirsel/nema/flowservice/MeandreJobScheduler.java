@@ -404,7 +404,7 @@ public class MeandreJobScheduler implements JobScheduler {
     * 
     * @return The {@link MeandreJobSchedulerConfig} currently in use.
     */
-   public MeandreJobSchedulerConfig getMeandreJobSchedulerConfig() {
+   public MeandreJobSchedulerConfig getJobSchedulerConfig() {
       return config;
    }
 
@@ -413,7 +413,7 @@ public class MeandreJobScheduler implements JobScheduler {
     * 
     * @param config The {@link MeandreJobSchedulerConfig} to use.
     */
-   public void setMeandreJobSchedulerConfig(MeandreJobSchedulerConfig config) {
+   public void setJobSchedulerConfig(MeandreJobSchedulerConfig config) {
       this.config = config;
    }
 
