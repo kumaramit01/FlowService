@@ -376,10 +376,6 @@
 
 	<repositories>
 		<repository>
-			<id>central</id>
-			<url>http://repo1.maven.org/maven2</url>
-		</repository>
-		<repository>
 			<id>nema-artifactory-repo</id>
 			<url>http://nema.lis.uiuc.edu/artifactory/repo</url>
 		</repository>
