@@ -271,22 +271,22 @@ public class NemaFlowService implements FlowService {
 	}
 
 	@Override
-	public Map<MeandreServerProxyConfig, MeandreServerProxyStatus> getMeandreServerProxyStatus() {
+	public Map<String, MeandreServerProxyStatus> getMeandreServerProxyStatus() {
 		MeandreServerProxy head=this.getJobScheduler().getJobSchedulerConfig().getHead();
-		HashMap<MeandreServerProxyConfig, MeandreServerProxyStatus> map = new HashMap<MeandreServerProxyConfig, MeandreServerProxyStatus>();
+		HashMap<String, MeandreServerProxyStatus> map = new HashMap<String, MeandreServerProxyStatus>();
 		MeandreServerProxyStatus proxyStatus = new MeandreServerProxyStatus();
 		proxyStatus.setNumRunning(head.getNumJobsRunning());
 		proxyStatus.setNumAborting(head.getNumJobsAborting());
 		proxyStatus.setHead(true);
 		proxyStatus.setMaxConcurrentJobs(head.getMeandreServerProxyConfig().getMaxConcurrentJobs());
-		map.put(head.getMeandreServerProxyConfig(), proxyStatus);
+		map.put(head.getServerString(), proxyStatus);
 		for(MeandreServerProxy serverProxy:this.getJobScheduler().getJobSchedulerConfig().getServers()){
 			proxyStatus = new MeandreServerProxyStatus();
 			proxyStatus.setNumRunning(serverProxy.getNumJobsRunning());
 			proxyStatus.setNumAborting(serverProxy.getNumJobsAborting());
 			proxyStatus.setMaxConcurrentJobs(head.getMeandreServerProxyConfig().getMaxConcurrentJobs());
 			proxyStatus.setHead(false);
-			map.put(serverProxy.getMeandreServerProxyConfig(),proxyStatus);
+			map.put(serverProxy.getServerString(),proxyStatus);
 		}
 		return map;
 	}
@@ -313,13 +313,13 @@ public class NemaFlowService implements FlowService {
 	}
 
 	@Override
-	public List<MeandreServerProxyConfig> getSchedulerConfig() {
-		ArrayList<MeandreServerProxyConfig> list = new ArrayList<MeandreServerProxyConfig>();
+	public List<String> getMeandreServerList() {
+		ArrayList<String> list = new ArrayList<String>();
 		MeandreServerProxy head=this.getJobScheduler().getJobSchedulerConfig().getHead();
-		list.add(head.getMeandreServerProxyConfig());
+		list.add(head.getServerString());
 		
 		for(MeandreServerProxy serverProxy:this.getJobScheduler().getJobSchedulerConfig().getServers()){
-			list.add(serverProxy.getMeandreServerProxyConfig());
+			list.add(serverProxy.getServerString());
 		}
 		return list;
 	}

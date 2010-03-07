@@ -1,5 +1,6 @@
 package org.imirsel.nema.flowservice.config;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.imirsel.nema.flowservice.MeandreJobSchedulerConfig;
@@ -13,7 +14,7 @@ import org.imirsel.nema.flowservice.MeandreServerProxy;
  * @since 0.4.0
  */
 public class SimpleMeandreJobSchedulerConfig implements
-		MeandreJobSchedulerConfig {
+		MeandreJobSchedulerConfig{
 
 	MeandreServerProxy head;
 	Set<MeandreServerProxy> servers;

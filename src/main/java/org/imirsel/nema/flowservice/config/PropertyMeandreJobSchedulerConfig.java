@@ -2,6 +2,7 @@ package org.imirsel.nema.flowservice.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -26,7 +27,8 @@ import org.springframework.core.io.ClassPathResource;
  * 
  */
 public class PropertyMeandreJobSchedulerConfig implements
-		MeandreJobSchedulerConfig {
+		MeandreJobSchedulerConfig{
+	
 	
 	private JobStatusMonitor jobStatusMonitor;
 	private RepositoryClientConnectionPool repositoryClientConnectionPool;
