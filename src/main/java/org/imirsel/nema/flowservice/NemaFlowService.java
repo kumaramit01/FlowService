@@ -292,13 +292,14 @@ public class NemaFlowService implements FlowService {
 			int port) {
 		MeandreServerProxy head=this.getJobScheduler().getJobSchedulerConfig().getHead();
 		if(head.getMeandreServerProxyConfig().getHost().equalsIgnoreCase(host) && head.getMeandreServerProxyConfig().getPort()== port){
-			return new MeandreServerProxyStatus(head.getNumJobsRunning(), head.getNumJobsAborting());
+			return new MeandreServerProxyStatus(head.getNumJobsRunning(), head.getNumJobsAborting(), head.getMeandreServerProxyConfig().getMaxConcurrentJobs());
 		}
 		for(MeandreServerProxy serverProxy:this.getJobScheduler().getJobSchedulerConfig().getServers()){
 			if(serverProxy.getMeandreServerProxyConfig().getHost().equalsIgnoreCase(host) && serverProxy.getMeandreServerProxyConfig().getPort()== port){
 				MeandreServerProxyStatus proxyStatus = new MeandreServerProxyStatus();
 				proxyStatus.setNumRunning(serverProxy.getNumJobsRunning());
 				proxyStatus.setNumAborting(serverProxy.getNumJobsAborting());
+				proxyStatus.setMaxConcurrentJobs(serverProxy.getMeandreServerProxyConfig().getMaxConcurrentJobs());
 				return proxyStatus;
 			}
 		}
