@@ -5,7 +5,7 @@ package org.imirsel.nema.flowservice;
  * the next job request.
  *
  * @author shirk
- * @since 1.0
+ * @since 0.4.0
  */
 public interface MeandreLoadBalancer {
 

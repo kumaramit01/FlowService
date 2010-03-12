@@ -8,7 +8,7 @@ import org.imirsel.nema.model.Job;
  * resources.
  *
  * @author shirk
- * @since 1.0
+ * @since 0.4.0
  */
 public interface JobScheduler {
 
@@ -27,8 +27,5 @@ public interface JobScheduler {
     * @param job The job to halt execution for.
     */
    public void abortJob(Job job);
-   
-   
-   public MeandreJobSchedulerConfig getJobSchedulerConfig();
    
 }

@@ -23,6 +23,8 @@ import org.hibernate.Transaction;
 import org.imirsel.meandre.client.ExecResponse;
 import org.imirsel.nema.dao.DaoFactory;
 import org.imirsel.nema.dao.JobDao;
+import org.imirsel.nema.flowservice.config.FlowServiceConfig;
+import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.Job.JobStatus;
 import org.springframework.dao.DataAccessException;
@@ -47,8 +49,11 @@ public class MeandreJobScheduler implements JobScheduler {
    //~ Instance fields ---------------------------------------------------------
 
    /** The configuration for this job scheduler. */
-   private MeandreJobSchedulerConfig config;
+   private FlowServiceConfig config;
 
+   /** Used to get references to Meandre server proxies. */
+   private MeandreServerProxyFactory serverFactory;
+   
    /** All jobs are placed on this queue as they come into the scheduler. */
    @GuardedBy("queueLock")
    private final Queue<Job> jobQueue = new LinkedList<Job>();
@@ -98,13 +103,16 @@ public class MeandreJobScheduler implements JobScheduler {
     * Creates a new instance given a configuration and a load balancer.
     * 
     * @param config The configuration details for this job scheduler.
-    * @param balancer The load balancer to use for distributing jobs.
+    * @param loadBalancer The load balancer to use for distributing jobs.
     */
-   public MeandreJobScheduler(MeandreJobSchedulerConfig config,
-         MeandreLoadBalancer balancer) {
-      loadBalancer = balancer;
-      workers = config.getServers();
-      for (MeandreServerProxy server : workers) {
+   public MeandreJobScheduler(FlowServiceConfig config,
+         MeandreLoadBalancer loadBalancer) {
+      this.loadBalancer = loadBalancer;
+      this.config = config;
+      Set<MeandreServerProxyConfig> workerConfigs = config.getWorkerConfigs();
+      for(MeandreServerProxyConfig workerConfig : workerConfigs) {
+         MeandreServerProxy server = 
+            serverFactory.getServerProxyInstance(workerConfig);
          loadBalancer.addServer(server);
       }
    }
@@ -117,8 +125,10 @@ public class MeandreJobScheduler implements JobScheduler {
    @PostConstruct
    public void init() {
       assert config != null : "No configuration was provided to the job scheduler.";
-      workers = config.getServers();
-      for (MeandreServerProxy server : workers) {
+      Set<MeandreServerProxyConfig> workerConfigs = config.getWorkerConfigs();
+      for(MeandreServerProxyConfig workerConfig : workerConfigs) {
+         MeandreServerProxy server = 
+            serverFactory.getServerProxyInstance(workerConfig);
          loadBalancer.addServer(server);
       }
    }
@@ -148,9 +158,9 @@ public class MeandreJobScheduler implements JobScheduler {
       try {
          for (MeandreServerProxy server : workers) {
             if (job.getHost().equals(
-                  server.getMeandreServerProxyConfig().getHost())
+                  server.getConfig().getHost())
                   && job.getPort().equals(
-                        server.getMeandreServerProxyConfig().getPort())) {
+                        server.getConfig().getPort())) {
                return server;
             }
          }
@@ -247,8 +257,8 @@ public class MeandreJobScheduler implements JobScheduler {
                session.refresh(job);
                
                logger.fine("Attempting to record job execution response.");
-               job.setHost(server.getMeandreServerProxyConfig().getHost());
-               job.setPort(server.getMeandreServerProxyConfig().getPort());
+               job.setHost(server.getConfig().getHost());
+               job.setPort(server.getConfig().getPort());
                job.setExecPort(response.getPort());
                job.setExecutionInstanceId(response.getUri());
                
@@ -400,20 +410,20 @@ public class MeandreJobScheduler implements JobScheduler {
    }
 
    /**
-    * Return the {@link MeandreJobSchedulerConfig} currently in use.
+    * Return the {@link FlowServiceConfig} currently in use.
     * 
-    * @return The {@link MeandreJobSchedulerConfig} currently in use.
+    * @return The {@link FlowServiceConfig} currently in use.
     */
-   public MeandreJobSchedulerConfig getJobSchedulerConfig() {
+   public FlowServiceConfig getFlowServiceConfig() {
       return config;
    }
 
    /**
-    * Set the {@link MeandreJobSchedulerConfig} to use.
+    * Set the {@link FlowServiceConfig} to use.
     * 
-    * @param config The {@link MeandreJobSchedulerConfig} to use.
+    * @param config The {@link FlowServiceConfig} to use.
     */
-   public void setJobSchedulerConfig(MeandreJobSchedulerConfig config) {
+   public void setFlowServiceConfig(FlowServiceConfig config) {
       this.config = config;
    }
 
@@ -435,6 +445,24 @@ public class MeandreJobScheduler implements JobScheduler {
       return daoFactory;
    }
 
+   /**
+    * Return the {@link MeandreServerProxyFactory} currently in use.
+    * 
+    * @return {@link MeandreServerProxyFactory} currently in use.
+    */
+   public MeandreServerProxyFactory getMeandreServerProxyFactory() {
+      return serverFactory;
+   }
+
+   /**
+    * Set the {@link MeandreServerProxyFactory} to use.
+    * 
+    * @param daoFactory The {@link MeandreServerProxyFactory} implementation to use.
+    */
+   public void setMeandreServerProxyFactory(MeandreServerProxyFactory serverFactory) {
+      this.serverFactory = serverFactory;
+   }
+   
    //~ Inner Classes -----------------------------------------------------------
 
    private class RunQueuedJobs implements Runnable {

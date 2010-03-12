@@ -1,6 +1,5 @@
 package org.imirsel.nema.flowservice;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,9 +14,12 @@ import org.imirsel.nema.dao.DaoFactory;
 import org.imirsel.nema.dao.FlowDao;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.dao.JobResultDao;
+import org.imirsel.nema.flowservice.config.FlowServiceConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyStatus;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
+import org.imirsel.nema.flowservice.notification.JobStatusNotificationCreator;
+import org.imirsel.nema.flowservice.notification.NotificationSender;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Flow;
 import org.imirsel.nema.model.Job;
@@ -40,15 +42,19 @@ public class NemaFlowService implements FlowService {
 	
 	private JobScheduler jobScheduler;
 	
-	private MeandreFlowStore meandreFlowStore;
-	
 	private JobStatusMonitor jobStatusMonitor;
 	
 	private DaoFactory daoFactory;
 	
+	private MeandreServerProxyFactory meandreServerProxyFactory;
+	
+	private FlowServiceConfig flowServiceConfig;
+	
 	private NotificationSender notificationSender;
 	
 	private JobStatusNotificationCreator notificationCreator;
+	
+	private MeandreServerProxy headServer;
 	
 	public NemaFlowService() {	
 	}
@@ -59,6 +65,8 @@ public class NemaFlowService implements FlowService {
        
        notificationCreator = 
     	   new JobStatusNotificationCreator(daoFactory);
+       headServer = meandreServerProxyFactory.
+       getServerProxyInstance(flowServiceConfig.getHeadConfig());
 	}
 	
 	/**
@@ -190,34 +198,36 @@ public class NemaFlowService implements FlowService {
 	@Override
 	public Flow getFlow(long flowId) {
 		FlowDao flowDao = daoFactory.getFlowDao();
-		return flowDao.findById(flowId, false);
+		Flow flow = flowDao.findById(flowId, false);
+		// set refs to meandre servers
+		return flow;
 	}
 
 
 	@Override
-	public String createNewFlow(HashMap<String, String> paramMap, String flowURI, long userId) throws MeandreServerException{
-		return this.getMeandreFlowStore().createNewFlow(paramMap, flowURI, userId);
+	public String createNewFlow(HashMap<String, String> paramMap, String flowURI, long userId) throws MeandreServerException {
+		return headServer.createFlow(paramMap, flowURI, userId);
 	}
 
 	@Override
 	public Map<String, Property> getComponentPropertyDataType(
 			Component component, String url) throws MeandreServerException {
-		return  this.getMeandreFlowStore().getComponentPropertyDataType(component, url);
+		return headServer.getComponentPropertyDataType(component, url);
 	}
 
 	@Override
-	public List<Component> getComponents(String url) throws MeandreServerException {
-		return  this.getMeandreFlowStore().getComponents(url);
+	public List<Component> getComponents(String flowUri) throws MeandreServerException {
+		return headServer.getComponents(flowUri);
 	}
 
 	@Override
 	public String getConsole(String uri) throws MeandreServerException {
-		return this.getMeandreFlowStore().getConsole(uri);
+		return headServer.getConsole(uri);
 	}
 
 	@Override
-	public boolean removeFlow(String URI) throws MeandreServerException {
-		return this.getMeandreFlowStore().removeFlow(URI);
+	public boolean removeFlow(String flowUri) throws MeandreServerException {
+		return headServer.removeFlow(flowUri);
 	}
 	
 	/**
@@ -261,15 +271,30 @@ public class NemaFlowService implements FlowService {
 	public void setNotificationSender(NotificationSender notificationSender) {
 		this.notificationSender = notificationSender;
 	}
+	
+	public MeandreServerProxyFactory getMeandreServerProxyFactory() {
+      return meandreServerProxyFactory;
+   }
 
-	public void setMeandreFlowStore(MeandreFlowStore meandreFlowStore) {
-		this.meandreFlowStore = meandreFlowStore;
-	}
+   public void setMeandreServerProxyFactory(
+         MeandreServerProxyFactory meandreServerProxyFactory) {
+      this.meandreServerProxyFactory = meandreServerProxyFactory;
+   }
 
-	public MeandreFlowStore getMeandreFlowStore() {
-		return meandreFlowStore;
-	}
+   
+   public FlowServiceConfig getNemaFlowServiceConfig() {
+      return flowServiceConfig;
+   }
 
+   public void setNemaFlowServiceConfig(
+         FlowServiceConfig nemaFlowServiceConfig) {
+      this.flowServiceConfig = nemaFlowServiceConfig;
+   }
+
+   @Override
+	public HashMap<MeandreServerProxyConfig, MeandreServerProxyStatus> getMeandreServerProxyStatus() {
+		// TODO Auto-generated method stub
+		return null;
 	@Override
 	public Map<String, MeandreServerProxyStatus> getMeandreServerProxyStatus() {
 		MeandreServerProxy head=this.getJobScheduler().getJobSchedulerConfig().getHead();
@@ -294,34 +319,14 @@ public class NemaFlowService implements FlowService {
 	@Override
 	public MeandreServerProxyStatus getMeandreServerProxyStatus(String host,
 			int port) {
-		MeandreServerProxy head=this.getJobScheduler().getJobSchedulerConfig().getHead();
-		if(head.getMeandreServerProxyConfig().getHost().equalsIgnoreCase(host) && head.getMeandreServerProxyConfig().getPort()== port){
-			return new MeandreServerProxyStatus(head.getNumJobsRunning(), head.getNumJobsAborting(), 
-					head.getMeandreServerProxyConfig().getMaxConcurrentJobs(), true);
-		}
-		for(MeandreServerProxy serverProxy:this.getJobScheduler().getJobSchedulerConfig().getServers()){
-			if(serverProxy.getMeandreServerProxyConfig().getHost().equalsIgnoreCase(host) && serverProxy.getMeandreServerProxyConfig().getPort()== port){
-				MeandreServerProxyStatus proxyStatus = new MeandreServerProxyStatus();
-				proxyStatus.setNumRunning(serverProxy.getNumJobsRunning());
-				proxyStatus.setNumAborting(serverProxy.getNumJobsAborting());
-				proxyStatus.setMaxConcurrentJobs(serverProxy.getMeandreServerProxyConfig().getMaxConcurrentJobs());
-				proxyStatus.setHead(false);
-				return proxyStatus;
-			}
-		}
-			return null;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public List<String> getMeandreServerList() {
-		ArrayList<String> list = new ArrayList<String>();
-		MeandreServerProxy head=this.getJobScheduler().getJobSchedulerConfig().getHead();
-		list.add(head.getServerString());
-		
-		for(MeandreServerProxy serverProxy:this.getJobScheduler().getJobSchedulerConfig().getServers()){
-			list.add(serverProxy.getServerString());
-		}
-		return list;
+	public List<MeandreServerProxyConfig> getSchedulerConfig() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

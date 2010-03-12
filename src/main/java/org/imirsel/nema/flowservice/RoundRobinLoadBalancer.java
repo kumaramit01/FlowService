@@ -10,7 +10,7 @@ import net.jcip.annotations.ThreadSafe;
  * algorithm to deal out servers. Implemented as a circular doubly linked list.
  *
  * @author shirk
- * @since 1.0
+ * @since 0.4.0
  */
 @ThreadSafe
 public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
