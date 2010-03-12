@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
+import org.imirsel.nema.flowservice.config.SimpleMeandreServerProxyConfig;
 
 import org.junit.Before;
 import org.junit.Test;

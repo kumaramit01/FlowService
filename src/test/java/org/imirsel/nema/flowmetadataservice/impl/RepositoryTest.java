@@ -7,9 +7,10 @@ import java.util.Set;
 
 import org.imirsel.nema.client.beans.repository.WBExecutableComponentDescription;
 import org.imirsel.nema.client.beans.repository.WBFlowDescription;
+import org.imirsel.nema.flowservice.LocalMeandreFlowRepository;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
-import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
+import org.imirsel.nema.flowservice.config.SimpleMeandreServerProxyConfig;
 import org.imirsel.nema.test.BaseManagerTestCase;
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +23,7 @@ import org.junit.Test;
  */
 public class RepositoryTest extends BaseManagerTestCase {
 	private MeandreServerProxy meandreServerProxy;
-	private Repository repository;
+	private LocalMeandreFlowRepository repository;
 
 
 	
@@ -38,7 +39,7 @@ public class RepositoryTest extends BaseManagerTestCase {
 				username,password,host,port,maxConcurrentJobs);
 		meandreServerProxy = new MeandreServerProxy(config);
 		meandreServerProxy.init();
-		repository = new Repository();
+		repository = new LocalMeandreFlowRepository();
 		repository.setMeandreServerProxy(meandreServerProxy);
 	}
 
@@ -65,7 +66,7 @@ public class RepositoryTest extends BaseManagerTestCase {
 	@Test(expected=MeandreServerException.class)
 	public void testRetrieveComponentDescriptorDoesNotExist() throws MeandreServerException {
 		String componentURI="meandre://seasr.org/components/input";
-			WBExecutableComponentDescription ecd=repository.retrieveComponentDescriptor(componentURI);
+			WBExecutableComponentDescription ecd=repository.getComponentDescription(componentURI);
 			assertTrue(ecd!=null);
 			assertTrue(ecd.getName().length()>0);
 	}
@@ -73,7 +74,7 @@ public class RepositoryTest extends BaseManagerTestCase {
 	@Test
 	public void testRetrieveComponentDescriptorExists() throws MeandreServerException {
 		String componentURI="meandre://seasr.org/components/input";
-			WBExecutableComponentDescription ecd=repository.retrieveComponentDescriptor(componentURI);
+			WBExecutableComponentDescription ecd=repository.getComponentDescription(componentURI);
 			assertTrue(ecd!=null);
 			assertTrue(ecd.getName().length()>0);
 	}
@@ -98,7 +99,7 @@ public class RepositoryTest extends BaseManagerTestCase {
 	public void testRetrieveFlowDescriptor() {
 		String flowURI="http://test.org/datatypetest/";
 		try {
-			WBFlowDescription wfd=this.repository.retrieveFlowDescriptor(flowURI);
+			WBFlowDescription wfd=this.repository.getFlowDescription(flowURI);
 			assertTrue(wfd!=null);
 		} catch (MeandreServerException e) {
 			// TODO Auto-generated catch block

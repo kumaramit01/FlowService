@@ -14,7 +14,7 @@ import org.imirsel.nema.annotations.parser.beans.DataTypeBean;
 import org.imirsel.nema.flowmetadataservice.impl.ComponentMetadataServiceImpl;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
-import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
+import org.imirsel.nema.flowservice.config.SimpleMeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Property;
 import org.imirsel.nema.repository.RepositoryClientConnectionPool;

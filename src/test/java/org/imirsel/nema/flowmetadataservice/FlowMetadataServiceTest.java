@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.imirsel.nema.flowmetadataservice.impl.FlowMetadataServiceImpl;
-import org.imirsel.nema.flowmetadataservice.impl.Repository;
+import org.imirsel.nema.flowservice.LocalMeandreFlowRepository;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.MeandreServerProxy;
-import org.imirsel.nema.flowservice.SimpleMeandreServerProxyConfig;
+import org.imirsel.nema.flowservice.config.SimpleMeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class FlowMetadataServiceTest{
 	
 	private final FlowMetadataServiceImpl flowMetadataService = new FlowMetadataServiceImpl();
 	private MeandreServerProxy meandreServerProxy;
-	private Repository repository;
+	private LocalMeandreFlowRepository repository;
 
 	@Before
 	public void setup() throws MeandreServerException{
@@ -37,7 +37,7 @@ public class FlowMetadataServiceTest{
 		SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
 				username,password,host,port,maxConcurrentJobs);
 		meandreServerProxy = new MeandreServerProxy(config);
-		repository = new Repository();
+		repository = new LocalMeandreFlowRepository();
 		repository.setMeandreServerProxy(meandreServerProxy);
 		repository.init();
 		flowMetadataService.setRepository(repository);
@@ -66,7 +66,7 @@ public class FlowMetadataServiceTest{
 		paramMap.put("datatypetestcomponent_0_mfcc","false");
 		String fileName=null;
 		try {
-			fileName=flowMetadataService.createNewFlow(paramMap, flowURI, 0l);
+			fileName=flowMetadataService.createFlow(paramMap, flowURI, 0l);
 			assertTrue(fileName!=null);
 			assertTrue(fileName.length()>0);
 		} catch (MeandreServerException e) {

@@ -45,7 +45,7 @@ public class NemaFlowServiceTest {
       instance.setName("Test instance");
       instance.setTemplate(false);
       instance
-            .setUrl("repository\\x0\\http___test.org_datatypetest_datatypetest1266359499405_.nt");
+            .setUri("repository\\x0\\http___test.org_datatypetest_datatypetest1266359499405_.nt");
       instance.setDescription("An instance for testing.");
       instance.setType(template.getType());
 
