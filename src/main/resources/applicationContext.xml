@@ -117,33 +117,37 @@
 		<property name="daoFactory" ref="daoFactory" />
 	</bean>
 
-	<bean id="jobSchedulerConfig"
-		class="org.imirsel.nema.flowservice.config.PropertyMeandreJobSchedulerConfig">
-		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
-		<property name="repositoryClientConnectionPool" ref="repositoryClientConnectionPool"/>
-	</bean>
+	<bean id="flowServiceConfig"
+		class="org.imirsel.nema.flowservice.config.PropertiesBasedFlowServiceConfig" />
 
+    <bean id="meandreServerProxyFactory"
+        class="org.imirsel.nema.flowservice.MeandreServerProxyFactory">
+        <property name="jobStatusMonitor" ref="jobStatusMonitor"/>
+        <property name="repositoryClientConnectionPool" ref="repositoryClientConnectionPool"/>
+    </bean>
+        
 	<bean id="loadBalancer" class="org.imirsel.nema.flowservice.RoundRobinLoadBalancer" />
 
 	<bean id="jobScheduler" class="org.imirsel.nema.flowservice.MeandreJobScheduler">
 		<property name="loadBalancer" ref="loadBalancer" />
 		<property name="daoFactory" ref="daoFactory" />
-		<property name="jobSchedulerConfig" ref="jobSchedulerConfig" />
+		<property name="flowServiceConfig" ref="flowServiceConfig" />
 	</bean>
 
-	<bean id="repositoryClientConnectionPool" class="org.imirsel.nema.repository.RepositoryClientConnectionPool">
-        </bean>
+	<bean id="repositoryClientConnectionPool" 
+	    class="org.imirsel.nema.repository.RepositoryClientConnectionPool" />
 
 	<bean id="meandreFlowStore" class="org.imirsel.nema.flowservice.MeandreFlowStore">
-		<property name="meandreJobSchedulerConfig" ref="jobSchedulerConfig"/>
+		<property name="repositoryClientConnectionPool" ref="repositoryClientConnectionPool"/>
 	</bean>
 	
 	<bean id="flowService" class="org.imirsel.nema.flowservice.NemaFlowService">
 		<property name="jobScheduler" ref="jobScheduler" />
 		<property name="jobStatusMonitor" ref="jobStatusMonitor" />
-		<property name="meandreFlowStore" ref="meandreFlowStore"/>
+		<property name="meandreServerProxyFactory" ref="meandreServerProxyFactory"/>
 		<property name="daoFactory" ref="daoFactory" />
 		<property name="notificationSender" ref="notificationSender"/>
+		<property name="flowServiceConfig" ref="flowServiceConfig"/>
 	</bean>
 
 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
@@ -151,7 +155,7 @@
 		<property name="service" ref="flowService" />
 		<property name="serviceInterface" value="org.imirsel.nema.flowservice.FlowService" />
 		<property name="registryPort" value="1099" />
-		<property name="registryHost" value="${nema.deployment.hostname}"/>
+		<!--  property name="registryHost" value="128.174.154.145" THIS IS FOR THE TEST MACHINE -->
 		<property name="servicePort" value="9001"/>
 	</bean>
 
