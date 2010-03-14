@@ -1,5 +1,9 @@
 package org.imirsel.nema.flowservice;
 
+import java.util.Map;
+
+import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
+import org.imirsel.nema.flowservice.config.MeandreServerProxyStatus;
 import org.imirsel.nema.model.Job;
 
 
@@ -22,10 +26,20 @@ public interface JobScheduler {
    public void scheduleJob(Job job);
 
    /**
-    * Halt the processing of a currently executing job.
+    * Request that the processing of a currently executing job is halted.
     *
     * @param job The job to halt execution for.
     */
    public void abortJob(Job job);
+   
+   /**
+    * Return the execution state of all worker servers. The key in the returned
+    * map uniquely identifies the server and the value is the server's current
+    * state.
+    * 
+    * @return Mapping from a {@link MeandreServerProxyConfig} to its current
+    * {@link MeandreServerProxyStatus}.
+    */
+   public Map<MeandreServerProxyConfig,MeandreServerProxyStatus> getWorkerStatus();
    
 }

@@ -29,7 +29,7 @@ import org.imirsel.nema.annotations.parser.beans.StringDataTypeBean;
 import org.imirsel.nema.client.beans.converters.MeandreConverter;
 import org.imirsel.nema.client.beans.repository.WBFlowDescription;
 import org.imirsel.nema.model.Component;
-import org.imirsel.nema.model.NEMADataset;
+import org.imirsel.nema.model.NemaDataset;
 import org.imirsel.nema.model.Property;
 import org.imirsel.nema.renderers.CollectionRenderer;
 import org.imirsel.nema.repository.RepositoryClientConnectionPool;
@@ -475,8 +475,8 @@ public class MeandreFlowStore {
             RepositoryClientInterface rpi = repositoryClientConnectionPool
                   .getFromPool();
             try {
-               List<NEMADataset> ltb = rpi.getDatasets();
-               for (NEMADataset dataset : ltb) {
+               List<NemaDataset> ltb = rpi.getDatasets();
+               for (NemaDataset dataset : ltb) {
                   String label = dataset.getName();
                   int value = dataset.getId();
                   labelList.add(label);

@@ -20,6 +20,7 @@ import org.imirsel.meandre.client.ExecResponse;
 import org.imirsel.meandre.client.MeandreClient;
 import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
+import org.imirsel.nema.flowservice.config.MeandreServerProxyStatus;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
 import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
 import org.imirsel.nema.model.Component;
@@ -48,8 +49,11 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
    private static final Logger logger = Logger
          .getLogger(MeandreServerProxy.class.getName());
 
-   private MeandreServerProxyConfig config = null;
-   private RepositoryClientConnectionPool repositoryClientConnectionPool = null;
+   private MeandreServerProxyConfig config;
+   private String host;
+   private int port;
+   
+   private RepositoryClientConnectionPool repositoryClientConnectionPool;
 
    @GuardedBy("runningLock")
    private final Set<Job> runningJobs = new HashSet<Job>(8);
@@ -74,6 +78,8 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 
    @PostConstruct
    public void init() {
+      host=config.getHost();
+      port=config.getPort();
       meandreClient = new MeandreClient(config.getHost(), config.getPort());
       meandreClient.setLogger(logger);
       meandreClient.setCredentials(config.getUsername(), config.getPassword());
@@ -99,6 +105,20 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
       }
    }
 
+   /**
+    * Return the number of jobs that are pending abort.
+    * 
+    * @return Number of jobs that are pending abort.
+    */
+   public int getNumJobsAborting() {
+      abortingLock.lock();
+      try {
+         return abortPending.size();
+      } finally {
+         abortingLock.unlock();
+      }
+   }
+   
    /**
     * Tests if the server is busy such that it cannot process any more jobs.
     * 
@@ -344,6 +364,8 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
     */
    public void setConfig(MeandreServerProxyConfig config) {
       this.config = config;
+      host=config.getHost();
+      port=config.getPort();
    }
    
    public JobStatusMonitor getJobStatusMonitor() {
@@ -358,18 +380,17 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
       return meandreClient;
    }
    
+   public MeandreServerProxyStatus getStatus() {
+      return new MeandreServerProxyStatus(getNumJobsRunning(),getNumJobsAborting());
+   }
+   
+
    @Override
    public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result
-            + ((abortPending == null) ? 0 : abortPending.hashCode());
-      result = prime * result
-            + ((config.getHost() == null) ? 0 : config.getHost().hashCode());
-      result = prime * result + config.getMaxConcurrentJobs();
-      result = prime * result + config.getPort();
-      result = prime * result
-            + ((runningJobs == null) ? 0 : runningJobs.hashCode());
+      result = prime * result + ((host == null) ? 0 : host.hashCode());
+      result = prime * result + port;
       return result;
    }
 
@@ -382,24 +403,12 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
       if (getClass() != obj.getClass())
          return false;
       MeandreServerProxy other = (MeandreServerProxy) obj;
-      if (abortPending == null) {
-         if (other.abortPending != null)
+      if (host == null) {
+         if (other.host != null)
             return false;
-      } else if (!abortPending.equals(other.abortPending))
+      } else if (!host.equals(other.host))
          return false;
-      if (config.getHost() == null) {
-         if (other.config.getHost() != null)
-            return false;
-      } else if (!config.getHost().equals(other.config.getHost()))
-         return false;
-      if (config.getMaxConcurrentJobs() != other.config.getMaxConcurrentJobs())
-         return false;
-      if (config.getPort() != other.config.getPort())
-         return false;
-      if (runningJobs == null) {
-         if (other.runningJobs != null)
-            return false;
-      } else if (!runningJobs.equals(other.runningJobs))
+      if (port != other.port)
          return false;
       return true;
    }

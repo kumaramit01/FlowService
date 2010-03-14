@@ -1,7 +1,9 @@
 package org.imirsel.nema.flowservice;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -25,6 +27,7 @@ import org.imirsel.nema.dao.DaoFactory;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.flowservice.config.FlowServiceConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
+import org.imirsel.nema.flowservice.config.MeandreServerProxyStatus;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.Job.JobStatus;
 import org.springframework.dao.DataAccessException;
@@ -391,6 +394,24 @@ public class MeandreJobScheduler implements JobScheduler {
       }
    }
 
+
+   /**
+    * @see JobScheduler#getWorkerStatus()
+    */
+   public Map<MeandreServerProxyConfig,MeandreServerProxyStatus> getWorkerStatus() {
+      Map<MeandreServerProxyConfig,MeandreServerProxyStatus> statusMap =
+         new HashMap<MeandreServerProxyConfig,MeandreServerProxyStatus>();
+      workersLock.lock();
+      try {
+         for (MeandreServerProxy server : workers) {
+            statusMap.put(server.getConfig(), server.getStatus());
+         }
+      } finally {
+         workersLock.unlock();
+      }
+      return statusMap;
+   }
+   
    /**
     * Return the {@link MeandreLoadBalancer} currently in use.
     * 

@@ -41,6 +41,8 @@ public class FlowServiceApp {
          new ClassPathXmlApplicationContext("applicationContext.xml");
       } catch (BeansException e) {
          e.printStackTrace();
+      } catch (Exception e) {
+         e.printStackTrace();
       }
    }
 
