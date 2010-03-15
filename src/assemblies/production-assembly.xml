@@ -25,6 +25,11 @@
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </file>
+     <file>
+      <source>run.bat</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
     <file>
       <source>run-console.sh</source>
       <outputDirectory>/</outputDirectory>
