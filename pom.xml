@@ -303,6 +303,7 @@
 						<exclude>**/*.properties</exclude>
 						<exclude>**/applicationContext.xml</exclude>
 						<exclude>**/*.sh</exclude>
+						<exclude>**/*.bat</exclude>
 					</excludes>
 				</configuration>
 
@@ -373,6 +374,7 @@
 					<include>**/*.xml</include>
 					<include>**/*.properties</include>
 					<include>**/*.sh</include>
+					<include>**/*.bat</include>
 				</includes>
 			</resource>
 		</resources>
