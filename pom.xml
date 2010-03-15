@@ -287,8 +287,11 @@
 				<configuration>
 					<archive>
 						<manifest>
+                                                        <mainClass>org.imirsel.nema.flowservice.FlowServiceApp</mainClass>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							 <addClasspath>true</addClasspath>
+                                                         <classpathPrefix>lib/</classpathPrefix>
+                                                         <classpathLayoutType>repository</classpathLayoutType>
 						</manifest>
 						<manifestEntries>
 							<Implementation-Build>${buildNumber}</Implementation-Build>
