@@ -65,6 +65,7 @@ public class JobStatusNotificationCreator implements JobStatusUpdateHandler {
 			  messageBuilder.append("was aborted: " + job.getEndTimestamp().toString() + ".");
 			  break;
 		}
+		messageBuilder.append("\n\nFor more details, see http://nema.lis.uiuc.edu/diy/get/JobManager.jobDetail?id=" + job.getId());
 		notification.setMessage(messageBuilder.toString());
 		NotificationDao notificationDao = daoFactory.getNotificationDao();
         Session session = notificationDao.getSessionFactory().openSession();
