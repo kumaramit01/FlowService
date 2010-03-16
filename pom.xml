@@ -314,7 +314,7 @@
 				<version>2.2-beta-5</version>
 				<configuration>
 					<descriptors>
-						<descriptor>src/assemblies/production-assembly.xml</descriptor>
+						<descriptor>src/assemblies/assembly.xml</descriptor>
 					</descriptors>
 				</configuration>
 
