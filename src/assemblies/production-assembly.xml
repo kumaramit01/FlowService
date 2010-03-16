@@ -45,8 +45,13 @@
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </file>
-       <file>
+     <file>
       <source>${project.basedir}/src/main/resources/mail.properties</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+     <file>
+      <source>${project.basedir}/src/main/resources/logging.properties</source>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </file>
