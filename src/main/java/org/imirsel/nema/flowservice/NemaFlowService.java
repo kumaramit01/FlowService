@@ -284,11 +284,11 @@ public class NemaFlowService implements FlowService {
       this.meandreServerProxyFactory = meandreServerProxyFactory;
    }
 
-   public FlowServiceConfig getNemaFlowServiceConfig() {
+   public FlowServiceConfig getFlowServiceConfig() {
       return flowServiceConfig;
    }
 
-   public void setNemaFlowServiceConfig(FlowServiceConfig nemaFlowServiceConfig) {
+   public void setFlowServiceConfig(FlowServiceConfig nemaFlowServiceConfig) {
       this.flowServiceConfig = nemaFlowServiceConfig;
    }
 

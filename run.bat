@@ -1,2 +1,2 @@
 @echo off
-java -classpath .;${project.build.finalName}.jar org.imirsel.nema.flowservice.FlowServiceApp
+java -Djava.util.logging.config.file=logging.properties -classpath .;${project.build.finalName}.jar org.imirsel.nema.flowservice.FlowServiceApp

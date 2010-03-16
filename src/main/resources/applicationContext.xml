@@ -62,7 +62,7 @@
         <property name="from" value="nema-diy-manager@mail.lis.illinois.edu"/>
     </bean>
 
-    <bean id="notificationSender" class="org.imirsel.nema.flowservice.EmailNotificationSender">
+    <bean id="notificationSender" class="org.imirsel.nema.flowservice.notification.EmailNotificationSender">
    		<property name="daoFactory" ref="daoFactory"/>
         <property name="mailSender" ref="mailSender"/>
         <property name="messageTemplate" ref="messageTemplate"/>
@@ -120,6 +120,9 @@
 	<bean id="flowServiceConfig"
 		class="org.imirsel.nema.flowservice.config.PropertiesBasedFlowServiceConfig" />
 
+    <bean id="repositoryClientConnectionPool" 
+        class="org.imirsel.nema.repository.RepositoryClientConnectionPool" />
+        
     <bean id="meandreServerProxyFactory"
         class="org.imirsel.nema.flowservice.MeandreServerProxyFactory">
         <property name="jobStatusMonitor" ref="jobStatusMonitor"/>
@@ -131,16 +134,10 @@
 	<bean id="jobScheduler" class="org.imirsel.nema.flowservice.MeandreJobScheduler">
 		<property name="loadBalancer" ref="loadBalancer" />
 		<property name="daoFactory" ref="daoFactory" />
+		<property name="meandreServerProxyFactory" ref="meandreServerProxyFactory"/>
 		<property name="flowServiceConfig" ref="flowServiceConfig" />
 	</bean>
 
-	<bean id="repositoryClientConnectionPool" 
-	    class="org.imirsel.nema.repository.RepositoryClientConnectionPool" />
-
-	<bean id="meandreFlowStore" class="org.imirsel.nema.flowservice.MeandreFlowStore">
-		<property name="repositoryClientConnectionPool" ref="repositoryClientConnectionPool"/>
-	</bean>
-	
 	<bean id="flowService" class="org.imirsel.nema.flowservice.NemaFlowService">
 		<property name="jobScheduler" ref="jobScheduler" />
 		<property name="jobStatusMonitor" ref="jobStatusMonitor" />

@@ -1,7 +1,6 @@
 package org.imirsel.nema.flowservice;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -65,7 +64,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
 
    private JobStatusMonitor jobStatusMonitor;
    private MeandreClient meandreClient;
-   private MeandreFlowStore meandreFlowStore;
+   private static MeandreFlowStore meandreFlowStore;
    
    public MeandreServerProxy(MeandreServerProxyConfig config) {
       this.config = config;
@@ -84,7 +83,6 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
       meandreClient.setLogger(logger);
       meandreClient.setCredentials(config.getUsername(), config.getPassword());
       
-      // THIS ACTUALLY NEEDS TO BE A SINGLETON..SERVER SHOULD BE HEAD SERVER
       meandreFlowStore = new MeandreFlowStore();
       meandreFlowStore.setMeandreClient(meandreClient);
       meandreFlowStore.setRepositoryClientConnectionPool(repositoryClientConnectionPool);
