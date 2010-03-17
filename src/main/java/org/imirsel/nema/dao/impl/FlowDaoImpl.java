@@ -15,12 +15,18 @@ import org.imirsel.nema.model.Flow;
  */
 public class FlowDaoImpl extends GenericDaoImpl<Flow,Long> implements FlowDao {
 
+   /**
+    * @see FlowDao#getFlowTemplates()
+    */
 	@Override
 	public List<Flow> getFlowTemplates() {
 		Criterion restriction=Restrictions.eq("template", Boolean.TRUE);
 		return this.findByCriteria(restriction);
 	}
 
+	/**
+	 * @see FlowDao#getFlowsByCreatorId(Long)
+	 */
 	@Override
 	public List<Flow> getFlowsByCreatorId(Long creatorId) {
 		Criterion restriction=Restrictions.eq("creatorId", creatorId);

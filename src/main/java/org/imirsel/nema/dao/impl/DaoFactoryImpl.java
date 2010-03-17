@@ -57,10 +57,21 @@ public class DaoFactoryImpl implements DaoFactory {
 		return notificationDao;
 	}
 
+	/**
+	 * Inject the provided {@link SessionFactory} to use for creating
+	 * transactional {@link Session}s.
+	 * 
+	 * @param sessionFactory The {@link SessionFactory} to use.
+	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 	
+	/**
+	 * Return the {@link SessionFactory} that is currently being used.
+	 * 
+	 * @return The {@link SessionFactory} that is currently being used.
+	 */
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
 	}

@@ -21,19 +21,13 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
  * Implements the generic CRUD data access operations using Hibernate APIs.
  *
  * <p>To write a DAO, subclass and parameterize this class with your persistent
- * class. Of course, assuming that you have a traditional 1:1 appraoch for
+ * class. Of course, assuming that you have a traditional 1:1 approach for
  * Entity:DAO design.</p>
  *
- * <p>You have to inject a current Hibernate <tt>Session</tt> to use a DAO.
- * Otherwise, this generic implementation will use <tt>
- * HibernateUtil.getSessionFactory()</tt> to obtain the curren <tt>Session</tt>.
- * </p>
  *
  * @author Christian Bauer
+ * @author shirk
  * @since 0.4.0
- * @param <T> Type to be maintained by the DAO.
- * @param <ID> The identity type.
- * @see HibernateDAOFactory
  */
 abstract public class GenericDaoImpl<T, ID extends Serializable>
       implements GenericDao<T, ID> {
@@ -49,7 +43,7 @@ abstract public class GenericDaoImpl<T, ID extends Serializable>
    //~ Constructors ------------------------------------------------------------
 
    /**
-    * TODO: Creates a new {@link GenericDaoImpl} object.
+    * Create a new instance.
     */
    @SuppressWarnings("unchecked")
    public GenericDaoImpl() {
@@ -61,10 +55,19 @@ abstract public class GenericDaoImpl<T, ID extends Serializable>
 
    //~ Methods -----------------------------------------------------------------
 
+   /**
+    * @see GenericDao#setSessionFactory(SessionFactory)
+    */
    public void setSessionFactory(SessionFactory s) { this.sessionFactory = s; }
    
+   /**
+    * @see GenericDao#getSessionFactory()
+    */
    public SessionFactory getSessionFactory() { return sessionFactory;}
 
+   /**
+    * Return the {@link Session} currently in use.
+    */
    protected Session getSession() { 
 	   if(managedSession!=null){
 		   return managedSession;
@@ -73,8 +76,16 @@ abstract public class GenericDaoImpl<T, ID extends Serializable>
 	   }
    }
 
+   /**
+    * Return the class type that this DAO manages.
+    * 
+    * @return Class whose instances are managed by this DAO.
+    */
    public Class<T> getPersistentClass() { return persistentClass; }
 
+   /**
+    * @see GenericDao#findById(Serializable, boolean)
+    */
    @SuppressWarnings("unchecked")
    public T findById(ID id, boolean lock) throws DataAccessException {
       T entity;
@@ -94,10 +105,16 @@ abstract public class GenericDaoImpl<T, ID extends Serializable>
       return entity;
    }
 
+   /**
+    * @see GenericDao#findAll()
+    */
    public List<T> findAll() throws DataAccessException {
       return findByCriteria();
    }
 
+   /**
+    * @see GenericDao#findByExample(Object, String...)
+    */
    @SuppressWarnings("unchecked")
    public List<T> findByExample(T exampleInstance, String... excludeProperty)
          throws DataAccessException {
@@ -114,6 +131,9 @@ abstract public class GenericDaoImpl<T, ID extends Serializable>
       }
    }
 
+   /**
+    * @see GenericDao#makePersistent(Object)
+    */
    public T makePersistent(T entity) throws DataAccessException {
       try {
          getSession().saveOrUpdate(entity);
@@ -123,21 +143,31 @@ abstract public class GenericDaoImpl<T, ID extends Serializable>
       return entity;
    }
 
+   /**
+    * @see GenericDao#makeTransient(Object)
+    */
    public void makeTransient(T entity) throws DataAccessException {
       getSession().delete(entity);
    }
 
+   /**
+    * @see GenericDao#flush()
+    */
    public void flush() { getSession().flush(); }
 
+   /**
+    * @see GenericDao#clear()
+    */
    public void clear() { getSession().clear(); }
 
    /**
-    * Use this inside subclasses as a convenience method.
+    * Finds entities based on the given search criteria. Duplicates may exist
+    * in the resulting list.
     *
-    * @param criterion TODO: Description of parameter criterion.
-    * @return use this inside subclasses as a convenience method.
-    * @throws DataAccessException TODO: Description of exception {@link
-    * DataAccessException}.
+    * @param criterion Search criteria.
+    * @return Search results given the specified criteria
+    * @throws DataAccessException if a problem occurs while performing the
+    * search.
     */
    @SuppressWarnings("unchecked")
    protected List<T> findByCriteria(Criterion... criterion)
@@ -154,12 +184,12 @@ abstract public class GenericDaoImpl<T, ID extends Serializable>
    }
    
    /**
-    * Use this inside subclasses as a convenience method.
+    * Finds a distinct set of results given the specified criteria.
     *
-    * @param criterion TODO: Description of parameter criterion.
-    * @return use this inside subclasses as a convenience method.
-    * @throws DataAccessException TODO: Description of exception {@link
-    * DataAccessException}.
+    * @param criterion Search criteria.
+    * @return Search results given the specified criteria
+    * @throws DataAccessException if a problem occurs while performing the
+    * search.
     */
    @SuppressWarnings("unchecked")
    protected List<T> findByCriteriaDistinct(Criterion... criterion)
@@ -176,9 +206,16 @@ abstract public class GenericDaoImpl<T, ID extends Serializable>
       }
    }
    
+   /**
+    * @see GenericDao#startManagedSession(Session)
+    */
    public void startManagedSession(Session session) {
 	   this.managedSession = session;
    }
+   
+   /**
+    * @see GenericDao#endManagedSession()
+    */
    public void endManagedSession() {
 	   managedSession=null;
    }

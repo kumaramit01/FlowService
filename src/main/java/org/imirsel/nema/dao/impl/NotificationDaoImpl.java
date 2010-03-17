@@ -15,12 +15,18 @@ import org.imirsel.nema.model.Notification;
  */
 public class NotificationDaoImpl extends GenericDaoImpl<Notification, Long>implements NotificationDao {
 
+   /**
+    * @see NotificationDao#getNotificationsByRecipientId(Long)
+    */
 	@Override
 	public List<Notification> getNotificationsByRecipientId(Long recipientId) {
 		Criterion restriction=Restrictions.eq("recipientId", recipientId);
 		return this.findByCriteria(restriction);
 	}
 	
+	/**
+	 * @see NotificationDao#getUnsentNotifications()
+	 */
 	public List<Notification> getUnsentNotifications() {
 		Criterion restriction=Restrictions.eq("deliveryStatusCode", -1);
 		return this.findByCriteria(restriction);

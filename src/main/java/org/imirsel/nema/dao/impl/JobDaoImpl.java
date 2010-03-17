@@ -15,6 +15,9 @@ import org.imirsel.nema.model.Job;
  */
 public class JobDaoImpl extends GenericDaoImpl<Job, Long>implements JobDao {
 
+   /**
+    * @see JobDao#getJobsByOwnerId(long)
+    */
 	@Override
 	public List<Job> getJobsByOwnerId(long ownerId) {
 		Criterion userId=Restrictions.eq("ownerId", ownerId);
