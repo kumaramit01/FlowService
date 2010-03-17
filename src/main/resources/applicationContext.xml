@@ -118,7 +118,9 @@
 	</bean>
 
 	<bean id="flowServiceConfig"
-		class="org.imirsel.nema.flowservice.config.PropertiesBasedFlowServiceConfig" />
+		class="org.imirsel.nema.flowservice.config.PropertiesBasedFlowServiceConfig" >
+		<property name="propertiesFileName" value="flowservice.properties"/>
+    </bean>
 
     <bean id="repositoryClientConnectionPool" 
         class="org.imirsel.nema.repository.RepositoryClientConnectionPool" />

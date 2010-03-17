@@ -8,37 +8,34 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.imirsel.nema.flowservice.MeandreServerException;
 import org.springframework.core.io.ClassPathResource;
 
 /**
- * A {@link FlowServiceConfig} intended to work in concert with a Spring
- * configuration file to inject the requisite properties.
+ * A {@link FlowServiceConfig} that loads the configuration from a Java
+ * properties file.
  * 
  * @author kumaramit01
  * @since 0.5.0
- * 
  */
 public class PropertiesBasedFlowServiceConfig implements
       FlowServiceConfig {
 
-   private static final String MEANDRE_SERVER_PROPERTIES_FILE_NAME = 
-      "meandreserver.properties";
-   
+   private String propertiesFileName;
    private Properties properties;
    private MeandreServerProxyConfig head;
-   private final Set<MeandreServerProxyConfig> workers = new HashSet<MeandreServerProxyConfig>();
+   private Set<MeandreServerProxyConfig> workers;
 
    public PropertiesBasedFlowServiceConfig() {
    }
 
    @PostConstruct
    public void init() throws ConfigException {
+      workers = new HashSet<MeandreServerProxyConfig>();
       ClassPathResource resource = new ClassPathResource(
-            MEANDRE_SERVER_PROPERTIES_FILE_NAME);
+            propertiesFileName);
       if (resource == null) {
          throw new ConfigException(
-               "Could not find " + MEANDRE_SERVER_PROPERTIES_FILE_NAME + ".");
+               "Could not find " + propertiesFileName + ".");
       }
       InputStream is = null;
       try {
@@ -59,7 +56,7 @@ public class PropertiesBasedFlowServiceConfig implements
       }
       if (properties == null) {
          throw new ConfigException(
-               "invalid meandre property list");
+               "Invalid flow service configuration file.");
       }
 
       String headServerPortStr = properties.getProperty("headserver.port");
@@ -107,31 +104,44 @@ public class PropertiesBasedFlowServiceConfig implements
          }
       } else {
          throw new ConfigException(
-               "invalid meandre property list");
+               "Invalid flow service configuration file.");
       }
 
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see
-    * org.imirsel.nema.flowservice.config.FlowServiceConfig#getHead()
+   /**
+    * @see FlowServiceConfig#getHeadConfig()
     */
    @Override
    public MeandreServerProxyConfig getHeadConfig() {
       return head;
    }
 
-   /*
-    * (non-Javadoc)
-    * 
-    * @see
-    * org.imirsel.nema.flowservice.config.FlowServiceConfig#getServers()
+   /**
+    * @see FlowServiceConfig#getWorkerConfigs()
     */
    @Override
    public Set<MeandreServerProxyConfig> getWorkerConfigs() {
       return workers;
+   }
+
+   /**
+    * Return the name of the properties file that contains the configuration.
+    * 
+    * @return Name of the properties file that contains the configuration.
+    */
+   public String getPropertiesFileName() {
+      return propertiesFileName;
+   }
+
+   /**
+    * Inject the name of the properties file that contains the configuration.
+    * 
+    * @param propertiesFileName The name of the properties file that
+    *  contains the configuration.
+    */
+   public void setPropertiesFileName(String propertiesFileName) {
+      this.propertiesFileName = propertiesFileName;
    }
 
 }

@@ -53,6 +53,12 @@ import com.hp.hpl.jena.vocabulary.XSD;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
+/**
+ * Models the flow repository for a Meandre server.
+ * 
+ * @author shirk
+ * @since 0.6.0
+ */
 public class MeandreFlowStore {
 
    private static final Logger logger = Logger
@@ -67,7 +73,7 @@ public class MeandreFlowStore {
    
    /** Locally cached version of the remote flow repository */
    @GuardedBy("repositoryLock")
-   private QueryableRepository cachedRepository;
+   private QueryableRepository cachedRemoteRepository;
    private final Lock repositoryLock = new ReentrantLock(true);
    
    private String repositoryLocation;
@@ -108,40 +114,11 @@ public class MeandreFlowStore {
       xstream.setMode(XStream.NO_REFERENCES);
       
       try {
-         cachedRepository = meandreClient.retrieveRepository();
+         cachedRemoteRepository = meandreClient.retrieveRepository();
       } catch (TransmissionException e) {
          throw new RuntimeException (
                "Could not initialize MeandreFlowStore...", e);
       }
-   }
-
-   
-   /**
-    * Removes the flow resource pointed by uri
-    * 
-    * @param uri
-    * @return success
-    * @throws MeandreServerException
-    */
-   private boolean removeResource(String uri) throws MeandreServerException {
-      boolean success = false;
-      try {
-         success = meandreClient.removeResource(uri);
-      } catch (TransmissionException e) {
-         throw new MeandreServerException("Could not remove" + uri + "--"
-               + e.getMessage());
-      }
-      flushRepository();
-      return success;
-   }
-
-   /**
-    * Gets the current cached repository.
-    * 
-    * @return The cached queryable repository
-    */
-   public QueryableRepository getRepository() {
-      return cachedRepository;
    }
 
    /**
@@ -152,7 +129,7 @@ public class MeandreFlowStore {
       repositoryLock.lock();
       Map<String, FlowDescription> map = null;
       try {
-         map = cachedRepository.getAvailableFlowDescriptionsMap();
+         map = cachedRemoteRepository.getAvailableFlowDescriptionsMap();
       } catch (Exception ex) {
       } finally {
          repositoryLock.unlock();
@@ -167,15 +144,15 @@ public class MeandreFlowStore {
     * @throws MeandreServerException
     * 
     */
-   public boolean flushRepository() throws MeandreServerException {
+   protected boolean flushRepository() throws MeandreServerException {
       boolean success = false;
-      cachedRepository = null;
+      cachedRemoteRepository = null;
       repositoryLock.lock();
       try {
          if (meandreClient == null) {
             return false;
          }
-         cachedRepository = meandreClient.retrieveRepository();
+         cachedRemoteRepository = meandreClient.retrieveRepository();
          success = true;
       } catch (Exception e) {
          success = false;
@@ -195,7 +172,7 @@ public class MeandreFlowStore {
       Set<Resource> resources = null;
       repositoryLock.lock();
       try {
-         resources = cachedRepository.getAvailableFlows();
+         resources = cachedRemoteRepository.getAvailableFlows();
       } catch (Exception ex) {
       } finally {
          repositoryLock.unlock();
@@ -208,7 +185,7 @@ public class MeandreFlowStore {
       ExecutableComponentDescription ecd = null;
       repositoryLock.lock();
       try {
-         ecd = cachedRepository.getExecutableComponentDescription(flowResource);
+         ecd = cachedRemoteRepository.getExecutableComponentDescription(flowResource);
       } catch (Exception ex) {
       } finally {
          repositoryLock.unlock();
@@ -364,10 +341,9 @@ public class MeandreFlowStore {
       flowDesc.setRights("owned by user");
       flowDesc.setCreationDate(new Date());
       flowDesc.updateParameters(flowUri, paramMap);
-      System.out.println(repositoryLocation);
       String fileLocation = saveFlow(flowDesc, userId);
       logger.info("Saved new flow to the following location:  " + fileLocation);
-      return fileLocation;//flowDesc.getFlowURI();
+      return fileLocation;
    }
 
    /**
@@ -378,8 +354,15 @@ public class MeandreFlowStore {
     * @returns success
     */
    public boolean removeFlow(String uri) throws MeandreServerException {
-      boolean result = removeResource(uri);
-      return result;
+      boolean success = false;
+      try {
+         success = meandreClient.removeResource(uri);
+      } catch (TransmissionException e) {
+         throw new MeandreServerException("Could not remove" + uri + "--"
+               + e.getMessage());
+      }
+      flushRepository();
+      return success;
    }
 
    public Map<String, Property> getComponentPropertyDataType(
@@ -531,8 +514,8 @@ public class MeandreFlowStore {
          throws MeandreServerException {
       FlowDescription flow = MeandreConverter.WBFlowDescriptionConverter
             .convert(wbFlow);
-      String flowURI = flow.getFlowComponent().getURI();
-      logger.info("Saving flow " + flowURI);
+      String flowUri = flow.getFlowComponent().getURI();
+      logger.info("Saving flow " + flowUri);
 
       String execStepMsg = "";
       String fileName = null;
@@ -540,10 +523,10 @@ public class MeandreFlowStore {
       try {
          Model flowModel = flow.getModel();
 
-         String fName = flowURI.replaceAll(":|/", "_");
-         String tempFolder = repositoryLocation + File.separator
-               + "x" + userId;//System.getProperty("java.io.tmpdir");
-         File file = new File(tempFolder);
+         String fName = flowUri.replaceAll(":|/", "_");
+         String userRepoDir = repositoryLocation + File.separator
+               + "x" + userId;
+         File file = new File(userRepoDir);
          if (!file.exists()) {
             boolean success = file.mkdir();
             if (!success) {
@@ -553,17 +536,14 @@ public class MeandreFlowStore {
             }
          }
 
-         //if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
-         // tempFolder += System.getProperty("file.separator");
-
-         fileName = tempFolder + System.getProperty("file.separator") + fName
+         fileName = userRepoDir + System.getProperty("file.separator") + fName
                + ".nt";
          logger.info(fileName);
-         ntStream = new FileOutputStream(tempFolder + fName + ".nt");
+         ntStream = new FileOutputStream(userRepoDir + fName + ".nt");
          flowModel.write(ntStream, "N-TRIPLE");
-         ttlStream = new FileOutputStream(tempFolder + fName + ".ttl");
+         ttlStream = new FileOutputStream(userRepoDir + fName + ".ttl");
          flowModel.write(ttlStream, "TTL");
-         rdfStream = new FileOutputStream(tempFolder + fName + ".rdf");
+         rdfStream = new FileOutputStream(userRepoDir + fName + ".rdf");
          flowModel.write(rdfStream, "RDF/XML-ABBREV");
 
          execStepMsg = "STEP1: Creating RepositoryImpl from flow model";
@@ -586,21 +566,18 @@ public class MeandreFlowStore {
             if (ttlStream != null)
                ttlStream.close();
          } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
          }
          try {
             if (ntStream != null)
                ntStream.close();
          } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
          }
          try {
             if (rdfStream != null)
                rdfStream.close();
          } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
          }
       }

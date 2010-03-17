@@ -417,7 +417,7 @@
 				<jdbc.driverClassName>${flowservice.jdbc.driverClassName}</jdbc.driverClassName>
 				<jdbc.maxActive>${flowservice.jdbc.maxActive}</jdbc.maxActive>
 
-				<!--meandreserver.properties-->
+				<!--flowservice.properties-->
 				<headserver.host>${meandre.headserver.host}</headserver.host>
 				<headserver.port>${meandre.headserver.port}</headserver.port>
 				<headserver.username>${meandre.headserver.username}</headserver.username>
@@ -458,7 +458,7 @@
 				<jdbc.driverClassName>${flowservice.jdbc.driverClassName}</jdbc.driverClassName>
 				<jdbc.maxActive>${flowservice.jdbc.maxActive}</jdbc.maxActive>
 
-				<!--meandreserver.properties-->
+				<!--flowservice.properties-->
 				<headserver.host>${meandre.headserver.host}</headserver.host>
 				<headserver.port>${meandre.headserver.port}</headserver.port>
 				<headserver.username>${meandre.headserver.username}</headserver.username>

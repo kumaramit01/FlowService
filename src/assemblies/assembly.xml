@@ -56,7 +56,7 @@
       <filtered>true</filtered>
     </file>
        <file>
-      <source>${project.basedir}/src/main/resources/meandreserver.properties</source>
+      <source>${project.basedir}/src/main/resources/flowservice.properties</source>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </file>

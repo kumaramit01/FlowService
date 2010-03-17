@@ -37,10 +37,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * @author shirk
  * @author kumaramit01
  * @since 0.4.0
- * @modified version 0.5.0 Abstracted the server configuration parameters Added
- *           flow specific functions used by the FlowMetadataServiceImpl and
- *           ComponentMetadataServiceImpl classes
- * 
  */
 @ThreadSafe
 public class MeandreServerProxy implements JobStatusUpdateHandler {
@@ -216,10 +212,8 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
       }
    }
 
-
-
    /**
-    * Returns the console from the job identified by uri
+    * Returns the console from the job identified by URI.
     * 
     * @param uri
     * @return console The console string
@@ -241,17 +235,6 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
     */
    public Map<String, FlowDescription> getAvailableFlowDescriptionsMap() {
       return meandreFlowStore.getAvailableFlowDescriptionsMap();
-   }
-
-   /**
-    * Flushes the cached repository.
-    * 
-    * @return success true/false
-    * @throws MeandreServerException
-    * 
-    */
-   public boolean flushRepository() throws MeandreServerException {
-      return meandreFlowStore.flushRepository();
    }
 
    /**
@@ -290,7 +273,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
     * @throws MeandreServerException if a problem occurs while communicating
     *            with the remote Meandre server.
     */
-   public Set<URI> getComponentUris() throws MeandreServerException {
+   public Set<URI> getComponentUrisInRepository() throws MeandreServerException {
       return meandreFlowStore.getComponentUrisInRepository();
    }
 
@@ -320,13 +303,6 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
       return meandreFlowStore.createFlow(paramMap, flowUri, userId);
    }
 
-   /**
-    * This method removes a flow from meandre
-    * 
-    * @throws MeandreServerException
-    * 
-    * @returns success
-    */
    public boolean removeFlow(String uri) throws MeandreServerException {
       return meandreFlowStore.removeFlow(uri);
    }
