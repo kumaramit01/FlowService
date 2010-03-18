@@ -32,8 +32,6 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 abstract public class GenericDaoImpl<T, ID extends Serializable>
       implements GenericDao<T, ID> {
 
-	private final Logger logger = Logger.getLogger(this.getClass().getName());
-	
    private final Class<T> persistentClass;
 
    private SessionFactory sessionFactory;
