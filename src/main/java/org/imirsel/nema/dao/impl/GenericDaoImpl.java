@@ -3,7 +3,6 @@ package org.imirsel.nema.dao.impl;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
