@@ -50,7 +50,7 @@ public class MeanderServerIntegrationTest {
 		SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
 				username,password,host,port,maxConcurrentJobs);
 				
-        MeandreServerProxy server = new MeandreServerProxy(config);
+        MeandreServerProxy server = new RemoteMeandreServerProxy(config);
         server.init();
         
 		Flow flow = new Flow();

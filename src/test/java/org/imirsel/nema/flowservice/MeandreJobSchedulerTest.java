@@ -65,7 +65,7 @@ public class MeandreJobSchedulerTest {
             servers.add(config);
             servers.add(config1);
             servers.add(config2);
-            //servers.add(new MeandreServerProxy(config3));
+            //servers.add(new RemoteMeandreServerProxy(config3));
             return servers;
          }
       };

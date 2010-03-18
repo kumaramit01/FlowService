@@ -15,7 +15,7 @@ import java.util.Map.Entry;
 import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.annotations.parser.beans.DataTypeBean;
 import org.imirsel.nema.flowservice.MeandreServerException;
-import org.imirsel.nema.flowservice.MeandreServerProxy;
+import org.imirsel.nema.flowservice.RemoteMeandreServerProxy;
 import org.imirsel.nema.flowservice.config.SimpleMeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Property;
@@ -46,7 +46,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
       int maxConcurrentJobs = 1;
       SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
             username, password, host, port, maxConcurrentJobs);
-      meandreServerProxy = new MeandreServerProxy(config);
+      meandreServerProxy = new RemoteMeandreServerProxy(config);
       meandreServerProxy.init();
    }
 

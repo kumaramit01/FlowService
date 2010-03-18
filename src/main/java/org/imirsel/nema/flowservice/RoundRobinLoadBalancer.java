@@ -36,8 +36,9 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
 
    //~ Methods -----------------------------------------------------------------
 
+
    /**
-    * @see org.imirsel.nema.flowservice.MeandreLoadBalancer#addServer(org.imirsel.nema.flowservice.MeandreServerProxy)
+    * @see MeandreLoadBalancer#addServer(MeandreServerProxy)
     */
    public synchronized void addServer(MeandreServerProxy server) {
 	   // do not allow duplicate servers
@@ -61,7 +62,7 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.MeandreLoadBalancer#removeServer(org.imirsel.nema.flowservice.MeandreServerProxy)
+    * @see MeandreLoadBalancer#removeServer(MeandreServerProxy)
     */
    public synchronized void removeServer(MeandreServerProxy server)
          throws IllegalStateException {
@@ -123,7 +124,7 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.MeandreLoadBalancer#nextAvailableServer()
+    * @see MeandreLoadBalancer#nextAvailableServer()
     */
    @Override
    public synchronized MeandreServerProxy nextAvailableServer() {
@@ -153,7 +154,7 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.MeandreLoadBalancer#nextAvailableServer()
+    * @see MeandreLoadBalancer#nextAvailableServer()
     */
    @Override
    public synchronized boolean hasAvailableServer() {
@@ -178,7 +179,7 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
    }
    
    /**
-    * Return the number of servers this load balancer is managing.
+    * @see MeandreLoadBalancer#size()
     */
    public synchronized int size() {
 	   return size;

@@ -41,7 +41,7 @@ public class MeandreServerProxyFactory {
       if(proxyInstances.containsKey(key)) {
          instance = proxyInstances.get(key);
       } else {
-         instance = new MeandreServerProxy(config);
+         instance = new RemoteMeandreServerProxy(config);
          instance.setJobStatusMonitor(jobStatusMonitor);
          instance.setRepositoryClientConnectionPool(repositoryClientConnectionPool);
          instance.init();

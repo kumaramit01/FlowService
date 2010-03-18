@@ -2,26 +2,15 @@ package org.imirsel.nema.flowservice;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Logger;
-
-import javax.annotation.PostConstruct;
-
-import net.jcip.annotations.GuardedBy;
-import net.jcip.annotations.ThreadSafe;
 
 import org.imirsel.meandre.client.ExecResponse;
 import org.imirsel.meandre.client.MeandreClient;
-import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyStatus;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
-import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.Property;
@@ -32,238 +21,106 @@ import org.meandre.core.repository.FlowDescription;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
- * A proxy class for a remote Meandre server.
+ * Provides indirect access to the services provided by a Meandre server.
  * 
  * @author shirk
- * @author kumaramit01
  * @since 0.4.0
  */
-@ThreadSafe
-public class MeandreServerProxy implements JobStatusUpdateHandler {
-
-   private static final Logger logger = Logger
-         .getLogger(MeandreServerProxy.class.getName());
-
-   private MeandreServerProxyConfig config;
-   private String host;
-   private int port;
-   
-   private RepositoryClientConnectionPool repositoryClientConnectionPool;
-
-   @GuardedBy("runningLock")
-   private final Set<Job> runningJobs = new HashSet<Job>(8);
-   private final Lock runningLock = new ReentrantLock();
-
-   @GuardedBy("abortingLock")
-   private final Set<Job> abortPending = new HashSet<Job>(8);
-   private final Lock abortingLock = new ReentrantLock();
-
-   private JobStatusMonitor jobStatusMonitor;
-   private MeandreClient meandreClient;
-   private static MeandreFlowStore meandreFlowStore;
-   
-   public MeandreServerProxy(MeandreServerProxyConfig config) {
-      this.config = config;
-   }
-
-   @SuppressWarnings("unused")
-   private MeandreServerProxy() {
-
-   }
-
-   @PostConstruct
-   public void init() {
-      host=config.getHost();
-      port=config.getPort();
-      meandreClient = new MeandreClient(config.getHost(), config.getPort());
-      meandreClient.setLogger(logger);
-      meandreClient.setCredentials(config.getUsername(), config.getPassword());
-      
-      meandreFlowStore = new MeandreFlowStore();
-      meandreFlowStore.setMeandreClient(meandreClient);
-      meandreFlowStore.setRepositoryClientConnectionPool(repositoryClientConnectionPool);
-      meandreFlowStore.init();
-   }
+public interface MeandreServerProxy {
 
    /**
-    * Return the number of jobs the server is currently processing.
-    * 
-    * @return Number of jobs the server is currently processing.
+    * Initialize this server proxy instance. This method must be called before
+    * an instance is used.
     */
-   public int getNumJobsRunning() {
-      runningLock.lock();
-      try {
-         return runningJobs.size();
-      } finally {
-         runningLock.unlock();
-      }
-   }
+   public void init();
+
+   /**
+    * Return the number of jobs currently running on this server.
+    * 
+    * @return Number of jobs currently running on this server.
+    */
+   public int getNumJobsRunning();
 
    /**
     * Return the number of jobs that are pending abort.
     * 
     * @return Number of jobs that are pending abort.
     */
-   public int getNumJobsAborting() {
-      abortingLock.lock();
-      try {
-         return abortPending.size();
-      } finally {
-         abortingLock.unlock();
-      }
-   }
-   
+   public int getNumJobsAborting();
+
    /**
     * Tests if the server is busy such that it cannot process any more jobs.
     * 
-    * @return busy true or false
+    * @return True if the server cannot accept any more jobs.
     */
-   public boolean isBusy() {
-      runningLock.lock();
-      try {
-         return config.getMaxConcurrentJobs() == runningJobs.size();
-      } finally {
-         runningLock.unlock();
-      }
-   }
-
-   public boolean isAborting(Job job) {
-      abortingLock.lock();
-      try {
-         return abortPending.contains(job);
-      } finally {
-         abortingLock.unlock();
-      }
-   }
-
-   public ExecResponse executeJob(Job job) throws MeandreServerException {
-
-      if (isBusy()) {
-         throw new IllegalStateException("Could not execute job " + job.getId()
-               + " because server " + getServerString() + " is busy.");
-      }
-
-      HashMap<String, String> probes = new HashMap<String, String>();
-      // Instructs the Meandre server to use the NEMA probe while executing
-      probes.put("nema", "true");
-
-      logger.fine("Attempting to execute job " + job.getId() + " on server "
-            + getServerString() + ".");
-      ExecResponse response = null;
-      runningLock.lock();
-      try {
-         assert meandreClient != null : "Meandre client null";
-         boolean returnVal = meandreClient.runAsyncModel(
-               job.getFlow().getUri(), job.getToken(), probes);
-         response = meandreClient.getFlowExecutionInstanceId(job.getToken());
-         logger.fine("Job " + job.getId()
-               + " successfully submitted to server " + getServerString()
-               + " for execution.");
-
-         runningJobs.add(job);
-         jobStatusMonitor.start(job, this);
-      } catch (TransmissionException e) {
-         throw new MeandreServerException("A problem occurred while "
-               + "communicating with server " + getServerString()
-               + " in order to execute job " + job.getId() + ".", e);
-      } finally {
-         runningLock.unlock();
-      }
-
-      return response;
-   }
-
-   public void abortJob(Job job) throws MeandreServerException {
-      abortingLock.lock();
-      try {
-         if (isAborting(job)) {
-            throw new IllegalStateException("An abort request has already "
-                  + "been made for job " + job.getId() + ".");
-         }
-         try {
-            meandreClient.abortFlow(job.getExecPort());
-         } catch (TransmissionException e) {
-            throw new MeandreServerException("Could not abort job "
-                  + job.getId() + ".", e);
-         }
-         abortPending.add(job);
-      } finally {
-         abortingLock.unlock();
-      }
-   }
-
-   public String getServerString() {
-      return config.getHost() + ":" + config.getPort();
-   }
-
-   @Override
-   public void jobStatusUpdate(Job job) {
-      logger.fine("Status update received for job " + job.getId() + ".");
-      if (!job.isRunning()) {
-         runningLock.lock();
-         abortingLock.lock();
-         try {
-            runningJobs.remove(job);
-            abortPending.remove(job);
-         } finally {
-            runningLock.unlock();
-            abortingLock.unlock();
-         }
-      }
-   }
+   public boolean isBusy();
 
    /**
-    * Returns the console from the job identified by URI.
+    * Tests if specified job is currently pending abort on this server.
     * 
-    * @param uri
-    * @return console The console string
+    * @param job Job to check to see if it is pending abort.
+    * @return True if the specified job is pending abort.
+    */
+   public boolean isAborting(Job job);
+
+   /**
+    * Execute the specified job.
+    * 
+    * @param job Job to execute on this server.
+    * @return The execution response from the server, which contains details
+    * only known after the job has been accepted, like the port that the job
+    * will be running on.
+    * @throws MeandreServerException if a problem occurs while attempting
+    * to execute the job.
+    */
+   public ExecResponse executeJob(Job job)
+         throws MeandreServerException;
+
+   /**
+    * Request that the specified job be aborted.
+    * 
+    * @param job Job for which the abort request will be made.
+    * @throws MeandreServerException if a problem occurs while requesting the
+    * job be aborted.
+    */
+   public void abortJob(Job job) throws MeandreServerException;
+
+   /**
+    * Return a <code>String</code> uniquely identifying this server. Returned
+    * <code>String</code> will be in the form of server:port.
+    * @return <code>String</code> uniquely identifying this server.
+    */
+   public String getServerString();
+
+   /**
+    * Return the job console for the job identified with the specified URI.
+    * 
+    * @param uri URI of the job for which the console should be returned.
+    * @return console Console output in the form of a <code>String</code>.
     * @throws MeandreServerException
     */
-   public String getConsole(String uri) throws MeandreServerException {
-      String consoleOutput;
-      try {
-         consoleOutput = meandreClient.retrieveJobConsole(uri);
-      } catch (TransmissionException e) {
-         throw new MeandreServerException(e.getMessage());
-      }
-      return consoleOutput;
-   }
+   public String getConsole(String uri) throws MeandreServerException;
 
-   /**
-    * 
-    * @return Map<String,FlowDescription> The Map of String and FlowDescription
-    */
-   public Map<String, FlowDescription> getAvailableFlowDescriptionsMap() {
-      return meandreFlowStore.getAvailableFlowDescriptionsMap();
-   }
+
+   public Map<String, FlowDescription> getAvailableFlowDescriptionsMap();
 
    /**
     * Returns the list of Flows available as resource
     * 
     * @return Set<Resource> The set of resource
     */
-   public Set<Resource> getAvailableFlows() {
-      return meandreFlowStore.getAvailableFlows();
-   }
+   public Set<Resource> getAvailableFlows();
 
    public ExecutableComponentDescription getComponentDescription(
-         Resource flowResource) {
-      return meandreFlowStore.getComponentDescription(flowResource);
-   }
+         Resource flowResource);
 
-   public Set<URI> getFlowUris() throws MeandreServerException {
-      return meandreFlowStore.getFlowUris();
-   }
+   public Set<URI> getFlowUris() throws MeandreServerException;
 
    public ExecutableComponentDescription getComponentDescription(
-         String componentUri) throws MeandreServerException {
-      return meandreFlowStore.getComponentDescription(componentUri);
-   }
+         String componentUri) throws MeandreServerException;
 
    public FlowDescription getFlowDescription(String flowUri)
-         throws MeandreServerException {
-      return meandreFlowStore.getFlowDescription(flowUri);
-   }
+         throws MeandreServerException;
 
    /**
     * Return the URIs of all the components in the Meandre server repository.
@@ -273,9 +130,8 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
     * @throws MeandreServerException if a problem occurs while communicating
     *            with the remote Meandre server.
     */
-   public Set<URI> getComponentUrisInRepository() throws MeandreServerException {
-      return meandreFlowStore.getComponentUrisInRepository();
-   }
+   public Set<URI> getComponentUrisInRepository()
+         throws MeandreServerException;
 
    /**
     * For the given flow URI, return the list of {@link Component}s that make up
@@ -287,9 +143,7 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
     *            the flows from the remote Meandre server.
     */
    public List<Component> getComponents(String flowUri)
-         throws MeandreServerException {
-      return meandreFlowStore.getComponents(flowUri);
-   }
+         throws MeandreServerException;
 
    /**
     * Create a new flow and save it in the local repository. The the supplied
@@ -298,37 +152,25 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
     * 
     * @returns URI of the new flow.
     */
-   public synchronized String createFlow(HashMap<String, String> paramMap,
-         String flowUri, long userId) throws MeandreServerException {
-      return meandreFlowStore.createFlow(paramMap, flowUri, userId);
-   }
+   public String createFlow(HashMap<String, String> paramMap,
+         String flowUri, long userId) throws MeandreServerException;
 
-   public boolean removeFlow(String uri) throws MeandreServerException {
-      return meandreFlowStore.removeFlow(uri);
-   }
+   public boolean removeFlow(String uri) throws MeandreServerException;
 
    public Map<String, Property> getComponentPropertyDataType(
-         Component component, String flowUri) throws MeandreServerException {
-      return meandreFlowStore.getComponentPropertyDataType(component, flowUri);
-   }
+         Component component, String flowUri) throws MeandreServerException;
 
-   public RepositoryClientConnectionPool getRepositoryClientConnectionPool() {
-      return repositoryClientConnectionPool;
-   }
+   public RepositoryClientConnectionPool getRepositoryClientConnectionPool();
 
    public void setRepositoryClientConnectionPool(
-         RepositoryClientConnectionPool repositoryClientConnectionPool) {
-      this.repositoryClientConnectionPool = repositoryClientConnectionPool;
-   }
+         RepositoryClientConnectionPool repositoryClientConnectionPool);
 
    /**
     * Return the configuration used to instantiate this proxy.
     * 
     * @return Current proxy configuration.
     */
-   public MeandreServerProxyConfig getConfig() {
-      return config;
-   }
+   public MeandreServerProxyConfig getConfig();
 
    /**
     * Set the configuration for this proxy.
@@ -336,60 +178,37 @@ public class MeandreServerProxy implements JobStatusUpdateHandler {
     * @param meandreServerProxyConfig The configuration parameters for this
     *           proxy.
     */
-   public void setConfig(MeandreServerProxyConfig config) {
-      this.config = config;
-      host=config.getHost();
-      port=config.getPort();
-   }
-   
-   public JobStatusMonitor getJobStatusMonitor() {
-      return jobStatusMonitor;
-   }
+   public void setConfig(MeandreServerProxyConfig config);
 
-   public void setJobStatusMonitor(JobStatusMonitor jobStatusMonitor) {
-      this.jobStatusMonitor = jobStatusMonitor;
-   }
-   
-   public MeandreClient getMeandreClient() {
-      return meandreClient;
-   }
-   
-   public MeandreServerProxyStatus getStatus() {
-      return new MeandreServerProxyStatus(getNumJobsRunning(),getNumJobsAborting());
-   }
-   
+   /**
+    * Return the {@link JobStatusMonitor} currently in use.
+    * 
+    * @return The {@link JobStatusMonitor} currently in use.
+    */
+   public JobStatusMonitor getJobStatusMonitor();
 
-   @Override
-   public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + ((host == null) ? 0 : host.hashCode());
-      result = prime * result + port;
-      return result;
-   }
+   /**
+    * Set the {@link JobStatusMonitor} to use.
+    * 
+    * @param jobStatusMonitor The {@link JobStatusMonitor} currently in use.
+    */
+   public void setJobStatusMonitor(JobStatusMonitor jobStatusMonitor);
 
-   @Override
-   public boolean equals(Object obj) {
-      if (this == obj)
-         return true;
-      if (obj == null)
-         return false;
-      if (getClass() != obj.getClass())
-         return false;
-      MeandreServerProxy other = (MeandreServerProxy) obj;
-      if (host == null) {
-         if (other.host != null)
-            return false;
-      } else if (!host.equals(other.host))
-         return false;
-      if (port != other.port)
-         return false;
-      return true;
-   }
+   /**
+    * Return the underlying {@link MeandreClient} currently in use by this
+    * proxy to communicate with the actual Meandre server.
+    * 
+    * @return The {@link MeandreClient} currently being used to communicate with
+    * the actual Meandre server.
+    */
+   public MeandreClient getMeandreClient();
 
-   @Override
-   public String toString() {
-      return config.getHost() + ":" + config.getPort();
-   }
+   /**
+    * Return the current server status, such as the number of jobs running and
+    * the number aborting.
+    * 
+    * @return Current server status.
+    */
+   public MeandreServerProxyStatus getStatus();
 
 }

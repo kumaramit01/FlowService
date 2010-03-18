@@ -52,10 +52,10 @@ public class RoundRobinLoadBalancerTest {
       SimpleMeandreServerProxyConfig(username,password,host3,port,maxConcurrentJobs);
 
 		
-      server1 = new MeandreServerProxy(config);
-      server2 = new MeandreServerProxy(config1);
-      server3 = new MeandreServerProxy(config2);
-      server4 = new MeandreServerProxy(config3);
+      server1 = new RemoteMeandreServerProxy(config);
+      server2 = new RemoteMeandreServerProxy(config1);
+      server3 = new RemoteMeandreServerProxy(config2);
+      server4 = new RemoteMeandreServerProxy(config3);
    }
 
    @Test
