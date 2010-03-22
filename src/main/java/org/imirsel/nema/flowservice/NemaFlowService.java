@@ -223,13 +223,13 @@ public class NemaFlowService implements FlowService {
     */
    @Override
    public Map<String, Property> getComponentPropertyDataType(
-         Component component, Flow flow) {
+         Component component, String flowUri) {
       Map<String, Property> propertyDataTypes = null;
       try {
-         propertyDataTypes = headServer.getComponentPropertyDataType(component, flow.getUri());
+         propertyDataTypes = headServer.getComponentPropertyDataType(component, flowUri);
       } catch (MeandreServerException e) {
          throw new ServiceException("A problem occurred while retrieving " +
-               "component data types for flow: " + flow.getUri(),e);
+               "component data types for flow: " + flowUri,e);
       }
       return propertyDataTypes;
    }
@@ -238,13 +238,13 @@ public class NemaFlowService implements FlowService {
     * @see FlowService#getComponents(Flow)
     */
    @Override
-   public List<Component> getComponents(Flow flow) {
+   public List<Component> getComponents(String flowUri) {
       List<Component> components = null;
       try {
-         components = headServer.getComponents(flow.getUri());
+         components = headServer.getComponents(flowUri);
       } catch (MeandreServerException e) {
          throw new ServiceException("A problem occurred while retrieving " +
-         		"components for flow: " + flow.getUri(),e);
+         		"components for flow: " + flowUri,e);
       }
       return components;
    }
@@ -268,18 +268,71 @@ public class NemaFlowService implements FlowService {
     * @see FlowService#removeFlow(Flow)
     */
    @Override
-   public boolean removeFlow(Flow flow) {
+   public boolean removeFlow(String flowUri) {
       boolean result = false;
       try {
-         result = headServer.removeFlow(flow.getUri());
+         result = headServer.removeFlow(flowUri);
       } catch (MeandreServerException e) {
          throw new ServiceException(
                "A problem occured while trying to remove flow: " + 
-               flow.getUri(),e);
+               flowUri,e);
       }
       return result;
    }
 
+   /**
+    * @see FlowService#getHeadConfig()
+    */
+   @Override
+   public MeandreServerProxyConfig getHeadConfig() {
+      return headServer.getConfig();
+   }
+   
+   /**
+    * @see FlowService#getWorkerConfigs()
+    */
+   @Override
+   public Set<MeandreServerProxyConfig> getWorkerConfigs() {
+      return flowServiceConfig.getWorkerConfigs();
+   }
+
+   /**
+    * @see FlowService#getHeadStatus()
+    */
+   @Override
+   public MeandreServerProxyStatus getHeadStatus() {
+      return headServer.getStatus();
+   }
+   
+   /**
+    * @see FlowService#getWorkerStatus()
+    */
+   @Override
+   public Map<MeandreServerProxyConfig, MeandreServerProxyStatus> getWorkerStatus() {
+      return jobScheduler.getWorkerStatus();
+   }
+   
+   /**
+    * @see FlowService#getWorkerStatus(String, int)
+    */
+   @Override
+   public MeandreServerProxyStatus getWorkerStatus(String host, int port) {
+      if(host==null) {
+         throw new IllegalArgumentException("Host must not be null.");
+      }
+      Map<MeandreServerProxyConfig, MeandreServerProxyStatus> status = 
+         jobScheduler.getWorkerStatus();
+      Iterator<MeandreServerProxyConfig> configIterator = 
+         status.keySet().iterator();
+      while(configIterator.hasNext()) {
+         MeandreServerProxyConfig config = configIterator.next();
+         if(host.equals(config.getHost()) && port==config.getPort()) {
+            return status.get(config);
+         }
+      }
+      return null;
+   }
+   
    /**
     * Return the {@link JobScheduler} instance currently being used.
     * 
@@ -337,48 +390,6 @@ public class NemaFlowService implements FlowService {
 
    public void setFlowServiceConfig(FlowServiceConfig nemaFlowServiceConfig) {
       this.flowServiceConfig = nemaFlowServiceConfig;
-   }
-
-
-   @Override
-   public MeandreServerProxyConfig getHeadConfig() {
-      return headServer.getConfig();
-   }
-   
-   @Override
-   public Set<MeandreServerProxyConfig> getWorkerConfigs() {
-      return flowServiceConfig.getWorkerConfigs();
-   }
-
-   @Override
-   public MeandreServerProxyStatus getHeadStatus() {
-      return headServer.getStatus();
-   }
-   
-   @Override
-   public Map<MeandreServerProxyConfig, MeandreServerProxyStatus> getWorkerStatus() {
-      return jobScheduler.getWorkerStatus();
-   }
-   
-   /**
-    * Return the current 
-    */
-   @Override
-   public MeandreServerProxyStatus getWorkerStatus(String host, int port) {
-      if(host==null) {
-         throw new IllegalArgumentException("Host must not be null.");
-      }
-      Map<MeandreServerProxyConfig, MeandreServerProxyStatus> status = 
-         jobScheduler.getWorkerStatus();
-      Iterator<MeandreServerProxyConfig> configIterator = 
-         status.keySet().iterator();
-      while(configIterator.hasNext()) {
-         MeandreServerProxyConfig config = configIterator.next();
-         if(host.equals(config.getHost()) && port==config.getPort()) {
-            return status.get(config);
-         }
-      }
-      return null;
    }
 
 }
