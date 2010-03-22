@@ -70,7 +70,7 @@ public class NemaFlowService implements FlowService {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.FlowService#abortJob(long)
+    * @see FlowService#abortJob(long)
     */
    @Override
    public void abortJob(long jobId) throws IllegalStateException {
@@ -83,7 +83,7 @@ public class NemaFlowService implements FlowService {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.FlowService#deleteJob(long)
+    * @see FlowService#deleteJob(long)
     */
    @Override
    public void deleteJob(long jobId) throws IllegalStateException {
@@ -106,8 +106,7 @@ public class NemaFlowService implements FlowService {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.FlowService#executeJob(String, String,
-    *      String, long, long, String)
+    * @see FlowService#executeJob(String, String, String, long, long, String)
     */
    @Override
    public Job executeJob(String token, String name, String description,
@@ -136,7 +135,7 @@ public class NemaFlowService implements FlowService {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.FlowService#getFlowTemplates()
+    * @see FlowService#getFlowTemplates()
     */
    @Override
    public Set<Flow> getFlowTemplates() {
@@ -148,7 +147,7 @@ public class NemaFlowService implements FlowService {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.FlowService#getJob(long)
+    * @see FlowService#getJob(long)
     */
    @Override
    public Job getJob(long jobId) {
@@ -167,7 +166,7 @@ public class NemaFlowService implements FlowService {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.FlowService#getUserJobs(long)
+    * @see FlowService#getUserJobs(long)
     */
    @Override
    public List<Job> getUserJobs(long userId) {
@@ -175,7 +174,7 @@ public class NemaFlowService implements FlowService {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.FlowService#getUserNotifications(long)
+    * @see FlowService#getUserNotifications(long)
     */
    @Override
    public List<Notification> getUserNotifications(long userId) {
@@ -184,7 +183,7 @@ public class NemaFlowService implements FlowService {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.FlowService#storeFlowInstance(Flow)
+    * @see FlowService#storeFlowInstance(Flow)
     */
    @Override
    public Long storeFlowInstance(Flow instance) {
@@ -195,42 +194,90 @@ public class NemaFlowService implements FlowService {
    }
 
    /**
-    * @see org.imirsel.nema.flowservice.FlowService#getFlow(long)
+    * @see FlowService#getFlow(long)
     */
    @Override
    public Flow getFlow(long flowId) {
       FlowDao flowDao = daoFactory.getFlowDao();
       Flow flow = flowDao.findById(flowId, false);
-      // set refs to meandre servers
       return flow;
    }
 
+   /**
+    * @see FlowService#createNewFlow(HashMap, String, long)
+    */
    @Override
    public String createNewFlow(HashMap<String, String> paramMap,
-         String flowURI, long userId) throws MeandreServerException {
-      return headServer.createFlow(paramMap, flowURI, userId);
+         String flowUri, long userId) {
+      String result = null;
+      try {
+         result = headServer.createFlow(paramMap, flowUri, userId);
+      } catch (MeandreServerException e) {
+         throw new ServiceException("Could not create flow: " + flowUri,e);
+      }
+      return result;
    }
 
+   /**
+    * @see FlowService#getComponentPropertyDataType(Component, Flow)
+    */
    @Override
    public Map<String, Property> getComponentPropertyDataType(
-         Component component, String url) throws MeandreServerException {
-      return headServer.getComponentPropertyDataType(component, url);
+         Component component, Flow flow) {
+      Map<String, Property> propertyDataTypes = null;
+      try {
+         propertyDataTypes = headServer.getComponentPropertyDataType(component, flow.getUri());
+      } catch (MeandreServerException e) {
+         throw new ServiceException("A problem occurred while retrieving " +
+               "component data types for flow: " + flow.getUri(),e);
+      }
+      return propertyDataTypes;
    }
 
+   /**
+    * @see FlowService#getComponents(Flow)
+    */
    @Override
-   public List<Component> getComponents(String flowUri)
-         throws MeandreServerException {
-      return headServer.getComponents(flowUri);
+   public List<Component> getComponents(Flow flow) {
+      List<Component> components = null;
+      try {
+         components = headServer.getComponents(flow.getUri());
+      } catch (MeandreServerException e) {
+         throw new ServiceException("A problem occurred while retrieving " +
+         		"components for flow: " + flow.getUri(),e);
+      }
+      return components;
    }
 
+   /**
+    * @see FlowService#getConsole(Job)
+    */
    @Override
-   public String getConsole(String uri) throws MeandreServerException {
-      return headServer.getConsole(uri);
+   public String getConsole(Job job) {
+      String console = null;
+      try {
+         console = headServer.getConsole(job.getFlow().getUri());
+      } catch (MeandreServerException e) {
+         throw new ServiceException("Could not retrieve the console for job " +
+               job.getId(),e);
+      }
+      return console;
    }
 
+   /**
+    * @see FlowService#removeFlow(Flow)
+    */
    @Override
-   public boolean removeFlow(String flowUri) throws MeandreServerException {
-      return headServer.removeFlow(flowUri);
+   public boolean removeFlow(Flow flow) {
+      boolean result = false;
+      try {
+         result = headServer.removeFlow(flow.getUri());
+      } catch (MeandreServerException e) {
+         throw new ServiceException(
+               "A problem occured while trying to remove flow: " + 
+               flow.getUri(),e);
+      }
+      return result;
    }
 
    /**
@@ -313,6 +360,9 @@ public class NemaFlowService implements FlowService {
       return jobScheduler.getWorkerStatus();
    }
    
+   /**
+    * Return the current 
+    */
    @Override
    public MeandreServerProxyStatus getWorkerStatus(String host, int port) {
       if(host==null) {

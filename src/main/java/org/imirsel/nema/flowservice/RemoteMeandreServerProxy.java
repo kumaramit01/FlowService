@@ -71,8 +71,8 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
 
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#init()
+   /**
+    * @see MeandreServerProxy#init()
     */
    @PostConstruct
    public void init() {
