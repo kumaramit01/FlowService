@@ -88,8 +88,8 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       meandreFlowStore.init();
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getNumJobsRunning()
+   /**
+    * @see MeandreServerProxy#getNumJobsRunning()
     */
    public int getNumJobsRunning() {
       runningLock.lock();
@@ -100,8 +100,8 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       }
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getNumJobsAborting()
+   /**
+    * @see MeandreServerProxy#getNumJobsAborting()
     */
    public int getNumJobsAborting() {
       abortingLock.lock();
@@ -112,8 +112,8 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       }
    }
    
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#isBusy()
+   /**
+    * @see MeandreServerProxy#isBusy()
     */
    public boolean isBusy() {
       runningLock.lock();
@@ -124,8 +124,8 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       }
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#isAborting(org.imirsel.nema.model.Job)
+   /**
+    * @see MeandreServerProxy#isAborting(org.imirsel.nema.model.Job)
     */
    public boolean isAborting(Job job) {
       abortingLock.lock();
@@ -136,8 +136,8 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       }
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#executeJob(org.imirsel.nema.model.Job)
+   /**
+    * @see MeandreServerProxy#executeJob(org.imirsel.nema.model.Job)
     */
    public ExecResponse executeJob(Job job) throws MeandreServerException {
 
@@ -176,8 +176,8 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       return response;
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#abortJob(org.imirsel.nema.model.Job)
+   /**
+    * @see MeandreServerProxy#abortJob(org.imirsel.nema.model.Job)
     */
    public void abortJob(Job job) throws MeandreServerException {
       abortingLock.lock();
@@ -198,8 +198,8 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       }
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getServerString()
+   /**
+    * @see MeandreServerProxy#getServerString()
     */
    public String getServerString() {
       return config.getHost() + ":" + config.getPort();
@@ -221,8 +221,8 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       }
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getConsole(java.lang.String)
+   /**
+    * @see MeandreServerProxy#getConsole(java.lang.String)
     */
    public String getConsole(String uri) throws MeandreServerException {
       String consoleOutput;
@@ -234,113 +234,113 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       return consoleOutput;
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getAvailableFlowDescriptionsMap()
+   /**
+    * @see MeandreServerProxy#getAvailableFlowDescriptionsMap()
     */
    public Map<String, FlowDescription> getAvailableFlowDescriptionsMap() {
       return meandreFlowStore.getAvailableFlowDescriptionsMap();
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getAvailableFlows()
+   /**
+    * @see MeandreServerProxy#getAvailableFlows()
     */
    public Set<Resource> getAvailableFlows() {
       return meandreFlowStore.getAvailableFlows();
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getComponentDescription(com.hp.hpl.jena.rdf.model.Resource)
+   /**
+    * @see MeandreServerProxy#getComponentDescription(com.hp.hpl.jena.rdf.model.Resource)
     */
    public ExecutableComponentDescription getComponentDescription(
          Resource flowResource) {
       return meandreFlowStore.getComponentDescription(flowResource);
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getFlowUris()
+   /**
+    * @see MeandreServerProxy#getFlowUris()
     */
    public Set<URI> getFlowUris() throws MeandreServerException {
       return meandreFlowStore.getFlowUris();
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getComponentDescription(java.lang.String)
+   /**
+    * @see MeandreServerProxy#getComponentDescription(java.lang.String)
     */
    public ExecutableComponentDescription getComponentDescription(
          String componentUri) throws MeandreServerException {
       return meandreFlowStore.getComponentDescription(componentUri);
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getFlowDescription(java.lang.String)
+   /**
+    * @see MeandreServerProxy#getFlowDescription(java.lang.String)
     */
    public FlowDescription getFlowDescription(String flowUri)
          throws MeandreServerException {
       return meandreFlowStore.getFlowDescription(flowUri);
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getComponentUrisInRepository()
+   /**
+    * @see MeandreServerProxy#getComponentUrisInRepository()
     */
    public Set<URI> getComponentUrisInRepository() throws MeandreServerException {
       return meandreFlowStore.getComponentUrisInRepository();
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getComponents(java.lang.String)
+   /**
+    * @see MeandreServerProxy#getComponents(java.lang.String)
     */
    public List<Component> getComponents(String flowUri)
          throws MeandreServerException {
       return meandreFlowStore.getComponents(flowUri);
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#createFlow(java.util.HashMap, java.lang.String, long)
+   /**
+    * @see MeandreServerProxy#createFlow(java.util.HashMap, java.lang.String, long)
     */
    public synchronized String createFlow(HashMap<String, String> paramMap,
          String flowUri, long userId) throws MeandreServerException {
       return meandreFlowStore.createFlow(paramMap, flowUri, userId);
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#removeFlow(java.lang.String)
+   /**
+    * @see MeandreServerProxy#removeFlow(java.lang.String)
     */
    public boolean removeFlow(String uri) throws MeandreServerException {
       return meandreFlowStore.removeFlow(uri);
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getComponentPropertyDataType(org.imirsel.nema.model.Component, java.lang.String)
+   /**
+    * @see MeandreServerProxy#getComponentPropertyDataType(org.imirsel.nema.model.Component, java.lang.String)
     */
    public Map<String, Property> getComponentPropertyDataType(
          Component component, String flowUri) throws MeandreServerException {
       return meandreFlowStore.getComponentPropertyDataType(component, flowUri);
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getRepositoryClientConnectionPool()
+   /**
+    * @see MeandreServerProxy#getRepositoryClientConnectionPool()
     */
    public RepositoryClientConnectionPool getRepositoryClientConnectionPool() {
       return repositoryClientConnectionPool;
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#setRepositoryClientConnectionPool(org.imirsel.nema.repository.RepositoryClientConnectionPool)
+   /**
+    * @see MeandreServerProxy#setRepositoryClientConnectionPool(org.imirsel.nema.repository.RepositoryClientConnectionPool)
     */
    public void setRepositoryClientConnectionPool(
          RepositoryClientConnectionPool repositoryClientConnectionPool) {
       this.repositoryClientConnectionPool = repositoryClientConnectionPool;
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getConfig()
+   /**
+    * @see MeandreServerProxy#getConfig()
     */
    public MeandreServerProxyConfig getConfig() {
       return config;
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#setConfig(org.imirsel.nema.flowservice.config.MeandreServerProxyConfig)
+   /**
+    * @see MeandreServerProxy#setConfig(org.imirsel.nema.flowservice.config.MeandreServerProxyConfig)
     */
    public void setConfig(MeandreServerProxyConfig config) {
       this.config = config;
@@ -348,29 +348,29 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       port=config.getPort();
    }
    
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getJobStatusMonitor()
+   /**
+    * @see MeandreServerProxy#getJobStatusMonitor()
     */
    public JobStatusMonitor getJobStatusMonitor() {
       return jobStatusMonitor;
    }
 
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#setJobStatusMonitor(org.imirsel.nema.flowservice.monitor.JobStatusMonitor)
+   /**
+    * @see MeandreServerProxy#setJobStatusMonitor(org.imirsel.nema.flowservice.monitor.JobStatusMonitor)
     */
    public void setJobStatusMonitor(JobStatusMonitor jobStatusMonitor) {
       this.jobStatusMonitor = jobStatusMonitor;
    }
    
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getMeandreClient()
+   /**
+    * @see MeandreServerProxy#getMeandreClient()
     */
    public MeandreClient getMeandreClient() {
       return meandreClient;
    }
    
-   /* (non-Javadoc)
-    * @see org.imirsel.nema.flowservice.MeandreServerProxy#getStatus()
+   /**
+    * @see MeandreServerProxy#getStatus()
     */
    public MeandreServerProxyStatus getStatus() {
       return new MeandreServerProxyStatus(getNumJobsRunning(),getNumJobsAborting());
