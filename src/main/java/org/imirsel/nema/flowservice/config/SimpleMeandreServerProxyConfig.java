@@ -2,6 +2,13 @@ package org.imirsel.nema.flowservice.config;
 
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 
+/**
+ * A {@link MeandreServerProxyConfig} meant to simply be instantiated or
+ * injected with the configuration properties.
+ * 
+ * @author shirk
+ * @since 0.4.0
+ */
 public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig{
 	private String host;
 	private int port;
@@ -9,6 +16,17 @@ public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig{
 	private String username;
 	private String password;
 
+	/**
+	 * Create a new instance with the given configuration properties.
+	 * 
+	 * @param username The username required to connect to the Meandre server.
+	 * @param password The password that corresponds to the username.
+	 * @param host Address of the machine the Meandre server is running on.
+	 * @param port Port the Meandre server is running on.
+	 * @param maxConcurrentJobs The maximum number of concurrently executing
+	 * jobs that should be allowed on this server. This number should largely
+	 * correspond to the number of processors in the machine.
+	 */
 	public SimpleMeandreServerProxyConfig(String username,String password, String host,
 			int port, int maxConcurrentJobs) {
 		this.host = host;
@@ -19,8 +37,8 @@ public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig{
 		this.maxConcurrentJobs = maxConcurrentJobs;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.imirsel.nema.flowservice.MeandreServerProxyConfig#getHost()
+	/**
+	 * @see MeandreServerProxyConfig#getHost()
 	 */
 	public String getHost() {
 		return host;
@@ -30,8 +48,8 @@ public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig{
 		this.host = host;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.imirsel.nema.flowservice.MeandreServerProxyConfig#getPort()
+	/**
+	 * @see MeandreServerProxyConfig#getPort()
 	 */
 	public int getPort() {
 		return port;
@@ -41,8 +59,8 @@ public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig{
 		this.port = port;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.imirsel.nema.flowservice.MeandreServerProxyConfig#getMaxConcurrentJobs()
+	/**
+	 * @see MeandreServerProxyConfig#getMaxConcurrentJobs()
 	 */
 	public int getMaxConcurrentJobs() {
 		return maxConcurrentJobs;
@@ -52,8 +70,8 @@ public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig{
 		this.maxConcurrentJobs = maxConcurrentJobs;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.imirsel.nema.flowservice.MeandreServerProxyConfig#getUsername()
+	/**
+	 * @see MeandreServerProxyConfig#getUsername()
 	 */
 	public String getUsername() {
 		return username;
@@ -98,6 +116,5 @@ public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig{
          return false;
       return true;
    }
-	
 	
 }
