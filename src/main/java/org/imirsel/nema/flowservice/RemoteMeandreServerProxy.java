@@ -66,10 +66,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       this.config = config;
    }
 
-   @SuppressWarnings("unused")
-   public RemoteMeandreServerProxy() {
-
-   }
+   public RemoteMeandreServerProxy() {}
 
    /**
     * @see MeandreServerProxy#init()
@@ -205,6 +202,9 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       return config.getHost() + ":" + config.getPort();
    }
 
+   /** 
+    * @see JobStatusUpdateHandler#jobStatusUpdate(Job)
+    */
    @Override
    public void jobStatusUpdate(Job job) {
       logger.fine("Status update received for job " + job.getId() + ".");
