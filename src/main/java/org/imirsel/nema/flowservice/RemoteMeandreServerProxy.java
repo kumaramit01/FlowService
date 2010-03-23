@@ -60,14 +60,14 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
 
    private JobStatusMonitor jobStatusMonitor;
    private MeandreClient meandreClient;
-   private static MeandreFlowStore meandreFlowStore;
+   private MeandreFlowStore meandreFlowStore;
    
    public RemoteMeandreServerProxy(MeandreServerProxyConfig config) {
       this.config = config;
    }
 
    @SuppressWarnings("unused")
-   private RemoteMeandreServerProxy() {
+   public RemoteMeandreServerProxy() {
 
    }
 
