@@ -337,9 +337,9 @@ public class MeandreJobScheduler implements JobScheduler {
    }
 
    /**
-    * TODO: Description of method {@link $class.name$#rollback}.
+    * Rollback the specified transaction.
     * 
-    * @param transaction TODO: Description of parameter transaction.
+    * @param transaction The transaction to rollback.
     */
    private void rollback(Transaction transaction) {
       try {
