@@ -38,6 +38,7 @@ public class FlowServiceApp {
          }
 
          new ClassPathXmlApplicationContext("applicationContext.xml");
+         
          logger.info("NEMA Flow Service successfully started...");
          
       } catch (BeansException e) {
