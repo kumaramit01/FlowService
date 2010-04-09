@@ -84,15 +84,6 @@ public class MeandreJobScheduler implements JobScheduler {
     */
    private final Lock workersLock = new ReentrantLock();
 
-   //~ Instance initializers ---------------------------------------------------
-
-   {
-      ScheduledExecutorService executor = Executors
-            .newSingleThreadScheduledExecutor();
-
-      runJobsFuture = executor.scheduleWithFixedDelay(new RunQueuedJobs(), 15,
-            POLL_PERIOD, TimeUnit.SECONDS);
-   }
 
    //~ Constructors ------------------------------------------------------------
 
@@ -100,24 +91,6 @@ public class MeandreJobScheduler implements JobScheduler {
     * Creates a new instance.
     */
    public MeandreJobScheduler() {
-   }
-
-   /**
-    * Creates a new instance given a configuration and a load balancer.
-    * 
-    * @param config The configuration details for this job scheduler.
-    * @param loadBalancer The load balancer to use for distributing jobs.
-    */
-   public MeandreJobScheduler(FlowServiceConfig config,
-         MeandreLoadBalancer loadBalancer) {
-      this.loadBalancer = loadBalancer;
-      this.config = config;
-      Set<MeandreServerProxyConfig> workerConfigs = config.getWorkerConfigs();
-      for(MeandreServerProxyConfig workerConfig : workerConfigs) {
-         MeandreServerProxy server = 
-            serverFactory.getServerProxyInstance(workerConfig);
-         loadBalancer.addServer(server);
-      }
    }
 
    //~ Methods -----------------------------------------------------------------
@@ -134,6 +107,11 @@ public class MeandreJobScheduler implements JobScheduler {
             serverFactory.getServerProxyInstance(workerConfig);
          loadBalancer.addServer(server);
       }
+      ScheduledExecutorService executor = Executors
+            .newSingleThreadScheduledExecutor();
+
+      runJobsFuture = executor.scheduleWithFixedDelay(new RunQueuedJobs(), 15,
+      POLL_PERIOD, TimeUnit.SECONDS);
    }
 
    /**
