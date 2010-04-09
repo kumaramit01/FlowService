@@ -37,8 +37,9 @@ public class FlowServiceApp {
             e.printStackTrace();
          }
 
-         logger.config("Nema Flow Service starting up...");
          new ClassPathXmlApplicationContext("applicationContext.xml");
+         logger.info("NEMA Flow Service successfully started...");
+         
       } catch (BeansException e) {
          e.printStackTrace();
       } catch (Exception e) {
