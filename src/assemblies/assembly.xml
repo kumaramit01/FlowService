@@ -68,7 +68,7 @@
      <file>
       <source>${project.basedir}/src/main/resources/applicationContext.xml</source>
       <outputDirectory>/</outputDirectory>
-      <filtered>true</filtered>
+      <filtered>false</filtered>
     </file>
     <file>
       <source>${project.basedir}/src/main/resources/flowtemplate.sql</source>
