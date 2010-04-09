@@ -191,7 +191,7 @@
 		<dependency>
 			<groupId>org.imirsel</groupId>
 			<artifactId>nema-flowservice-api</artifactId>
-			<version>0.6.0-SNAPSHOT</version>
+			<version>0.6.0</version>
 		</dependency>
 
 		<dependency>
@@ -203,7 +203,7 @@
 		<dependency>
 			<groupId>org.imirsel</groupId>
 			<artifactId>nema-annotations</artifactId>
-			<version>0.5.0-SNAPSHOT</version>
+			<version>0.5.0</version>
 		</dependency>
 
 
