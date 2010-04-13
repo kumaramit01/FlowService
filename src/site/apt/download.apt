@@ -1,0 +1,27 @@
+                                    ------------------------------
+                                              Download
+                                    ------------------------------
+                                         Andre Shirk
+                                    ------------------------------
+                                              2010-04-11
+                                    ------------------------------
+
+Download
+
+* Releases
+
+   You can download source, binary distribution and the javadocs from the
+   {{{http://nema-dev.lis.illinois.edu/executorservice/builds/nema-flow-service/release}NEMA Development server}}.
+
+* Development snapshot
+
+   The latest snapshot builds can be downloaded directly from the {{{http://nema-dev.lis.illinois.edu/builds/nema-flow-service/trunk/target}Executor service}}.
+
+   Get this one only if you are a developer or you absolutely need a feature/fix added
+   before the latest release (see {{{changes-report.html}changes}} for the full change log).
+
+* Source code from SVN
+
+   You can also obtain the source from the Google Code, see
+   {{{source-repository.html}Source Repository}}.
+

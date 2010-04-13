@@ -1,0 +1,45 @@
+<project name="NEMA Executor Service">
+  <publishDate position="right" format="MM-dd-yyyy hh:mm" />
+  <version position="right"/>
+  <bannerLeft>
+    <name>NEMA Flow Service</name>
+    <src>http://code.google.com/p/nemadiy/logo?logo_id=1262666177</src>
+    <href>http://code.google.com/p/nemadiy</href>
+  </bannerLeft>
+  <bannerRight>
+    <name>Flow Service</name>
+    <src>images/flowservice-logo.png</src>
+    <href>index.html</href>
+  </bannerRight>
+
+  <body>
+  
+  
+    <breadcrumbs>
+      <item name="NEMA Development" href="http://nema-dev.lis.illinois.edu/"/>
+      <item name="Flow Service" href="http://nema-dev.lis.illinois.edu/development/nema-flow-service/"/>
+    </breadcrumbs>
+  <links>
+      <item name="NEMA" href="http://nema.lis.illinois.edu/"/>
+       <item name="NEMA DIY@Googlecode" href="http://code.google.com/p/nemadiy/"/>
+        <item name="NEMA APPS@Googlecode" href="http://code.google.com/p/nema-apps/"/>
+  </links>
+  
+  
+  
+  <menu name="Home">
+  	<item name="Index" href="index.html"/>
+  	
+  </menu>
+  <menu name="Reference">
+   <item name="Developer" href="developer.html"/>
+   <item name="Downloads" href="download.html"/>
+   <item name="Installation" href="install.html"/>
+   <item name="Release Notes" href="release-notes.html"/>
+   <item name="Roadmap" href="roadmap.html"/>
+  </menu>
+  <menu ref="reports" />
+  </body>
+  
+  
+  </project>
