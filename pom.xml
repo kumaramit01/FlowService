@@ -555,8 +555,15 @@
 					<execution>
 						<phase>compile</phase>
 						<goals>
-							<goal>publish</goal>
-							<goal>check-architecture</goal>
+
+                                                       <goal>publish</goal>
+                                                        <goal>check-architecture</goal>
+                                                        <goal>check-xs</goal>
+                                                        <goal>report-xs</goal>
+                                                        <goal>report-summary</goal>
+                                                        <goal>report-metrics</goal>
+                                                        <goal>retropublish</goal>
+
 						</goals>
 					</execution>
 				</executions>
