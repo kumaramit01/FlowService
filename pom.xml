@@ -11,7 +11,7 @@
 	<prerequisites>
 		<maven>2.2.0</maven>
 	</prerequisites>
-	
+
 	<mailingLists>
 		<mailingList>
 			<name>NEMA Developers Mailing List</name>
@@ -22,10 +22,10 @@
 
 
 	<organization>
-     <name>IMIRSEL -Graduate School of Library Information Science UIUC</name>
-     <url>http://www.imirsel.org/</url>
-    </organization>
-	
+		<name>IMIRSEL -Graduate School of Library Information Science UIUC</name>
+		<url>http://www.imirsel.org/</url>
+	</organization>
+
 
 
 	<inceptionYear>2010</inceptionYear>
@@ -35,9 +35,9 @@
 			<url>LICENSE.txt</url>
 		</license>
 	</licenses>
-	
-	
-		<developers>
+
+
+	<developers>
 		<developer>
 			<id>shirk</id>
 			<name>Andrew Shirk</name>
@@ -48,7 +48,7 @@
 			</roles>
 			<timezone>-5</timezone>
 		</developer>
-			<developer>
+		<developer>
 			<id>kumaramit01</id>
 			<name>Amit Kumar</name>
 			<email>kumaramit01@gmail.com</email>
@@ -58,7 +58,7 @@
 			<timezone>-5</timezone>
 		</developer>
 	</developers>
-	
+
 
 
 	<reporting>
@@ -111,12 +111,14 @@
 				<artifactId>maven-surefire-report-plugin</artifactId>
 				<version>2.4.3</version>
 			</plugin>
+		
+
 		</plugins>
 	</reporting>
 
-	
-	
-	
+
+
+
 	<distributionManagement>
 		<repository>
 			<name>IMIRSEL Releases</name>
@@ -131,11 +133,11 @@
 		</snapshotRepository>
 
 
-		  <site>
-     	  <id>nema-site</id>
-     	  <url>scp://nema-dev.lis.illinois.edu:/home/meandre/buildtools/www/executionservice</url>
-    	  </site>
-		
+		<site>
+			<id>nema-site</id>
+			<url>scp://nema-dev.lis.illinois.edu:/home/meandre/buildtools/www/nema-flow-service</url>
+		</site>
+
 		<downloadUrl>http://nema-dev.lis.illinois.edu/artifactory/</downloadUrl>
 	</distributionManagement>
 
@@ -160,43 +162,43 @@
 			<version>4.4</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.jmock</groupId>
-            <artifactId>jmock</artifactId>
-            <version>2.5.1</version>
-            <optional>true</optional>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jmock</groupId>
-            <artifactId>jmock-legacy</artifactId>
-            <version>2.5.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>2.1_3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <version>1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-           <groupId>org.hamcrest</groupId>
-           <artifactId>hamcrest-core</artifactId>
-           <version>1.1</version>
-           <scope>test</scope>
-        </dependency>
-        <dependency>
-           <groupId>org.hamcrest</groupId>
-           <artifactId>hamcrest-library</artifactId>
-           <version>1.1</version>
-           <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.jmock</groupId>
+			<artifactId>jmock</artifactId>
+			<version>2.5.1</version>
+			<optional>true</optional>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jmock</groupId>
+			<artifactId>jmock-legacy</artifactId>
+			<version>2.5.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>2.1_3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.objenesis</groupId>
+			<artifactId>objenesis</artifactId>
+			<version>1.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+			<version>1.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+			<version>1.1</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>net.jcip</groupId>
 			<artifactId>jcip-annotations</artifactId>
@@ -310,7 +312,11 @@
 			<scope>test</scope>
 		</dependency>
 
-
+		<dependency>
+			<groupId>com.structure101.java</groupId>
+			<artifactId>maven-structure101-plugin</artifactId>
+			<version>0.5</version>
+		</dependency>
 
 
 	</dependencies>
@@ -420,11 +426,11 @@
 				<configuration>
 					<archive>
 						<manifest>
-                                                        <mainClass>org.imirsel.nema.flowservice.FlowServiceApp</mainClass>
+							<mainClass>org.imirsel.nema.flowservice.FlowServiceApp</mainClass>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							 <addClasspath>true</addClasspath>
-                                                         <classpathPrefix>lib/</classpathPrefix>
-                                                         <classpathLayoutType>repository</classpathLayoutType>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<classpathLayoutType>repository</classpathLayoutType>
 						</manifest>
 						<manifestEntries>
 							<Implementation-Build>${buildNumber}</Implementation-Build>
@@ -490,6 +496,34 @@
 						<svn>javasvn</svn>
 					</providerImplementations>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.structure101.java</groupId>
+				<artifactId>maven-structure101-plugin</artifactId>
+				<version>0.5</version>
+				<configuration>
+					<!-- put your configurations here -->
+					<project>
+						${project.name}
+					</project>
+					<breakOnError>false</breakOnError>
+					<classpath>${project.build.outputDirectory}</classpath>
+					<date>system time</date>
+					<key></key>
+					<label>${project.version}</label>
+					<overwrite>true</overwrite>
+					<repository>http://nema-dev.lis.illinois.edu/s101j/data</repository>
+					<rpkey></rpkey>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>publish</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 
@@ -609,7 +643,7 @@
 		</profile>
 
 	</profiles>
-	
 
-	
+
+
 </project>
