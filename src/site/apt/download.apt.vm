@@ -11,11 +11,11 @@ Download
 * Releases
 
    You can download source, binary distribution and the javadocs from the
-   {{{http://nema-dev.lis.illinois.edu/executorservice/builds/nema-flow-service/release}NEMA Development server}}.
+   {{{http://nema-dev.lis.illinois.edu/executorservice/builds/${project.name}/release/${project.version}}NEMA Development server}}.
 
 * Development snapshot
 
-   The latest snapshot builds can be downloaded directly from the {{{http://nema-dev.lis.illinois.edu/builds/nema-flow-service/trunk/target}Executor service}}.
+   The latest snapshot builds can be downloaded directly from the {{{http://nema-dev.lis.illinois.edu/builds/${project.name}/trunk/target}Flow Service}}.
 
    Get this one only if you are a developer or you absolutely need a feature/fix added
    before the latest release (see {{{changes-report.html}changes}} for the full change log).
