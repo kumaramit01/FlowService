@@ -509,7 +509,6 @@
 					</project>
 					<breakOnError>false</breakOnError>
 					<classpath>${project.build.outputDirectory}</classpath>
-					<date>system time</date>
 					<key></key>
 					<label>${project.version}</label>
 					<overwrite>true</overwrite>
