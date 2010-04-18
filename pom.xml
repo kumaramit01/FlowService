@@ -592,6 +592,7 @@
 				<jdbc.password>${flowservice.jdbc.password}</jdbc.password>
 				<jdbc.driverClassName>${flowservice.jdbc.driverClassName}</jdbc.driverClassName>
 				<jdbc.maxActive>${flowservice.jdbc.maxActive}</jdbc.maxActive>
+				<flowservice.db.name>flowservice060</flowservice.db.name>
 
 				<!--flowservice.properties-->
 				<headserver.host>${meandre.headserver.host}</headserver.host>
@@ -633,6 +634,7 @@
 				<jdbc.password>${flowservice.jdbc.password}</jdbc.password>
 				<jdbc.driverClassName>${flowservice.jdbc.driverClassName}</jdbc.driverClassName>
 				<jdbc.maxActive>${flowservice.jdbc.maxActive}</jdbc.maxActive>
+				<flowservice.db.name>flowservice060</flowservice.db.name>
 
 				<!--flowservice.properties-->
 				<headserver.host>${meandre.headserver.host}</headserver.host>

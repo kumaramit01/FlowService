@@ -19,9 +19,9 @@
 -- Current Database: `flowservice`
 --
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `flowservice051` /*!40100 DEFAULT CHARACTER SET latin1 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `${flowservice.db.name}` /*!40100 DEFAULT CHARACTER SET latin1 */;
 
-USE `flowservice051`;
+USE `${flowservice.db.name}`;
 
 --
 -- Table structure for table `flow`
@@ -36,7 +36,7 @@ CREATE TABLE `flow` (
   `keyWords` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `isTemplate` bit(1) NOT NULL,
-  `url` varchar(255) NOT NULL,
+  `uri` text NOT NULL,
   `instanceOf` bigint(20) default NULL,
   `typeName` varchar(255) default NULL,
   PRIMARY KEY  (`id`),
@@ -149,3 +149,9 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2010-02-22 19:18:07
+/*grant permissions to the user*/
+grant all privileges on ${flowservice.db.name}.* to '${jdbc.username}'@'localhost' identified by '${jdbc.password}'
+
+flush privileges;
+
+
