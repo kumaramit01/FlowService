@@ -8,7 +8,32 @@
                                     
 Developer Documentation
 
+
+Flow Service Architecture
+
+    The Flow Service receives and manages requests for executions of Meandre
+    flows. As job requests arrive at the Flow Service, they are scheduled
+    for execution, then dispatched to a Meandre server when one becomes
+    available. A round robin algorithm is used to balance the job processing
+    load across the collection of Meandre servers. In addition to dispatching
+    jobs to Meandre servers, the Flow Service also monitors the progress
+    of all jobs and sends notifications to users as job status changes. A 
+    simple interface that clients can use to query for jobs and job updates
+    is also provided.
+
+[images/flow-service-architecture.png]
+
+Code Structure
+
+[images/code-structure.jpeg]
+
 Deployment
 	
+	The Flow Service runs as a Java RMI service. A JDBC datasource is used
+	to read and store information about flows, jobs, job results, and 
+	notifications. A configuration file is used to register a series of Meandre
+	servers with the Flow Service. When jobs execute on Meandre servers, job
+	results are produced and stored in a result repository. The results are
+	accessible to the Flow Service and available through the public API.
 	
-[images/flowservice-deployment.jpg]                                  
+[images/flow-service-deployment.jpg]
