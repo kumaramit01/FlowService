@@ -17,6 +17,7 @@ Roadmap
 * Medium Priority
 
     [[1]] Implement dynamic addition/removal of Meandre servers
-    [[1]] Develop user interface for monitoring the state of the service (server load, jobs running, job queue, etc.)
+    
+    [[2]] Develop user interface for monitoring the state of the service (server load, jobs running, job queue, etc.)
 	
 * Low Priority
