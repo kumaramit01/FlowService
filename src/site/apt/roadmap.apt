@@ -15,6 +15,7 @@ Roadmap
 	1. Create more unit and integration tests
 
 * Medium Priority
+
 	1. Implement dynamic addition/removal of Meandre servers
 	2. Develop user interface for monitoring the state of the service (server load, jobs running, job queue, etc.)
 	
