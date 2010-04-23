@@ -3,7 +3,14 @@
 													------------
 													Andrew Shirk
 													------------
-													2010-04-11
+													2010-04-23
 													------------
 
-Release Notes for 0.7.0
+Release Notes for 0.6.0
+
+    
+    Version 0.6.0 is primarily a refactoring of version 0.5.0. In version 0.5.0,
+    the API was enhanced with operations to provide metadata about flows and 
+    components. Due to time constraints however, the class design wasn't given
+    top consideration. Version 0.6.0 resolves the design problems introduced
+    by version 0.5.0, and includes fixes to bugs and small feature enhancements.
