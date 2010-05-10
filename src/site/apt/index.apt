@@ -7,13 +7,21 @@
 												-----------
 												
 												
-Nema Flow Service
+NEMA Flow Service
 
-	This documentation is related to the executor service <<0.6.0-SNAPSHOT>> release ({{{changes-report.html}changelog}}).												
+	This documentation is related to the NEMA Flow service <<0.6.0-SNAPSHOT>> release ({{{changes-report.html}changelog}}).												
 
 Introduction
 
-	
+	The NEMA Flow Service receives and manages requests for executions of Meandre
+    flows. As job requests arrive at the Flow Service, they are scheduled
+    for execution, then dispatched to a Meandre server when one becomes
+    available. A round robin algorithm is used to balance the job processing
+    load across the collection of Meandre servers. In addition to dispatching
+    jobs to Meandre servers, the Flow Service also monitors the progress
+    of all jobs and sends notifications to users as job status changes. A 
+    simple interface that clients can use to query for jobs and job updates
+    is also provided.
 
 Getting Started
 
