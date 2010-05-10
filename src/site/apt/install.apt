@@ -14,7 +14,7 @@ Installation Guide
 
 * Manual installation
 
-  This package comes as a tar gzip file. After you untar and gunzip the file (tar -zxvf), notice the following configuration files, scripts and libraries.
+  This package comes as a tar gzip file. After you untar and gunzip the file (tar -zxvf), notice the following configuration files, scripts and libraries:
 
 *--------------------------------------------+---------------------------------------------+
 || file                                      || description                               ||
@@ -48,4 +48,6 @@ Installation Guide
 
   After you have completed the configuration of the various properties files, execute the run.sh
   script to start the service on Linux/Unix, or the run.bat script to start the service on Windows.
+  
+  The Flow Service depends on the existence of several other services.
 
