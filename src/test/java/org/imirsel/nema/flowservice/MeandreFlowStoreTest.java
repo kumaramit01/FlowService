@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import javax.jcr.Credentials;
+import javax.jcr.SimpleCredentials;
+
 import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.annotations.parser.beans.DataTypeBean;
 import org.imirsel.nema.flowservice.MeandreServerException;
@@ -36,12 +39,14 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 public class MeandreFlowStoreTest extends BaseManagerTestCase {
    private MeandreServerProxy meandreServerProxy;
+   private String passwordHash=null;
 
    @Before
    public void setUp() throws Exception {
       String host = getPropertyAsString("host");
       String password = getPropertyAsString("password");
       String username = getPropertyAsString("username");
+      passwordHash = getPropertyAsString("passwordHash");
       int port = getPropertyAsInteger("port");
       int maxConcurrentJobs = 1;
       SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
@@ -188,7 +193,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
       paramMap.put("datatypetestcomponent_0_mfcc","false");
       String fileName=null;
       try {
-         fileName=meandreServerProxy.createFlow(paramMap, flowURI, 0l);
+    	 fileName=meandreServerProxy.createFlow( paramMap, flowURI, 0l);
          assertTrue(fileName!=null);
          assertTrue(fileName.length()>0);
       } catch (MeandreServerException e) {

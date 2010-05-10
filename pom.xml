@@ -4,7 +4,7 @@
 	<groupId>org.imirsel</groupId>
 	<artifactId>nema-flow-service</artifactId>
 	<packaging>jar</packaging>
-	<version>0.6.1-SNAPSHOT</version>
+	<version>0.7.0-SNAPSHOT</version>
 	<name>nema-flow-service</name>
 	<url>http://nema-dev.lis.illinois.edu/development/nema-flow-service</url>
 
@@ -111,7 +111,7 @@
 				<artifactId>maven-surefire-report-plugin</artifactId>
 				<version>2.4.3</version>
 			</plugin>
-		
+
 
 		</plugins>
 	</reporting>
@@ -289,7 +289,7 @@
 		<dependency>
 			<groupId>org.imirsel</groupId>
 			<artifactId>nema-flowservice-api</artifactId>
-			<version>0.6.1-SNAPSHOT</version>
+			<version>0.7.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -317,6 +317,24 @@
 			<artifactId>maven-structure101-plugin</artifactId>
 			<version>0.5</version>
 		</dependency>
+
+
+		<dependency>
+			<groupId>javax.jcr</groupId>
+			<artifactId>jcr</artifactId>
+			<version>2.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.imirsel</groupId>
+			<artifactId>nema-contentrepository-service-client</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+
+
+
 
 
 	</dependencies>
@@ -527,47 +545,47 @@
 	</repositories>
 
 	<profiles>
-	<profile>
-		<id>architecture-check</id>
+		<profile>
+			<id>architecture-check</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<build>
 				<plugins>
-			<plugin>
-				<groupId>com.structure101.java</groupId>
-				<artifactId>maven-structure101-plugin</artifactId>
-				<version>0.5</version>
-				<configuration>
-					<!-- put your configurations here -->
-					<project>
-						${project.name}
-					</project>
-					<breakOnError>false</breakOnError>
-					<classpath>${project.build.outputDirectory}</classpath>
-					<key></key>
-					<label>${project.version}</label>
-					<overwrite>true</overwrite>
-					<repository>http://nema-dev.lis.illinois.edu/s101j/data</repository>
-					<rpkey></rpkey>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>compile</phase>
-						<goals>
+					<plugin>
+						<groupId>com.structure101.java</groupId>
+						<artifactId>maven-structure101-plugin</artifactId>
+						<version>0.5</version>
+						<configuration>
+							<!-- put your configurations here -->
+							<project>
+								${project.name}
+							</project>
+							<breakOnError>false</breakOnError>
+							<classpath>${project.build.outputDirectory}</classpath>
+							<key></key>
+							<label>${project.version}</label>
+							<overwrite>true</overwrite>
+							<repository>http://nema-dev.lis.illinois.edu/s101j/data</repository>
+							<rpkey></rpkey>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>compile</phase>
+								<goals>
 
-                                                       <goal>publish</goal>
-                                                        <goal>check-architecture</goal>
-                                                        <goal>check-xs</goal>
-                                                        <goal>report-summary</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			</plugins>
+									<goal>publish</goal>
+									<goal>check-architecture</goal>
+									<goal>check-xs</goal>
+									<goal>report-summary</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
 			</build>
 		</profile>
-	
+
 		<profile>
 			<id>development</id>
 			<activation>

@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.jcr.SimpleCredentials;
+
 import org.imirsel.nema.model.Flow;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -32,6 +34,8 @@ public class NemaFlowServiceTest {
       ApplicationContext ctx = null;
       ctx = new ClassPathXmlApplicationContext(
             "applicationContext-flowservice-test.xml");
+      String username="admin";
+      String passwordHash="d033e22ae348aeb5660fc2140aec35850c4da997";
 
       FlowService flowService = (FlowService) ctx.getBean("flowService");
 
@@ -44,12 +48,21 @@ public class NemaFlowServiceTest {
       instance.setKeyWords(template.getKeyWords());
       instance.setName("Test instance");
       instance.setTemplate(false);
-      instance
-            .setUri("repository\\x0\\http___test.org_datatypetest_datatypetest1266359499405_.nt");
       instance.setDescription("An instance for testing.");
       instance.setType(template.getType());
 
-      long instanceId = flowService.storeFlowInstance(instance);
+      //long instanceId = flowService.storeFlowInstance(instance);
+      long userId=0l;
+      SimpleCredentials credentials = new SimpleCredentials(username,passwordHash.toCharArray());
+      String flowUri ="http://www.imirsel.org/test/testdynamiccomponentflow/";
+      HashMap<String,String> paramMap = new HashMap<String,String>();
+      paramMap.put("propertytostring_0_propertyvalue","hello world");
+    
+      flowService.createNewFlow(credentials, instance, paramMap, flowUri, userId);
+      
+      long instanceId = instance.getId();
+      
+      System.out.println("URI IS: ===> " + instance.getUri());
 
       for (int i = 0; i < 8; i++) {
          try {

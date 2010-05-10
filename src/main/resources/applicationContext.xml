@@ -15,7 +15,7 @@
 
 	<context:annotation-config />
 
-	<context:property-placeholder location="classpath:jdbc.properties,classpath:mail.properties" />
+	<context:property-placeholder location="classpath:jdbc.properties,classpath:mail.properties,classpath:contentrepositoryservice.properties" />
 
 	<!-- Enable @Configured support -->
 	<context:spring-configured />
@@ -125,6 +125,22 @@
     <bean id="repositoryClientConnectionPool" 
         class="org.imirsel.nema.repository.RepositoryClientConnectionPool" />
         
+     <!-- content repository to store the flow -->
+    <bean id="contentRepositoryService" 
+    	class="org.imirsel.nema.contentrepository.client.ContentRepositoryService">
+    	<property name="repository" ref="remoteContentRepository"/>
+    </bean>
+    
+    <bean id="remoteContentRepository" factory-bean="clientRepositoryFactory" 
+     factory-method="getRepository">
+     	<constructor-arg value="${contentrepository.url}"/>
+     </bean>
+    
+    <bean id="clientRepositoryFactory" 
+    class="org.apache.jackrabbit.rmi.client.ClientRepositoryFactory"/>
+    <!-- End of content repository beans -->
+    
+        
     <bean id="meandreServerProxyFactory"
         class="org.imirsel.nema.flowservice.MeandreServerProxyFactory">
         <property name="jobStatusMonitor" ref="jobStatusMonitor"/>
@@ -147,7 +163,8 @@
 		<property name="daoFactory" ref="daoFactory" />
 		<property name="notificationSender" ref="notificationSender"/>
 		<property name="flowServiceConfig" ref="flowServiceConfig"/>
-	</bean>
+		<property name="artifactService" ref="contentRepositoryService"/>
+  </bean>
 
 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
 		<property name="serviceName" value="FlowService" />

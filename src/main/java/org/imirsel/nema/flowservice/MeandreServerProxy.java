@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
 import org.imirsel.meandre.client.ExecResponse;
 import org.imirsel.meandre.client.MeandreClient;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
@@ -149,10 +150,13 @@ public interface MeandreServerProxy {
     * Create a new flow and save it in the local repository. The the supplied
     * parameter map containing custom properties that a user has set based on a
     * template flow and creates a new flow.
+    * @param paramMap
+    * @param flowUri
+    * @param userId
     * 
     * @returns URI of the new flow.
     */
-   public String createFlow(HashMap<String, String> paramMap,
+   public String createFlow( HashMap<String, String> paramMap,
          String flowUri, long userId) throws MeandreServerException;
 
    public boolean removeFlow(String uri) throws MeandreServerException;
