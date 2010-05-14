@@ -9,7 +9,7 @@
 												
 NEMA Flow Service
 
-	This documentation is related to the NEMA Flow service <<0.6.0-SNAPSHOT>> release ({{{changes-report.html}changelog}}).												
+	This documentation is related to the NEMA Flow service <<0.7.0-SNAPSHOT>> release ({{{changes-report.html}changelog}}).												
 
 Introduction
 
@@ -30,12 +30,19 @@ Getting Started
 		
 	
 ** Prerequisites
-		
+		The Meandre Servers should be running prior to running the flow service. The addresses of
+		the servers and
+	
 	
 ** Execution parameters
 		
 		
-		The flow service requires following parameters:
+		The flow service reads the list of Meandre servers, the connection ports, the username
+		the password and maximum number of jobs that the server can run from a property file.
+		By default it tries to read the property file "flowservice.properties" from the classpath.
+		The current working directory is in the classpath and it will read the <<<flowservice.properties>>>
+		file from there. The <<<jdbc.properties>>> file and <<<mail.properties>>> file are also read from the
+		classpath to set the jdbc datasource and mail server information.
 	
 
 

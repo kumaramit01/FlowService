@@ -133,7 +133,7 @@
     
     <bean id="remoteContentRepository" factory-bean="clientRepositoryFactory" 
      factory-method="getRepository">
-     	<constructor-arg value="${contentrepository.url}"/>
+     	<constructor-arg value="${contentrepository.rmi.url}"/>
      </bean>
     
     <bean id="clientRepositoryFactory" 

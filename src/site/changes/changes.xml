@@ -6,14 +6,27 @@
     <author email="shirk@uiuc.edu">Andrew Shirk</author>
   </properties>
   <body>
-    <release version="0.6.0" date="2010-04-03" description="Subsequent release">
-     
-    </release>
+  
+  <release version="0.7.0" date="??" description="API incompatiable with previous release">
+  	<action dev="kumaramit01" type="add">Modified createNewFlow method call to to use Content Repository for storing the flow.</action>
+  
+  
+  </release>
+  
+  
+    <release version="0.6.0" date="2010-04-05" description="Subsequent release">
+      <action dev="kumaramit01" type="add">Added site support -updated apt files</action>
+        <action dev="shirk" type="update">Updated site support</action>
+     </release>
 
-    <release version="0.5.0" date="??" description="Second release">
+    <release version="0.5.0" date="2010-02-23" description="Second release">
+    <action dev="kumaramit01" type="add">Added support for assembly</action>
+    <action dev="shirk" type="add">Class name changes</action>
+    <action dev="shirk" type="update">Bug fix: Job status was not getting updated when execute #19 Google issue</action>
     </release>
     
-     <release version="0.1.0" date="???" description="First release">
+     <release version="0.1.0" date="2009-12-01" description="First release">
+     	<action dev="shirk">First Release</action>
     </release>
   </body>
 </document>
