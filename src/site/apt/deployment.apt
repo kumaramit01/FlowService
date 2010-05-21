@@ -1,0 +1,19 @@
+   									------------------------------
+                                          Developer Information
+                                    ------------------------------
+                                         Amit Kumar
+                                    ------------------------------
+                                           2010-05-21
+                                    ------------------------------
+                                    
+
+Deployment
+	
+	The Flow Service runs as a Java RMI service. A JDBC datasource is used
+	to read and store information about flows, jobs, job results, and 
+	notifications. A configuration file is used to register a series of Meandre
+	servers with the Flow Service. When jobs execute on Meandre servers, job
+	results are produced and stored in a result repository. The results are
+	accessible to the Flow Service and available through the public API.
+	
+[images/flow-service-deployment.jpg]
