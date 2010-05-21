@@ -5,6 +5,11 @@
 													------------
 													2010-04-23
 													------------
+Release Notes for 0.7.0
+
+	Version 0.7.0 stores the flows to a content repository. Earlier versions of this 
+	service would store the flow on the filesystem.
+
 
 Release Notes for 0.6.0
 
