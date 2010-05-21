@@ -30,9 +30,8 @@ Getting Started
 		
 	
 ** Prerequisites
-		The Meandre Servers should be running prior to running the flow service. The addresses of
-		the servers and
-	
+
+		The Meandre Servers and the mysql database should be running prior to running the flow service.
 	
 ** Execution parameters
 		
