@@ -536,8 +536,7 @@ public class MeandreFlowStore {
             }
          }
 
-         fileName = userRepoDir + System.getProperty("file.separator") + fName
-               + ".nt";
+         fileName = new File(userRepoDir , fName+ ".nt").getAbsolutePath();
          logger.info(fileName);
          ntStream = new FileOutputStream(userRepoDir + fName + ".nt");
          flowModel.write(ntStream, "N-TRIPLE");
