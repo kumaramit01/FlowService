@@ -9,8 +9,6 @@ import java.util.ResourceBundle;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.orm.toplink.SessionFactory;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 /**
