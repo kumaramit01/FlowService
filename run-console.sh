@@ -4,7 +4,7 @@ CLASSPATH=.:${project.build.finalName}.jar
 MAIN_CLASS=org.imirsel.nema.flowservice.FlowServiceApp
 CWD=`pwd`
 HOST=${nema.deployment.hostname}
-FLAG="-Dava.rmi.server.logCalls=true -Djava.rmi.server.codebase=file:///$CWD/lib -Djava.rmi.server.hostname=$HOST -Djava.util.logging.config.file=logging.properties"
+FLAG="-Dava.rmi.server.logCalls=true -Djava.rmi.server.codebase=file:///$CWD/lib -Djava.rmi.server.hostname=$HOST -Djava.util.logging.config.file=logging.properties -enableassertions"
 mkdir -p log
 jarList=`find $CWD/lib -name '*.jar'`
 

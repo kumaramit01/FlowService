@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -37,6 +38,7 @@ import org.imirsel.nema.model.Notification;
 import org.imirsel.nema.model.Property;
 import org.imirsel.nema.model.Job.JobStatus;
 import org.springframework.orm.ObjectRetrievalFailureException;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A {@link FlowService} implementation for the NEMA project.
@@ -196,7 +198,8 @@ public class NemaFlowService implements FlowService {
 	 * @see FlowService#storeFlowInstance(Flow)
 	 * 
 	 */
-	private Long storeFlowInstance(Flow instance) {
+	@Transactional 
+	public Long storeFlowInstance(Flow instance) {
 		FlowDao flowDao = daoFactory.getFlowDao();
 		flowDao.makePersistent(instance);
 		return instance.getId();
@@ -222,10 +225,35 @@ public class NemaFlowService implements FlowService {
 		try {
 			result = headServer.createFlow(paramMap, flowUri,userId);
 			byte[] flowContent = readFileAsBytes(result);
-			this.getArtifactService().saveFlow(
-					(SimpleCredentials) credentials, flow,
-					Long.toString(flow.getId()), flowContent);
+			assert this.getArtifactService()!=null;
+			assert flow != null;
+			assert credentials != null;
+			assert flowContent != null;
+			
+			if(this.getArtifactService()==null){
+				logger.severe("Error: Artifact service is null");
+			}else{
+				System.out.println(this.getArtifactService().toString());
+			}
+			if(flow==null){
+				logger.severe("Error: Flow is null");
+			}else{
+				System.out.println(flow.toString());
+			}
+			
+			if(credentials==null){
+				logger.severe("Credentials is null");
+			}else{
+				System.out.println(credentials.toString());
+			}
+			System.out.println("FLOW IS IS: ");
+			System.out.print(flow.getId());
+			String id = UUID.randomUUID().toString();
+			this.getArtifactService().saveFlow((SimpleCredentials) credentials, flow,id, flowContent);
+		
+			System.out.println("Debugging; Flow uri" + result);
 			flow.setUri(result);
+
 			this.storeFlowInstance(flow);
 		} catch (MeandreServerException e) {
 			throw new ServiceException("Could not create flow: " + flowUri, e);
@@ -424,10 +452,19 @@ public class NemaFlowService implements FlowService {
 		throw new IllegalArgumentException("DEPRECATED..");
 	}
 
+	/**
+	 * Set the artifact service to store the flow
+	 * @param artifactService
+	 */
 	public void setArtifactService(ArtifactService artifactService) {
 		this.artifactService = artifactService;
 	}
 
+	/** 
+	 * Returns ArtifactService
+	 * 
+	 * @return artifactservice {@link ArtifactService}}
+	 */
 	public ArtifactService getArtifactService() {
 		return artifactService;
 	}
@@ -454,6 +491,7 @@ public class NemaFlowService implements FlowService {
 		}catch(Exception ex){
 			// error closing stream -okay
 		}
+		logger.info("read: " + bytes.length + " of flow " + fileLocation);
 		return bytes;
 	}
 
