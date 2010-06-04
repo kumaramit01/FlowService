@@ -11,6 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.jcr.Credentials;
+import javax.jcr.SimpleCredentials;
 
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
@@ -18,6 +20,8 @@ import net.jcip.annotations.ThreadSafe;
 import org.imirsel.meandre.client.ExecResponse;
 import org.imirsel.meandre.client.MeandreClient;
 import org.imirsel.meandre.client.TransmissionException;
+import org.imirsel.nema.contentrepository.client.ArtifactService;
+import org.imirsel.nema.contentrepository.client.ContentRepositoryServiceException;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyStatus;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
@@ -25,6 +29,8 @@ import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.Property;
+import org.imirsel.nema.model.RepositoryResourcePath;
+import org.imirsel.nema.model.ResourcePath;
 import org.imirsel.nema.repository.RepositoryClientConnectionPool;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
@@ -61,6 +67,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
    private JobStatusMonitor jobStatusMonitor;
    private MeandreClient meandreClient;
    private MeandreFlowStore meandreFlowStore;
+   private ArtifactService artifactService;
    
    public RemoteMeandreServerProxy(MeandreServerProxyConfig config) {
       this.config = config;
@@ -153,27 +160,52 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       runningLock.lock();
       try {
          assert meandreClient != null : "Meandre client null";
-         meandreClient.runAsyncModel(
-               job.getFlow().getUri(), job.getToken(), probes);
+         ResourcePath rp = getResourcePath(job.getFlow().getUri());
+         SimpleCredentials credentials = getCredentials(job.getCredentials());
+         byte[] flowData=this.artifactService.retrieveFlow(credentials, rp);
+         meandreClient.runAsyncModelBytes(
+               flowData, job.getToken(), probes);
          response = meandreClient.getFlowExecutionInstanceId(job.getToken());
          logger.fine("Job " + job.getId()
                + " successfully submitted to server " + getServerString()
                + " for execution.");
-         
          runningJobs.add(job);
          jobStatusMonitor.start(job, this);
       } catch (TransmissionException e) {
          throw new MeandreServerException("A problem occurred while "
                + "communicating with server " + getServerString()
                + " in order to execute job " + job.getId() + ".", e);
-      } finally {
+      } catch (ContentRepositoryServiceException e) {
+    	  throw new MeandreServerException("A problem occurred while "
+    			  + "trying to retrive the flow ", e);
+                 
+	} finally {
          runningLock.unlock();
       }
 
       return response;
    }
+   
+   
 
-   /**
+   private SimpleCredentials getCredentials(String credentials) {
+	   String[] splits = credentials.split(":");
+	   String username = splits[0];
+	   String password =splits[1];
+	   SimpleCredentials sc = new SimpleCredentials(username,password.toCharArray());
+	   return sc;
+}
+
+   private ResourcePath getResourcePath(String uri) {
+	   String splits[] = uri.split("://");
+	   String pcol = splits[0];
+	   String path = splits[1];
+	   String workspace = "default";
+	   RepositoryResourcePath rp = new  RepositoryResourcePath(pcol,workspace,path);
+	   return rp;
+   }
+
+/**
     * @see MeandreServerProxy#abortJob(org.imirsel.nema.model.Job)
     */
    public void abortJob(Job job) throws MeandreServerException {
@@ -409,5 +441,11 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
    public String toString() {
       return config.getHost() + ":" + config.getPort();
    }
+
+@Override
+public void setArtifactService(ArtifactService artifactService) {
+	this.artifactService=artifactService;
+	
+}
 
 }

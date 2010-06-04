@@ -36,6 +36,7 @@ import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.JobResult;
 import org.imirsel.nema.model.Notification;
 import org.imirsel.nema.model.Property;
+import org.imirsel.nema.model.ResourcePath;
 import org.imirsel.nema.model.Job.JobStatus;
 import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,7 +122,7 @@ public class NemaFlowService implements FlowService {
 	 * @see FlowService#executeJob(String, String, String, long, long, String)
 	 */
 	@Override
-	public Job executeJob(String token, String name, String description,
+	public Job executeJob(Credentials credentials,String token, String name, String description,
 			long flowInstanceId, long userId, String userEmail) {
 		FlowDao flowDao = daoFactory.getFlowDao();
 		JobDao jobDao = daoFactory.getJobDao();
@@ -249,10 +250,13 @@ public class NemaFlowService implements FlowService {
 			System.out.println("FLOW IS IS: ");
 			System.out.print(flow.getId());
 			String id = UUID.randomUUID().toString();
-			this.getArtifactService().saveFlow((SimpleCredentials) credentials, flow,id, flowContent);
+			ResourcePath resourcePath=this.getArtifactService().saveFlow((SimpleCredentials) credentials, flow,id, flowContent);
+			
+			
 		
-			System.out.println("Debugging; Flow uri" + result);
-			flow.setUri(result);
+			String uri = resourcePath.getProtocol() + "://"+ resourcePath.getPath();
+			System.out.println("\n\nDebugging; Flow uri" + uri);
+			flow.setUri(uri);
 
 			this.storeFlowInstance(flow);
 		} catch (MeandreServerException e) {

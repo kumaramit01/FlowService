@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.imirsel.meandre.client.ExecResponse;
 import org.imirsel.meandre.client.MeandreClient;
+import org.imirsel.nema.contentrepository.client.ArtifactService;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyStatus;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
@@ -214,5 +215,11 @@ public interface MeandreServerProxy {
     * @return Current server status.
     */
    public MeandreServerProxyStatus getStatus();
+
+   /**
+    * Set the artifact service, which is used to retrieve flow bytes
+    * @param artifactService
+    */
+   public void setArtifactService(ArtifactService artifactService);
 
 }
