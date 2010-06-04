@@ -108,7 +108,7 @@ public class MeandreServerProxyFactory {
 	 * Set the {@link RepositoryClientConnectionPool} that new
 	 * {@link MeandreServerProxy} instances should be given.
 	 * 
-	 * @return {@link RepositoryClientConnectionPool} that should be set upon
+	 * {@link RepositoryClientConnectionPool} that should be set upon
 	 *         new {@link MeandreServerProxy} instances.
 	 */
 	public void setRepositoryClientConnectionPool(

@@ -1,9 +1,9 @@
-#Wed Feb 17 10:57:19 CST 2010
+#Fri Jun 04 10:02:14 CDT 2010
 activeProfiles=-Denv\=development
 eclipse.preferences.version=1
 fullBuildGoals=process-test-resources
 includeModules=false
-resolveWorkspaceProjects=true
+resolveWorkspaceProjects=false
 resourceFilterGoals=process-resources resources\:testResources
 skipCompilerPlugin=true
 version=1
