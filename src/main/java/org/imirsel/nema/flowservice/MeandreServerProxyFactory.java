@@ -116,4 +116,12 @@ public class MeandreServerProxyFactory {
 		this.repositoryClientConnectionPool = repositoryClientConnectionPool;
 	}
 
+	public ArtifactService getArtifactService() {
+		return artifactService;
+	}
+
+	public void setArtifactService(ArtifactService artifactService) {
+		this.artifactService = artifactService;
+	}
+
 }

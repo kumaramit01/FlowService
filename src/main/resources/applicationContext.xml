@@ -146,6 +146,7 @@
         class="org.imirsel.nema.flowservice.MeandreServerProxyFactory">
         <property name="jobStatusMonitor" ref="jobStatusMonitor"/>
         <property name="repositoryClientConnectionPool" ref="repositoryClientConnectionPool"/>
+        <property name="artifactService" ref="contentRepositoryService"/>
     </bean>
         
 	<bean id="loadBalancer" class="org.imirsel.nema.flowservice.RoundRobinLoadBalancer" />

@@ -136,7 +136,11 @@ public class NemaFlowService implements FlowService {
 		job.setFlow(flowInstance);
 		job.setOwnerId(userId);
 		job.setOwnerEmail(userEmail);
+		SimpleCredentials sc=(SimpleCredentials)credentials;
+		String serialized = sc.getUserID()+":"+ new String(sc.getPassword());
+		job.setCredentials(serialized);
 		jobDao.makePersistent(job);
+		
 
 		jobScheduler.scheduleJob(job);
 		job.setJobStatus(JobStatus.SCHEDULED);
@@ -310,7 +314,7 @@ public class NemaFlowService implements FlowService {
 	public String getConsole(Job job) {
 		String console = null;
 		try {
-			console = headServer.getConsole(job.getFlow().getUri());
+			console = headServer.getConsole(job.getExecutionInstanceId());
 		} catch (MeandreServerException e) {
 			throw new ServiceException(
 					"Could not retrieve the console for job " + job.getId(), e);

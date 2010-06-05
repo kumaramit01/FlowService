@@ -160,6 +160,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       runningLock.lock();
       try {
          assert meandreClient != null : "Meandre client null";
+         assert this.artifactService != null: "Artifact service is null";
          ResourcePath rp = getResourcePath(job.getFlow().getUri());
          SimpleCredentials credentials = getCredentials(job.getCredentials());
          byte[] flowData=this.artifactService.retrieveFlow(credentials, rp);
@@ -189,6 +190,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
    
 
    private SimpleCredentials getCredentials(String credentials) {
+	   assert credentials!= null : "User Credentials are null";
 	   String[] splits = credentials.split(":");
 	   String username = splits[0];
 	   String password =splits[1];
