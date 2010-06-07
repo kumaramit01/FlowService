@@ -231,34 +231,16 @@ public class NemaFlowService implements FlowService {
 			result = headServer.createFlow(paramMap, flowUri,userId);
 			byte[] flowContent = readFileAsBytes(result);
 			assert this.getArtifactService()!=null;
-			assert flow != null;
-			assert credentials != null;
-			assert flowContent != null;
-			
-			if(this.getArtifactService()==null){
-				logger.severe("Error: Artifact service is null");
-			}else{
-				System.out.println(this.getArtifactService().toString());
-			}
-			if(flow==null){
-				logger.severe("Error: Flow is null");
-			}else{
-				System.out.println(flow.toString());
-			}
-			
-			if(credentials==null){
-				logger.severe("Credentials is null");
-			}else{
-				System.out.println(credentials.toString());
-			}
-			System.out.println("FLOW IS IS: ");
-			System.out.print(flow.getId());
+			assert flow != null :  "flow is null";
+			assert credentials != null:  "credentials are null";
+			assert flowContent != null: "flowcontent is null";
+			logger.info("flow id is: " +flow.getId()+"");
 			String id = UUID.randomUUID().toString();
 			ResourcePath resourcePath=this.getArtifactService().saveFlow((SimpleCredentials) credentials, flow,id, flowContent);
 			
 			
 		
-			String uri = resourcePath.getProtocol() + "://"+ resourcePath.getPath();
+			String uri = resourcePath.getProtocol() + ":"+resourcePath.getWorkspace()+"://"+ resourcePath.getPath();
 			System.out.println("\n\nDebugging; Flow uri" + uri);
 			flow.setUri(uri);
 
