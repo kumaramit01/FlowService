@@ -24,6 +24,7 @@ public class MeandreServerProxyFactory {
 
 	private ArtifactService artifactService;
 	private RepositoryClientConnectionPool repositoryClientConnectionPool;
+	
 
 	private Map<String, MeandreServerProxy> proxyInstances = new HashMap<String, MeandreServerProxy>(
 			8);
@@ -50,6 +51,7 @@ public class MeandreServerProxyFactory {
 			instance
 					.setRepositoryClientConnectionPool(repositoryClientConnectionPool);
 			instance.init();
+			instance.setArtifactService(artifactService);
 			proxyInstances.put(key, instance);
 		}
 		return instance;
@@ -106,12 +108,20 @@ public class MeandreServerProxyFactory {
 	 * Set the {@link RepositoryClientConnectionPool} that new
 	 * {@link MeandreServerProxy} instances should be given.
 	 * 
-	 * @return {@link RepositoryClientConnectionPool} that should be set upon
+	 * {@link RepositoryClientConnectionPool} that should be set upon
 	 *         new {@link MeandreServerProxy} instances.
 	 */
 	public void setRepositoryClientConnectionPool(
 			RepositoryClientConnectionPool repositoryClientConnectionPool) {
 		this.repositoryClientConnectionPool = repositoryClientConnectionPool;
+	}
+
+	public ArtifactService getArtifactService() {
+		return artifactService;
+	}
+
+	public void setArtifactService(ArtifactService artifactService) {
+		this.artifactService = artifactService;
 	}
 
 }

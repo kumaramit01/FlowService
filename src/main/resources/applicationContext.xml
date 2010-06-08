@@ -40,6 +40,7 @@
 			<tx:method name="deleteJob" rollback-for="DataAccessException" />
 			<tx:method name="executeJob" rollback-for="DataAccessException" />
 			<tx:method name="storeFlowInstance" rollback-for="DataAccessException"/>
+			<tx:method name="createNewFlow" rollback-for="DataAccessException"/>
 			<tx:method name="getUserJobs" read-only="true" />
 			<tx:method name="getJob" read-only="true" />
 			<tx:method name="getFlowTemplates" read-only="true"/>
@@ -145,6 +146,7 @@
         class="org.imirsel.nema.flowservice.MeandreServerProxyFactory">
         <property name="jobStatusMonitor" ref="jobStatusMonitor"/>
         <property name="repositoryClientConnectionPool" ref="repositoryClientConnectionPool"/>
+        <property name="artifactService" ref="contentRepositoryService"/>
     </bean>
         
 	<bean id="loadBalancer" class="org.imirsel.nema.flowservice.RoundRobinLoadBalancer" />

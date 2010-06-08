@@ -114,7 +114,9 @@ public class MeandreFlowStore {
       xstream.setMode(XStream.NO_REFERENCES);
       
       try {
-         cachedRemoteRepository = meandreClient.retrieveRepository();
+    	  String server=  meandreClient.getServerHost() + ":" + meandreClient.getPort();
+    	  logger.info("Retrieve Repository from the server : " + server);
+    	  cachedRemoteRepository = meandreClient.retrieveRepository();
       } catch (TransmissionException e) {
          throw new RuntimeException (
                "Could not initialize MeandreFlowStore...", e);
@@ -518,15 +520,17 @@ public class MeandreFlowStore {
       logger.info("Saving flow " + flowUri);
 
       String execStepMsg = "";
-      String fileName = null;
+     // String fileName = null;
       FileOutputStream ttlStream = null, ntStream = null, rdfStream = null;
+      File ntFile;
       try {
          Model flowModel = flow.getModel();
 
          String fName = flowUri.replaceAll(":|/", "_");
-         String userRepoDir = repositoryLocation + File.separator
-               + "x" + userId;
-         File file = new File(userRepoDir);
+        // String userRepoDir = repositoryLocation + File.separator
+        //      + "x" + userId;
+         File repLoc = new File(repositoryLocation);
+         File file = new File(repLoc,"x"+userId);
          if (!file.exists()) {
             boolean success = file.mkdir();
             if (!success) {
@@ -535,14 +539,16 @@ public class MeandreFlowStore {
                            + file.getAbsolutePath());
             }
          }
-
-         fileName = new File(userRepoDir , fName+ ".nt").getAbsolutePath();
-         logger.info(fileName);
-         ntStream = new FileOutputStream(userRepoDir + fName + ".nt");
+         ntFile = new File(file,fName+".nt");
+         File ttlFile = new File(file,fName+".ttl");
+         File rdfFile = new File(file,fName+".rdf");
+         
+         logger.info("Saving file: "+ ntFile.getAbsolutePath());
+         ntStream = new FileOutputStream(ntFile);
          flowModel.write(ntStream, "N-TRIPLE");
-         ttlStream = new FileOutputStream(userRepoDir + fName + ".ttl");
+         ttlStream = new FileOutputStream(ttlFile);
          flowModel.write(ttlStream, "TTL");
-         rdfStream = new FileOutputStream(userRepoDir + fName + ".rdf");
+         rdfStream = new FileOutputStream(rdfFile);
          flowModel.write(rdfStream, "RDF/XML-ABBREV");
 
          execStepMsg = "STEP1: Creating RepositoryImpl from flow model";
@@ -560,7 +566,6 @@ public class MeandreFlowStore {
                : (MeandreServerException) e;
          throw mException;
       } finally {
-
          try {
             if (ttlStream != null)
                ttlStream.close();
@@ -580,7 +585,7 @@ public class MeandreFlowStore {
             e.printStackTrace();
          }
       }
-      return fileName;
+      return ntFile.getAbsolutePath();
    }
    
    public RepositoryClientConnectionPool getRepositoryClientConnectionPool() {

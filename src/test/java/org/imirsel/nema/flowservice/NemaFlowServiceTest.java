@@ -70,8 +70,8 @@ public class NemaFlowServiceTest {
          } catch (InterruptedException e) {
             e.printStackTrace();
          }
-
-         flowService.executeJob(UUID.randomUUID().toString(), "Test: "
+         SimpleCredentials simpleCredentials = new SimpleCredentials("admin","admin".toCharArray());
+         flowService.executeJob(simpleCredentials,UUID.randomUUID().toString(), "Test: "
                + new Date().toString(), "Test job " + i, instanceId, 0L,
                "shirk@uiuc.edu");
       }

@@ -195,6 +195,7 @@ public class MeandreJobScheduler implements JobScheduler {
             job.incrementNumTries();
             job.setJobStatus(JobStatus.SUBMITTED);
             job.setSubmitTimestamp(new Date());
+            logger.info("$$$$ credentials for the job is: " + job.getCredentials());
 
             logger.fine("Preparing to update job " + job.getId()
                   + " as submitted.");

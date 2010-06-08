@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -35,8 +36,10 @@ import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.JobResult;
 import org.imirsel.nema.model.Notification;
 import org.imirsel.nema.model.Property;
+import org.imirsel.nema.model.ResourcePath;
 import org.imirsel.nema.model.Job.JobStatus;
 import org.springframework.orm.ObjectRetrievalFailureException;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A {@link FlowService} implementation for the NEMA project.
@@ -119,7 +122,7 @@ public class NemaFlowService implements FlowService {
 	 * @see FlowService#executeJob(String, String, String, long, long, String)
 	 */
 	@Override
-	public Job executeJob(String token, String name, String description,
+	public Job executeJob(Credentials credentials,String token, String name, String description,
 			long flowInstanceId, long userId, String userEmail) {
 		FlowDao flowDao = daoFactory.getFlowDao();
 		JobDao jobDao = daoFactory.getJobDao();
@@ -133,7 +136,11 @@ public class NemaFlowService implements FlowService {
 		job.setFlow(flowInstance);
 		job.setOwnerId(userId);
 		job.setOwnerEmail(userEmail);
+		SimpleCredentials sc=(SimpleCredentials)credentials;
+		String serialized = sc.getUserID()+":"+ new String(sc.getPassword());
+		job.setCredentials(serialized);
 		jobDao.makePersistent(job);
+		
 
 		jobScheduler.scheduleJob(job);
 		job.setJobStatus(JobStatus.SCHEDULED);
@@ -196,7 +203,8 @@ public class NemaFlowService implements FlowService {
 	 * @see FlowService#storeFlowInstance(Flow)
 	 * 
 	 */
-	private Long storeFlowInstance(Flow instance) {
+	@Transactional 
+	public Long storeFlowInstance(Flow instance) {
 		FlowDao flowDao = daoFactory.getFlowDao();
 		flowDao.makePersistent(instance);
 		return instance.getId();
@@ -222,10 +230,20 @@ public class NemaFlowService implements FlowService {
 		try {
 			result = headServer.createFlow(paramMap, flowUri,userId);
 			byte[] flowContent = readFileAsBytes(result);
-			this.getArtifactService().saveFlow(
-					(SimpleCredentials) credentials, flow,
-					Long.toString(flow.getId()), flowContent);
-			flow.setUri(result);
+			assert this.getArtifactService()!=null;
+			assert flow != null :  "flow is null";
+			assert credentials != null:  "credentials are null";
+			assert flowContent != null: "flowcontent is null";
+			logger.info("flow id is: " +flow.getId()+"");
+			String id = UUID.randomUUID().toString();
+			ResourcePath resourcePath=this.getArtifactService().saveFlow((SimpleCredentials) credentials, flow,id, flowContent);
+			
+			
+		
+			String uri = resourcePath.getProtocol() + ":"+resourcePath.getWorkspace()+"://"+ resourcePath.getPath();
+			System.out.println("\n\nDebugging; Flow uri" + uri);
+			flow.setUri(uri);
+
 			this.storeFlowInstance(flow);
 		} catch (MeandreServerException e) {
 			throw new ServiceException("Could not create flow: " + flowUri, e);
@@ -278,7 +296,7 @@ public class NemaFlowService implements FlowService {
 	public String getConsole(Job job) {
 		String console = null;
 		try {
-			console = headServer.getConsole(job.getFlow().getUri());
+			console = headServer.getConsole(job.getExecutionInstanceId());
 		} catch (MeandreServerException e) {
 			throw new ServiceException(
 					"Could not retrieve the console for job " + job.getId(), e);
@@ -424,10 +442,19 @@ public class NemaFlowService implements FlowService {
 		throw new IllegalArgumentException("DEPRECATED..");
 	}
 
+	/**
+	 * Set the artifact service to store the flow
+	 * @param artifactService
+	 */
 	public void setArtifactService(ArtifactService artifactService) {
 		this.artifactService = artifactService;
 	}
 
+	/** 
+	 * Returns ArtifactService
+	 * 
+	 * @return artifactservice {@link ArtifactService}}
+	 */
 	public ArtifactService getArtifactService() {
 		return artifactService;
 	}
@@ -454,6 +481,7 @@ public class NemaFlowService implements FlowService {
 		}catch(Exception ex){
 			// error closing stream -okay
 		}
+		logger.info("read: " + bytes.length + " of flow " + fileLocation);
 		return bytes;
 	}
 
