@@ -4,7 +4,7 @@
 	<groupId>org.imirsel</groupId>
 	<artifactId>nema-flow-service</artifactId>
 	<packaging>jar</packaging>
-	<version>0.7.0-SNAPSHOT</version>
+	<version>0.8.0-SNAPSHOT</version>
 	<name>nema-flow-service</name>
 	<url>http://nema-dev.lis.illinois.edu/development/nema-flow-service</url>
 
@@ -156,6 +156,13 @@
 
 
 	<dependencies>
+	
+		<dependency>
+			<groupId>com.structure101.java</groupId>
+			<artifactId>maven-structure101-plugin</artifactId>
+			<version>0.5</version>
+		</dependency>
+	
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -315,19 +322,19 @@
 		<dependency>
 			<groupId>org.imirsel</groupId>
 			<artifactId>nema-flowservice-api</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
+			<version>${flowservice.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.imirsel</groupId>
 			<artifactId>nema-repositoryservice</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
+			<version>${repositoryservice.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.imirsel</groupId>
 			<artifactId>nema-annotations</artifactId>
-			<version>0.5.0</version>
+			<version>${imirsel-nema-annotations.version}</version>
 		</dependency>
 
 
@@ -336,12 +343,6 @@
 			<artifactId>test-api</artifactId>
 			<version>0.2.0-SNAPSHOT</version>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.structure101.java</groupId>
-			<artifactId>maven-structure101-plugin</artifactId>
-			<version>0.5</version>
 		</dependency>
 
 
@@ -355,7 +356,7 @@
 		<dependency>
 			<groupId>org.imirsel</groupId>
 			<artifactId>nema-contentrepository-service-client</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${contentrepository-client.version}</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -365,8 +366,12 @@
 
 	</dependencies>
 	<properties>
-		<imirsel-nema-core.version>0.6.0-SNAPSHOT</imirsel-nema-core.version>
-		<imirsel-meandre-client.version>0.7.0-SNAPSHOT</imirsel-meandre-client.version>
+		<repositoryservice.version>0.3.0-SNAPSHOT</repositoryservice.version>
+		<flowservice.version>0.8.0-SNAPSHOT</flowservice.version>
+		<imirsel-nema-annotations.version>0.7.0-SNAPSHOT</imirsel-nema-annotations.version>
+	    <contentrepository-client.version>0.0.2-SNAPSHOT</contentrepository-client.version>
+		<imirsel-nema-core.version>0.7.0-SNAPSHOT</imirsel-nema-core.version>
+		<imirsel-meandre-client.version>0.8.0-SNAPSHOT</imirsel-meandre-client.version>
 		<meandre-server.version>1.4.8</meandre-server.version>
 		<spring-framework.version>2.5.6</spring-framework.version>
 		<jdbc.groupId>mysql</jdbc.groupId>
