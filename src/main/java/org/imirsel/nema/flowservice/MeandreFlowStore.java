@@ -61,554 +61,677 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
  */
 public class MeandreFlowStore {
 
-   private static final Logger logger = Logger
-   .getLogger(MeandreFlowStore.class.getName());
-   
-   private static final String DATATYPE_KEY = "DATATYPE";
-   private final XStream xstream = new XStream(new JettisonMappedXmlDriver());
+	private static final Logger logger = Logger
+			.getLogger(MeandreFlowStore.class.getName());
 
-   private RepositoryClientConnectionPool repositoryClientConnectionPool = null;
-   
-   private MeandreClient meandreClient = null;
-   
-   /** Locally cached version of the remote flow repository */
-   @GuardedBy("repositoryLock")
-   private QueryableRepository cachedRemoteRepository;
-   private final Lock repositoryLock = new ReentrantLock(true);
-   
-   private String repositoryLocation;
+	private static final String DATATYPE_KEY = "DATATYPE";
+	private final XStream xstream = new XStream(new JettisonMappedXmlDriver());
 
-   @PostConstruct
-   public void init() {
-      DefaultResourceLoader drl = new DefaultResourceLoader();
-      org.springframework.core.io.Resource resource = 
-         drl.getResource("flowrepository.properties");
-      if (resource != null) {
-         Properties properties = new Properties();
-         try {
-            properties.load(resource.getInputStream());
-            repositoryLocation = properties.getProperty(
-                  "flowresource.location", "repository");
-         } catch (IOException e) {
-            logger
-                  .warning("Property file 'flowrepository.properties' " +
-                  		"was not found. Using the default properties...");
-            repositoryLocation = "repository";
-         }
-      } else {
-         logger
-         .warning("Property file 'flowrepository.properties' " +
-               "was not found. Using the default properties...");
-         repositoryLocation = "repository";
-      }
-      File file = new File(repositoryLocation);
-      if (!file.exists()) {
-         boolean success = file.mkdirs();
-         if (!success) {
-            throw new RuntimeException(
-                  "Could not create flow repository at location: "
-                        + file.getAbsolutePath());
-         }
-      }
-      
-      xstream.setMode(XStream.NO_REFERENCES);
-      
-      try {
-    	  String server=  meandreClient.getServerHost() + ":" + meandreClient.getPort();
-    	  logger.info("Retrieve Repository from the server : " + server);
-    	  cachedRemoteRepository = meandreClient.retrieveRepository();
-      } catch (TransmissionException e) {
-         throw new RuntimeException (
-               "Could not initialize MeandreFlowStore...", e);
-      }
-   }
+	private RepositoryClientConnectionPool repositoryClientConnectionPool = null;
 
-   /**
-    * 
-    * @return Map<String,FlowDescription> The Map of String and FlowDescription
-    */
-   public Map<String, FlowDescription> getAvailableFlowDescriptionsMap() {
-      repositoryLock.lock();
-      Map<String, FlowDescription> map = null;
-      try {
-         map = cachedRemoteRepository.getAvailableFlowDescriptionsMap();
-      } catch (Exception ex) {
-      } finally {
-         repositoryLock.unlock();
-      }
-      return map;
-   }
+	private MeandreClient meandreClient = null;
 
-   /**
-    * Flushes the cached repository.
-    * 
-    * @return success true/false
-    * @throws MeandreServerException
-    * 
-    */
-   protected boolean flushRepository() throws MeandreServerException {
-      boolean success = false;
-      cachedRemoteRepository = null;
-      repositoryLock.lock();
-      try {
-         if (meandreClient == null) {
-            return false;
-         }
-         cachedRemoteRepository = meandreClient.retrieveRepository();
-         success = true;
-      } catch (Exception e) {
-         success = false;
-         throw new MeandreServerException(e);
-      } finally {
-         repositoryLock.unlock();
-      }
-      return success;
-   }
+	/** Locally cached version of the remote flow repository */
+	@GuardedBy("repositoryLock")
+	private QueryableRepository cachedRemoteRepository;
+	private final Lock repositoryLock = new ReentrantLock(true);
 
-   /**
-    * Returns the flows that reside at the server, as {@link Resource}s.
-    * 
-    * @return Set<Resource> Set of {@link Resource}s that are flows.
-    */
-   public Set<Resource> getAvailableFlows() {
-      Set<Resource> resources = null;
-      repositoryLock.lock();
-      try {
-         resources = cachedRemoteRepository.getAvailableFlows();
-      } catch (Exception ex) {
-      } finally {
-         repositoryLock.unlock();
-      }
-      return resources;
-   }
+	private String repositoryLocation;
 
-   public ExecutableComponentDescription getComponentDescription(
-         Resource flowResource) {
-      ExecutableComponentDescription ecd = null;
-      repositoryLock.lock();
-      try {
-         ecd = cachedRemoteRepository.getExecutableComponentDescription(flowResource);
-      } catch (Exception ex) {
-      } finally {
-         repositoryLock.unlock();
-      }
-      return ecd;
-   }
+	
+	/**
+	 *  initialize the MeandreFlowStore
+	 */
+	@PostConstruct
+	public void init() {
+		DefaultResourceLoader drl = new DefaultResourceLoader();
+		org.springframework.core.io.Resource resource = drl
+				.getResource("flowrepository.properties");
+		if (resource != null) {
+			Properties properties = new Properties();
+			try {
+				properties.load(resource.getInputStream());
+				repositoryLocation = properties.getProperty(
+						"flowresource.location", "repository");
+			} catch (IOException e) {
+				logger.warning("Property file 'flowrepository.properties' "
+						+ "was not found. Using the default properties...");
+				repositoryLocation = "repository";
+			}
+		} else {
+			logger.warning("Property file 'flowrepository.properties' "
+					+ "was not found. Using the default properties...");
+			repositoryLocation = "repository";
+		}
+		File file = new File(repositoryLocation);
+		if (!file.exists()) {
+			boolean success = file.mkdirs();
+			if (!success) {
+				throw new RuntimeException(
+						"Could not create flow repository at location: "
+								+ file.getAbsolutePath());
+			}
+		}
 
-   public Set<URI> getFlowUris() throws MeandreServerException {
-      Set<URI> set = null;
-      repositoryLock.lock();
-      try {
-         set = meandreClient.retrieveFlowUris();
-      } catch (TransmissionException e) {
-         throw new MeandreServerException(e);
-      } finally {
-         repositoryLock.unlock();
-      }
+		xstream.setMode(XStream.NO_REFERENCES);
 
-      return set;
-   }
+		try {
+			String server = meandreClient.getServerHost() + ":"
+					+ meandreClient.getPort();
+			logger.info("Retrieve Repository from the server : " + server);
+			cachedRemoteRepository = meandreClient.retrieveRepository();
+		} catch (TransmissionException e) {
+			throw new RuntimeException(
+					"Could not initialize MeandreFlowStore...", e);
+		}
+	}
 
-   public ExecutableComponentDescription getComponentDescription(
-         String componentUri) throws MeandreServerException {
+	/**
+	 * 
+	 * @return Map<String,FlowDescription> The Map of String and FlowDescription
+	 */
+	public Map<String, FlowDescription> getAvailableFlowDescriptionsMap() {
+		repositoryLock.lock();
+		Map<String, FlowDescription> map = null;
+		try {
+			map = cachedRemoteRepository.getAvailableFlowDescriptionsMap();
+		} catch (Exception ex) {
+		} finally {
+			repositoryLock.unlock();
+		}
+		return map;
+	}
 
-      ExecutableComponentDescription componentDesc = null;
-      repositoryLock.lock();
-      try {
-         componentDesc = meandreClient.retrieveComponentDescriptor(componentUri);
-      } catch (TransmissionException e) {
-         throw new MeandreServerException(e);
-      } finally {
-         repositoryLock.unlock();
-      }
-      return componentDesc;
-   }
+	/**
+	 * Flushes the cached repository.
+	 * 
+	 * @return success true/false
+	 * @throws MeandreServerException
+	 * 
+	 */
+	protected boolean flushRepository() throws MeandreServerException {
+		boolean success = false;
+		cachedRemoteRepository = null;
+		repositoryLock.lock();
+		try {
+			if (meandreClient == null) {
+				return false;
+			}
+			cachedRemoteRepository = meandreClient.retrieveRepository();
+			success = true;
+		} catch (Exception e) {
+			success = false;
+			throw new MeandreServerException(e);
+		} finally {
+			repositoryLock.unlock();
+		}
+		return success;
+	}
 
-   public FlowDescription getFlowDescription(String flowUri)
-         throws MeandreServerException {
-      FlowDescription flowDesc = null;
-      repositoryLock.lock();
-      try {
-         flowDesc = meandreClient.retrieveFlowDescriptor(flowUri);
-      } catch (TransmissionException e) {
-         throw new MeandreServerException(e);
-      } finally {
-         repositoryLock.unlock();
-      }
-      return flowDesc;
-   }
+	/**
+	 * Returns the flows that reside at the server, as {@link Resource}s.
+	 * 
+	 * @return Set<Resource> Set of {@link Resource}s that are flows.
+	 */
+	public Set<Resource> getAvailableFlows() {
+		Set<Resource> resources = null;
+		repositoryLock.lock();
+		try {
+			resources = cachedRemoteRepository.getAvailableFlows();
+		} catch (Exception ex) {
+		} finally {
+			repositoryLock.unlock();
+		}
+		return resources;
+	}
 
-   /**
-    * Return the URIs of all the components in the Meandre server repository.
-    * 
-    * @return URIs of all the components in the Meandre server repository.
-    * 
-    * @throws MeandreServerException if a problem occurs while communicating
-    *            with the remote Meandre server.
-    */
-   public Set<URI> getComponentUrisInRepository() throws MeandreServerException {
-      Set<URI> componentUriSet = null;
-      repositoryLock.lock();
-      try {
-         componentUriSet = meandreClient.retrieveComponentUris();
-      } catch (TransmissionException e) {
-         throw new MeandreServerException(e);
-      } finally {
-         repositoryLock.unlock();
-      }
-      return componentUriSet;
-   }
+	public ExecutableComponentDescription getComponentDescription(
+			Resource flowResource) {
+		ExecutableComponentDescription ecd = null;
+		repositoryLock.lock();
+		try {
+			ecd = cachedRemoteRepository
+					.getExecutableComponentDescription(flowResource);
+		} catch (Exception ex) {
+		} finally {
+			repositoryLock.unlock();
+		}
+		return ecd;
+	}
 
-   /**
-    * For the given flow URI, return the list of {@link Component}s that make up
-    * the flow.
-    * 
-    * @param flowUri URI of the flow to get the components for.
-    * @return List of {@link Component}s that make up the flow.
-    * @throws MeandreServerException if a problem occurs while attempting to get
-    *            the flows from the remote Meandre server.
-    */
-   public List<Component> getComponents(String flowUri)
-         throws MeandreServerException {
-      Map<String, FlowDescription> map = null;
-      map = getAvailableFlowDescriptionsMap();
-      // Used later in case something goes wrong communicating with the server.
-      String errMsg = "Could not find components for the flow with URI: "
-            + flowUri;
-      if (map == null) {
-         logger.severe(errMsg);
-         throw new MeandreServerException(errMsg);
-      }
-      FlowDescription flowDescription = map.get(flowUri);
-      if (flowDescription == null) {
-         logger.severe(errMsg);
-         throw new MeandreServerException(errMsg);
-      }
-      Set<ExecutableComponentInstanceDescription> componentDescriptions = flowDescription
-            .getExecutableComponentInstances();
-      ArrayList<Component> list = new ArrayList<Component>(
-            componentDescriptions.size());
-      Iterator<ExecutableComponentInstanceDescription> descriptionsIterator = componentDescriptions
-            .iterator();
-      while (descriptionsIterator.hasNext()) {
-         ExecutableComponentInstanceDescription description = descriptionsIterator
-               .next();
-         String uri = description.getExecutableComponent().getURI();
-         String instanceUri = description.getExecutableComponentInstance()
-               .getURI();
-         Component component = new Component();
-         component.setUri(uri);
-         component.setInstanceUri(instanceUri);
-         component.setName(description.getName());
-         component.setDescription(description.getDescription());
-         component.setHidden(isHiddenComponentForFlow(flowUri, instanceUri));
-         list.add(component);
-      }
-      return list;
-   }
+	public Set<URI> getFlowUris() throws MeandreServerException {
+		Set<URI> set = null;
+		repositoryLock.lock();
+		try {
+			set = meandreClient.retrieveFlowUris();
+		} catch (TransmissionException e) {
+			throw new MeandreServerException(e);
+		} finally {
+			repositoryLock.unlock();
+		}
 
-   private boolean isHiddenComponentForFlow(String flowUri,
-         String componentInstanceUri) {
-      if (componentInstanceUri.indexOf("fork") != -1
-            || componentInstanceUri.indexOf("printobject") != -1
-            || componentInstanceUri.indexOf("runbinary") != -1
-            || componentInstanceUri.indexOf("StructuralSegmentationEvaluator"
-                  .toLowerCase()) != -1
-            || componentInstanceUri
-                  .indexOf("TrainTestGateKeeper".toLowerCase()) != -1
-            || componentInstanceUri.indexOf("ClassificationEvaluator"
-                  .toLowerCase()) != -1
-            || componentInstanceUri
-                  .indexOf("ClassificationEvaluationsAggregator".toLowerCase()) != -1) {
-         return true;
-      }
-      return false;
-   }
+		return set;
+	}
 
-   /**
-    * Create a new flow and save it in the local repository. The the supplied
-    * parameter map containing custom properties that a user has set based on a
-    * template flow and creates a new flow.
-    * 
-    * @returns URI of the new flow.
-    */
-   public synchronized String createFlow(HashMap<String, String> paramMap,
-         String flowUri, long userId) throws MeandreServerException {
-      WBFlowDescription flowDesc = MeandreConverter.FlowDescriptionConverter
-            .convert(getFlowDescription(flowUri));
-      String name = flowDesc.getName();
-      name = name + System.currentTimeMillis();
-      flowDesc.setName(name);
-      flowDesc.setDescription("Derived from " + flowUri);
-      flowDesc.setRights("owned by user");
-      flowDesc.setCreationDate(new Date());
-      flowDesc.updateParameters(flowUri, paramMap);
-      String fileLocation = saveFlow(flowDesc, userId);
-      logger.info("Saved new flow to the following location:  " + fileLocation);
-      return fileLocation;
-   }
+	public ExecutableComponentDescription getComponentDescription(
+			String componentUri) throws MeandreServerException {
 
-   /**
-    * This method removes a flow from meandre
-    * 
-    * @throws MeandreServerException
-    * 
-    * @returns success
-    */
-   public boolean removeFlow(String uri) throws MeandreServerException {
-      boolean success = false;
-      try {
-         success = meandreClient.removeResource(uri);
-      } catch (TransmissionException e) {
-         throw new MeandreServerException("Could not remove" + uri + "--"
-               + e.getMessage());
-      }
-      flushRepository();
-      return success;
-   }
+		ExecutableComponentDescription componentDesc = null;
+		repositoryLock.lock();
+		try {
+			componentDesc = meandreClient
+					.retrieveComponentDescriptor(componentUri);
+		} catch (TransmissionException e) {
+			throw new MeandreServerException(e);
+		} finally {
+			repositoryLock.unlock();
+		}
+		return componentDesc;
+	}
 
-   public Map<String, Property> getComponentPropertyDataType(
-         Component component, String flowUri) throws 
-       MeandreServerException {
+	public FlowDescription getFlowDescription(String flowUri)
+			throws MeandreServerException {
+		FlowDescription flowDesc = null;
+		repositoryLock.lock();
+		try {
+			flowDesc = meandreClient.retrieveFlowDescriptor(flowUri);
+		} catch (TransmissionException e) {
+			throw new MeandreServerException(e);
+		} finally {
+			repositoryLock.unlock();
+		}
+		return flowDesc;
+	}
 
-      Model model = getEmptyModel();
-      ExecutableComponentDescription ecd = getComponentDescription(model
-            .createResource(component.getUri()));
-      FlowDescription fd = getFlowDescription(flowUri);
+	/**
+	 * Return the URIs of all the components in the Meandre server repository.
+	 * 
+	 * @return URIs of all the components in the Meandre server repository.
+	 * 
+	 * @throws MeandreServerException
+	 *             if a problem occurs while communicating with the remote
+	 *             Meandre server.
+	 */
+	public Set<URI> getComponentUrisInRepository()
+			throws MeandreServerException {
+		Set<URI> componentUriSet = null;
+		repositoryLock.lock();
+		try {
+			componentUriSet = meandreClient.retrieveComponentUris();
+		} catch (TransmissionException e) {
+			throw new MeandreServerException(e);
+		} finally {
+			repositoryLock.unlock();
+		}
+		return componentUriSet;
+	}
 
-      if (ecd == null) {
-         logger.severe("component: " + component.getUri()
-               + " could not be found.");
+	/**
+	 * For the given flow URI, return the list of {@link Component}s that make
+	 * up the flow.
+	 * 
+	 * @param flowUri
+	 *            URI of the flow to get the components for.
+	 * @return List of {@link Component}s that make up the flow.
+	 * @throws MeandreServerException
+	 *             if a problem occurs while attempting to get the flows from
+	 *             the remote Meandre server.
+	 */
+	public List<Component> getComponents(String flowUri)
+			throws MeandreServerException {
+		Map<String, FlowDescription> map = null;
+		map = getAvailableFlowDescriptionsMap();
+		// Used later in case something goes wrong communicating with the
+		// server.
+		String errMsg = "Could not find components for the flow with URI: "
+				+ flowUri;
+		if (map == null) {
+			logger.severe(errMsg);
+			throw new MeandreServerException(errMsg);
+		}
+		FlowDescription flowDescription = map.get(flowUri);
+		if (flowDescription == null) {
+			logger.severe(errMsg);
+			throw new MeandreServerException(errMsg);
+		}
+		Set<ExecutableComponentInstanceDescription> componentDescriptions = flowDescription
+				.getExecutableComponentInstances();
+		ArrayList<Component> list = new ArrayList<Component>(
+				componentDescriptions.size());
+		Iterator<ExecutableComponentInstanceDescription> descriptionsIterator = componentDescriptions
+				.iterator();
+		while (descriptionsIterator.hasNext()) {
+			ExecutableComponentInstanceDescription description = descriptionsIterator
+					.next();
+			String uri = description.getExecutableComponent().getURI();
+			String instanceUri = description.getExecutableComponentInstance()
+					.getURI();
+			Component component = new Component();
+			component.setUri(uri);
+			component.setInstanceUri(instanceUri);
+			component.setName(description.getName());
+			component.setDescription(description.getDescription());
+			component.setHidden(isHiddenComponentForFlow(flowUri, instanceUri));
+			list.add(component);
+		}
+		return list;
+	}
 
-         throw new MeandreServerException("component: " + component.getUri()
-               + " could not be found.");
-      }
-      Model m = this.getEmptyModel();
-      ExecutableComponentInstanceDescription ecid = fd
-            .getExecutableComponentInstanceDescription(m
-                  .createResource(component.getInstanceUri()));
-      if (ecid == null) {
-         logger.severe("component instance: " + component.getInstanceUri()
-               + " could not be found.");
+	private boolean isHiddenComponentForFlow(String flowUri,
+			String componentInstanceUri) {
+		if (componentInstanceUri.indexOf("fork") != -1
+				|| componentInstanceUri.indexOf("printobject") != -1
+				|| componentInstanceUri.indexOf("runbinary") != -1
+				|| componentInstanceUri
+						.indexOf("StructuralSegmentationEvaluator"
+								.toLowerCase()) != -1
+				|| componentInstanceUri.indexOf("TrainTestGateKeeper"
+						.toLowerCase()) != -1
+				|| componentInstanceUri.indexOf("ClassificationEvaluator"
+						.toLowerCase()) != -1
+				|| componentInstanceUri
+						.indexOf("ClassificationEvaluationsAggregator"
+								.toLowerCase()) != -1) {
+			return true;
+		}
+		return false;
+	}
 
-         throw new MeandreServerException("component instance : "
-               + component.getInstanceUri() + " could not be found.");
-      }
-      PropertiesDescriptionDefinition propertiesDefn = ecd.getProperties();
-      Set<String> propertiesSet = propertiesDefn.getKeys();
-      Iterator<String> it = propertiesSet.iterator();
-      Map<String, Property> dataTypeMap = new HashMap<String, Property>();
-      boolean foundDataType = Boolean.FALSE;
-      while (it.hasNext()) {
-         String propertyName = it.next();
-         Property property = new Property();
-         property.setName(propertyName);
+	/**
+	 * Create a new flow and save it in the local repository. The the supplied
+	 * parameter map containing custom properties that a user has set based on a
+	 * template flow and creates a new flow.
+	 * 
+	 * @returns URI of the new flow.
+	 */
+	public synchronized String createFlow(HashMap<String, String> paramMap,
+			String flowUri, long userId) throws MeandreServerException {
+		WBFlowDescription flowDesc = MeandreConverter.FlowDescriptionConverter
+				.convert(getFlowDescription(flowUri));
+		String name = flowDesc.getName();
+		name = name + System.currentTimeMillis();
+		flowDesc.setName(name);
+		flowDesc.setDescription("Derived from " + flowUri);
+		flowDesc.setRights("owned by user");
+		flowDesc.setCreationDate(new Date());
+		flowDesc.updateParameters(flowUri, paramMap);
+		String fileLocation = saveFlow(flowDesc, userId);
+		logger.info("Saved new flow to the following location:  "
+				+ fileLocation);
+		return fileLocation;
+	}
 
-         Map<String, String> otherPropertyMap = propertiesDefn
-               .getOtherProperties(propertyName);
-         String description = propertiesDefn.getDescription(propertyName);
-         String defaultValue = propertiesDefn.getValue(propertyName);
-         String value = ecid.getProperties().getValue(propertyName);
-         if (value != null) {
-            property.setValue(value);
-         } else {
-            property.setValue(defaultValue);
-         }
-         property.setDefaultValue(defaultValue);
-         property.setDescription(description);
-         List<DataTypeBean> dataTypes = null;
-         if (!otherPropertyMap.isEmpty()) {
-            Iterator<Entry<String, String>> it1 = otherPropertyMap.entrySet()
-                  .iterator();
-            while (it1.hasNext()) {
-               Entry<String, String> tmp = it1.next();
-               String key = tmp.getKey();
-               String value1 = tmp.getValue();
-               if (key.endsWith(propertyName + DATATYPE_KEY)) {
-                  dataTypes = getDataTypeBeanFromJson(value1);
-                  updatePropertyWithCollectionMetadata(property, dataTypes);
-                  property.setDataTypeBeanList(dataTypes);
-                  foundDataType = true;
-               }
-            }
-            // add the default data type
-            if (!foundDataType) {
-               dataTypes = getDefaultDataTypeBean();
-               property.setDataTypeBeanList(dataTypes);
-            }
-         } else {
-            if (!foundDataType) {
-               dataTypes = getDefaultDataTypeBean();
-               property.setDataTypeBeanList(dataTypes);
-            }
-         }
+	/**
+	 * This method removes a flow from meandre
+	 * 
+	 * @throws MeandreServerException
+	 * 
+	 * @returns success
+	 */
+	public boolean removeFlow(String uri) throws MeandreServerException {
+		boolean success = false;
+		try {
+			success = meandreClient.removeResource(uri);
+		} catch (TransmissionException e) {
+			throw new MeandreServerException("Could not remove" + uri + "--"
+					+ e.getMessage());
+		}
+		flushRepository();
+		return success;
+	}
 
-         dataTypeMap.put(propertyName, property);
-         // reset to false for the next property
-         foundDataType = Boolean.FALSE;
-      }
-      return dataTypeMap;
-   }
+	public Map<String, Property> getComponentPropertyDataType(
+			Component component, String flowUri) throws MeandreServerException {
 
-   private void updatePropertyWithCollectionMetadata(Property property,
-         List<DataTypeBean> dataTypes) {
-      for (DataTypeBean dtb : dataTypes) {
-         if (dtb.getRenderer().equals(CollectionRenderer.class.getName())) {
-            // this is a collection
-            ArrayList<String> labelList = new ArrayList<String>();
-            ArrayList<Object> valueList = new ArrayList<Object>();
-            RepositoryClientInterface rpi = repositoryClientConnectionPool
-                  .getFromPool();
-            try {
-               List<NemaDataset> ltb = rpi.getDatasets();
-               for (NemaDataset dataset : ltb) {
-                  String label = dataset.getName();
-                  int value = dataset.getId();
-                  labelList.add(label);
-                  valueList.add(value);
-               }
-            } catch (SQLException e) {
-               e.printStackTrace();
-            } finally {
-               repositoryClientConnectionPool.returnToPool(rpi);
-            }
+		Model model = getEmptyModel();
+		ExecutableComponentDescription ecd = getComponentDescription(model
+				.createResource(component.getUri()));
+		FlowDescription fd = getFlowDescription(flowUri);
 
-            if (labelList.size() > 0) {
-               property.setEnumeratedValueList(labelList);
-               property.setEnumneratedLabelList(valueList);
-            }
-         }
-      }
-   }
+		if (ecd == null) {
+			logger.severe("component: " + component.getUri()
+					+ " could not be found.");
 
-   private Model getEmptyModel() {
-      Model model = ModelFactory.createDefaultModel();
-      model.setNsPrefix("meandre", Store.MEANDRE_ONTOLOGY_BASE_URL);
-      model.setNsPrefix("xsd", XSD.getURI());
-      model.setNsPrefix("rdf", RDF.getURI());
-      model.setNsPrefix("rdfs", RDFS.getURI());
-      model.setNsPrefix("dc", DC.getURI());
-      return model;
-   }
+			throw new MeandreServerException("component: " + component.getUri()
+					+ " could not be found.");
+		}
+		Model m = this.getEmptyModel();
+		ExecutableComponentInstanceDescription ecid = fd
+				.getExecutableComponentInstanceDescription(m
+						.createResource(component.getInstanceUri()));
+		if (ecid == null) {
+			logger.severe("component instance: " + component.getInstanceUri()
+					+ " could not be found.");
 
-   private List<DataTypeBean> getDefaultDataTypeBean() {
-      List<DataTypeBean> list = new ArrayList<DataTypeBean>();
-      list.add(new StringDataTypeBean());
-      return list;
-   }
+			throw new MeandreServerException("component instance : "
+					+ component.getInstanceUri() + " could not be found.");
+		}
+		PropertiesDescriptionDefinition propertiesDefn = ecd.getProperties();
+		Set<String> propertiesSet = propertiesDefn.getKeys();
+		Iterator<String> it = propertiesSet.iterator();
+		Map<String, Property> dataTypeMap = new HashMap<String, Property>();
+		boolean foundDataType = Boolean.FALSE;
+		while (it.hasNext()) {
+			String propertyName = it.next();
+			Property property = new Property();
+			property.setName(propertyName);
 
-   @SuppressWarnings("unchecked")
-   private List<DataTypeBean> getDataTypeBeanFromJson(String value) {
-      List<DataTypeBean> list = (List<DataTypeBean>) xstream.fromXML(value);
-      return list;
-   }
+			Map<String, String> otherPropertyMap = propertiesDefn
+					.getOtherProperties(propertyName);
+			String description = propertiesDefn.getDescription(propertyName);
+			String defaultValue = propertiesDefn.getValue(propertyName);
+			String value = ecid.getProperties().getValue(propertyName);
+			if (value != null) {
+				property.setValue(value);
+			} else {
+				property.setValue(defaultValue);
+			}
+			property.setDefaultValue(defaultValue);
+			property.setDescription(description);
+			List<DataTypeBean> dataTypes = null;
+			if (!otherPropertyMap.isEmpty()) {
+				Iterator<Entry<String, String>> it1 = otherPropertyMap
+						.entrySet().iterator();
+				while (it1.hasNext()) {
+					Entry<String, String> tmp = it1.next();
+					String key = tmp.getKey();
+					String value1 = tmp.getValue();
+					if (key.endsWith(propertyName + DATATYPE_KEY)) {
+						dataTypes = getDataTypeBeanFromJson(value1);
+						updatePropertyWithCollectionMetadata(property,
+								dataTypes);
+						property.setDataTypeBeanList(dataTypes);
+						foundDataType = true;
+					}
+				}
+				// add the default data type
+				if (!foundDataType) {
+					dataTypes = getDefaultDataTypeBean();
+					property.setDataTypeBeanList(dataTypes);
+				}
+			} else {
+				if (!foundDataType) {
+					dataTypes = getDefaultDataTypeBean();
+					property.setDataTypeBeanList(dataTypes);
+				}
+			}
 
-   /**
-    * Returns the file path to the new flow
-    * 
-    * @param wbFlow
-    * @param userId
-    * @return File Path to the new flow
-    * @throws MeandreServerException
-    * @throws CorruptedFlowException
-    */
-   public String saveFlow(WBFlowDescription wbFlow, long userId)
-         throws MeandreServerException {
-      FlowDescription flow = MeandreConverter.WBFlowDescriptionConverter
-            .convert(wbFlow);
-      String flowUri = flow.getFlowComponent().getURI();
-      logger.info("Saving flow " + flowUri);
+			dataTypeMap.put(propertyName, property);
+			// reset to false for the next property
+			foundDataType = Boolean.FALSE;
+		}
+		return dataTypeMap;
+	}
 
-      String execStepMsg = "";
-     // String fileName = null;
-      FileOutputStream ttlStream = null, ntStream = null, rdfStream = null;
-      File ntFile;
-      try {
-         Model flowModel = flow.getModel();
+	private void updatePropertyWithCollectionMetadata(Property property,
+			List<DataTypeBean> dataTypes) {
+		for (DataTypeBean dtb : dataTypes) {
+			if (dtb.getRenderer().equals(CollectionRenderer.class.getName())) {
+				// this is a collection
+				ArrayList<String> labelList = new ArrayList<String>();
+				ArrayList<Object> valueList = new ArrayList<Object>();
+				RepositoryClientInterface rpi = repositoryClientConnectionPool
+						.getFromPool();
+				try {
+					List<NemaDataset> ltb = rpi.getDatasets();
+					for (NemaDataset dataset : ltb) {
+						String label = dataset.getName();
+						int value = dataset.getId();
+						labelList.add(label);
+						valueList.add(value);
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				} finally {
+					repositoryClientConnectionPool.returnToPool(rpi);
+				}
 
-         String fName = flowUri.replaceAll(":|/", "_");
-        // String userRepoDir = repositoryLocation + File.separator
-        //      + "x" + userId;
-         File repLoc = new File(repositoryLocation);
-         File file = new File(repLoc,"x"+userId);
-         if (!file.exists()) {
-            boolean success = file.mkdir();
-            if (!success) {
-               throw new RuntimeException(
-                     "Error could not create user directory "
-                           + file.getAbsolutePath());
-            }
-         }
-         ntFile = new File(file,fName+".nt");
-         File ttlFile = new File(file,fName+".ttl");
-         File rdfFile = new File(file,fName+".rdf");
-         
-         logger.info("Saving file: "+ ntFile.getAbsolutePath());
-         ntStream = new FileOutputStream(ntFile);
-         flowModel.write(ntStream, "N-TRIPLE");
-         ttlStream = new FileOutputStream(ttlFile);
-         flowModel.write(ttlStream, "TTL");
-         rdfStream = new FileOutputStream(rdfFile);
-         flowModel.write(rdfStream, "RDF/XML-ABBREV");
+				if (labelList.size() > 0) {
+					property.setEnumeratedValueList(labelList);
+					property.setEnumneratedLabelList(valueList);
+				}
+			}
+		}
+	}
 
-         execStepMsg = "STEP1: Creating RepositoryImpl from flow model";
-         RepositoryImpl repository = new RepositoryImpl(flowModel);
-         execStepMsg = "STEP2: Retrieving available flows";
-         Set<FlowDescription> flows = repository.getAvailableFlowDescriptions();
-         execStepMsg = "STEP3: Getting flow";
-         flow = flows.iterator().next();
-         if (flow == null) {
-            throw new MeandreServerException("The flow obtained is null!");
-         }
-      } catch (Exception e) {
-         MeandreServerException mException = (execStepMsg != null) ? new MeandreServerException(
-               execStepMsg, e)
-               : (MeandreServerException) e;
-         throw mException;
-      } finally {
-         try {
-            if (ttlStream != null)
-               ttlStream.close();
-         } catch (IOException e) {
-            e.printStackTrace();
-         }
-         try {
-            if (ntStream != null)
-               ntStream.close();
-         } catch (IOException e) {
-            e.printStackTrace();
-         }
-         try {
-            if (rdfStream != null)
-               rdfStream.close();
-         } catch (IOException e) {
-            e.printStackTrace();
-         }
-      }
-      return ntFile.getAbsolutePath();
-   }
-   
-   public RepositoryClientConnectionPool getRepositoryClientConnectionPool() {
-      return repositoryClientConnectionPool;
-   }
+	private Model getEmptyModel() {
+		Model model = ModelFactory.createDefaultModel();
+		model.setNsPrefix("meandre", Store.MEANDRE_ONTOLOGY_BASE_URL);
+		model.setNsPrefix("xsd", XSD.getURI());
+		model.setNsPrefix("rdf", RDF.getURI());
+		model.setNsPrefix("rdfs", RDFS.getURI());
+		model.setNsPrefix("dc", DC.getURI());
+		return model;
+	}
 
+	private List<DataTypeBean> getDefaultDataTypeBean() {
+		List<DataTypeBean> list = new ArrayList<DataTypeBean>();
+		list.add(new StringDataTypeBean());
+		return list;
+	}
 
-   public void setRepositoryClientConnectionPool(
-         RepositoryClientConnectionPool repositoryClientConnectionPool) {
-      this.repositoryClientConnectionPool = repositoryClientConnectionPool;
-   }
-   
-   public MeandreClient getMeandreClient() {
-      return meandreClient;
-   }
+	@SuppressWarnings("unchecked")
+	private List<DataTypeBean> getDataTypeBeanFromJson(String value) {
+		List<DataTypeBean> list = (List<DataTypeBean>) xstream.fromXML(value);
+		return list;
+	}
 
+	/**
+	 * Returns the file path to the new flow
+	 * 
+	 * @param wbFlow
+	 * @param userId
+	 * @return File Path to the new flow
+	 * @throws MeandreServerException
+	 * @throws CorruptedFlowException
+	 */
+	public String saveFlow(WBFlowDescription wbFlow, long userId)
+			throws MeandreServerException {
+		FlowDescription flow = MeandreConverter.WBFlowDescriptionConverter
+				.convert(wbFlow);
+		String flowUri = flow.getFlowComponent().getURI();
+		logger.info("Saving flow " + flowUri);
 
-   /**
-    * Set the Meandre client reference to use to communicate with the remote
-    * Meandre server. Must be a pre-initialized reference to a Meandre server.
-    * @param meandreClient
-    */
-   public void setMeandreClient(MeandreClient meandreClient) {
-      this.meandreClient = meandreClient;
-   }
+		String execStepMsg = "";
+		// String fileName = null;
+		FileOutputStream ttlStream = null, ntStream = null, rdfStream = null;
+		File ntFile;
+		try {
+			Model flowModel = flow.getModel();
+
+			String fName = flowUri.replaceAll(":|/", "_");
+			// String userRepoDir = repositoryLocation + File.separator
+			// + "x" + userId;
+			File repLoc = new File(repositoryLocation);
+			File file = new File(repLoc, "x" + userId);
+			if (!file.exists()) {
+				boolean success = file.mkdir();
+				if (!success) {
+					throw new RuntimeException(
+							"Error could not create user directory "
+									+ file.getAbsolutePath());
+				}
+			}
+			ntFile = new File(file, fName + ".nt");
+			File ttlFile = new File(file, fName + ".ttl");
+			File rdfFile = new File(file, fName + ".rdf");
+
+			logger.info("Saving file: " + ntFile.getAbsolutePath());
+			ntStream = new FileOutputStream(ntFile);
+			flowModel.write(ntStream, "N-TRIPLE");
+			ttlStream = new FileOutputStream(ttlFile);
+			flowModel.write(ttlStream, "TTL");
+			rdfStream = new FileOutputStream(rdfFile);
+			flowModel.write(rdfStream, "RDF/XML-ABBREV");
+
+			execStepMsg = "STEP1: Creating RepositoryImpl from flow model";
+			RepositoryImpl repository = new RepositoryImpl(flowModel);
+			execStepMsg = "STEP2: Retrieving available flows";
+			Set<FlowDescription> flows = repository
+					.getAvailableFlowDescriptions();
+			execStepMsg = "STEP3: Getting flow";
+			flow = flows.iterator().next();
+			if (flow == null) {
+				throw new MeandreServerException("The flow obtained is null!");
+			}
+		} catch (Exception e) {
+			MeandreServerException mException = (execStepMsg != null) ? new MeandreServerException(
+					execStepMsg, e)
+					: (MeandreServerException) e;
+			throw mException;
+		} finally {
+			try {
+				if (ttlStream != null)
+					ttlStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (ntStream != null)
+					ntStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (rdfStream != null)
+					rdfStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return ntFile.getAbsolutePath();
+	}
+
+	/**
+	 * Return the connection pool client
+	 * 
+	 * @return {@link RepositoryClientConnectionPool}
+	 */
+	public RepositoryClientConnectionPool getRepositoryClientConnectionPool() {
+		return repositoryClientConnectionPool;
+	}
+
+	/**
+	 *  Set the repository connection pool
+	 * @param repositoryClientConnectionPool
+	 */
+	public void setRepositoryClientConnectionPool(
+			RepositoryClientConnectionPool repositoryClientConnectionPool) {
+		this.repositoryClientConnectionPool = repositoryClientConnectionPool;
+	}
+
+	public MeandreClient getMeandreClient() {
+		return meandreClient;
+	}
+
+	/**
+	 * Set the Meandre client reference to use to communicate with the remote
+	 * Meandre server. Must be a pre-initialized reference to a Meandre server.
+	 * 
+	 * @param meandreClient
+	 */
+	public void setMeandreClient(MeandreClient meandreClient) {
+		this.meandreClient = meandreClient;
+	}
+
+	
+	/**
+	 * Return the map of the component and list of properties
+	 * @param flowUri
+	 * @return Map of {@link Component} and List of {@link Property}
+	 * @throws MeandreServerException
+	 */
+	public Map<Component, List<Property>> getAllComponentsPropertyDataTypes(String flowUri) throws MeandreServerException {
+			
+		
+		Map<Component, List<Property>> componentPropertyMap = new HashMap<Component, List<Property>>();
+
+		List<Component> componentList=null;
+		FlowDescription fd = null;
+		componentList = getComponents(flowUri);
+		fd = getFlowDescription(flowUri);
+	
+
+		for (Component component : componentList) {
+			List<Property> componentPropertyList = new ArrayList<Property>();
+			Model model = getEmptyModel();
+			ExecutableComponentDescription ecd = getComponentDescription(model.createResource(component.getUri()));
+			if (ecd == null) {
+				logger.severe("component: " + component.getUri()
+						+ " could not be found.");
+				// throw new MeandreServerException("component: " +
+				// component.getUri()+ " could not be found.");
+			}
+			Model m = this.getEmptyModel();
+			ExecutableComponentInstanceDescription ecid = fd
+					.getExecutableComponentInstanceDescription(m
+							.createResource(component.getInstanceUri()));
+
+			if (ecid == null) {
+				logger.severe("component instance: "
+						+ component.getInstanceUri() + " could not be found.");
+				// throw new MeandreServerException("component instance : "
+				// + component.getInstanceUri() + " could not be found.");
+			}
+
+			PropertiesDescriptionDefinition propertiesDefn = ecd
+					.getProperties();
+			Set<String> propertiesSet = propertiesDefn.getKeys();
+			Iterator<String> it = propertiesSet.iterator();
+		
+			
+			boolean foundDataType = Boolean.FALSE;
+			while (it.hasNext()) {
+				String propertyName = it.next();
+				Property property = new Property();
+				property.setName(propertyName);
+				Map<String, String> otherPropertyMap = propertiesDefn
+						.getOtherProperties(propertyName);
+				String description = propertiesDefn
+						.getDescription(propertyName);
+				String defaultValue = propertiesDefn.getValue(propertyName);
+				String value = ecid.getProperties().getValue(propertyName);
+				if (value != null) {
+					property.setValue(value);
+				} else {
+					property.setValue(defaultValue);
+				}
+				property.setDefaultValue(defaultValue);
+				property.setDescription(description);
+				List<DataTypeBean> dataTypes = null;
+				if (!otherPropertyMap.isEmpty()) {
+					Iterator<Entry<String, String>> it1 = otherPropertyMap
+							.entrySet().iterator();
+					while (it1.hasNext()) {
+						Entry<String, String> tmp = it1.next();
+						String key = tmp.getKey();
+						String value1 = tmp.getValue();
+						if (key.endsWith(propertyName + DATATYPE_KEY)) {
+							dataTypes = getDataTypeBeanFromJson(value1);
+							updatePropertyWithCollectionMetadata(property,
+									dataTypes);
+							property.setDataTypeBeanList(dataTypes);
+							foundDataType = true;
+						}
+					}
+					// add the default data type
+					if (!foundDataType) {
+						dataTypes = getDefaultDataTypeBean();
+						property.setDataTypeBeanList(dataTypes);
+					}
+				} else {
+					if (!foundDataType) {
+						dataTypes = getDefaultDataTypeBean();
+						property.setDataTypeBeanList(dataTypes);
+					}
+				}
+				componentPropertyList.add(property);
+				// reset to false for the next property
+				foundDataType = Boolean.FALSE;
+			}
+			componentPropertyMap.put(component, componentPropertyList);
+		}
+		return componentPropertyMap;
+	}
+
 }

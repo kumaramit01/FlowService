@@ -11,7 +11,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
-import javax.jcr.Credentials;
 import javax.jcr.SimpleCredentials;
 
 import net.jcip.annotations.GuardedBy;
@@ -69,10 +68,17 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
    private MeandreFlowStore meandreFlowStore;
    private ArtifactService artifactService;
    
+   /**
+    * Constructor that takes config
+    * @param config
+    */
    public RemoteMeandreServerProxy(MeandreServerProxyConfig config) {
       this.config = config;
    }
 
+   /**
+    * 
+    */
    public RemoteMeandreServerProxy() {}
 
    /**
@@ -448,6 +454,12 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
 public void setArtifactService(ArtifactService artifactService) {
 	this.artifactService=artifactService;
 	
+}
+
+@Override
+public Map<Component, List<Property>> getAllComponentsPropertyDataTypes(
+		String flowUri) throws MeandreServerException {
+	return meandreFlowStore.getAllComponentsPropertyDataTypes(flowUri);
 }
 
 }

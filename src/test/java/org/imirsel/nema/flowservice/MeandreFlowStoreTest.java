@@ -25,6 +25,7 @@ import org.imirsel.nema.model.Property;
 import org.imirsel.nema.test.BaseManagerTestCase;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
@@ -53,12 +54,13 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
             username, password, host, port, maxConcurrentJobs);
       meandreServerProxy = new RemoteMeandreServerProxy(config);
       meandreServerProxy.init();
+     
    }
 
    @After
    public void tearDown() throws Exception {
    }
-
+   @Ignore
    @Test
    public void testGetComponentUrisInRepository() {
       Set<URI> sets = null;
@@ -72,7 +74,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
          System.out.println(uri.toString());
       }
    }
-
+   @Ignore
    @Test(expected = MeandreServerException.class)
    public void testGetComponentDescriptionDoesNotExist()
          throws MeandreServerException {
@@ -80,7 +82,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
       ExecutableComponentDescription ecd = 
          meandreServerProxy.getComponentDescription(componentURI);
    }
-
+   @Ignore
    @Test
    public void testGetComponentDescriptionExists()
          throws MeandreServerException {
@@ -90,7 +92,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
       assertTrue(ecd != null);
       assertTrue(ecd.getName().length() > 0);
    }
-
+   @Ignore
    @Test
    public void testGetFlowUrls() {
       Set<URI> flowURI = null;
@@ -105,10 +107,10 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
          System.out.println(uri.toString());
       }
    }
-
+   @Ignore
    @Test
    public void testGetFlowDescription() {
-      String flowURI = "http://test.org/datatypetest/";
+      String flowURI = "http://www.imirsel.org/test/testdynamiccomponentflow/";
       try {
          FlowDescription wfd = meandreServerProxy.getFlowDescription(flowURI);
          assertTrue(wfd != null);
@@ -117,7 +119,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
          e.printStackTrace();
       }
    }
-
+   @Ignore
    @Test
    public void testGetAvailableFlows() {
          Set<Resource> list = meandreServerProxy
@@ -125,36 +127,36 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
          assertTrue(list != null);
          assertTrue(list.size() > 0);
    }
-
+   @Ignore
    @Test(expected=MeandreServerException.class)
    public void testGetComponentDataTypeNotExist() throws TransmissionException, SQLException, MeandreServerException{
       String componentURI="meandre://seasr.org/components/datatypetestcomponent-invalid";
-      String instanceURI = "http://test.org/datatypetest/instance/datatypetestcomponent/0";
-      String flowURI = "http://test.org/datatypetest/";
+      String instanceURI = "http://www.imirsel.org/test/testdynamiccomponentflow/instance/datatypetestcomponent/0";
+      String flowURI = "http://www.imirsel.org/test/testdynamiccomponentflow/";
       Component component= new Component();
       component.setInstanceUri(instanceURI);
       component.setUri(componentURI);
       Map<String, Property> map=meandreServerProxy.getComponentPropertyDataType(component, flowURI);
       assertTrue(map.size()==0);
    }
-   
+   @Ignore
    @Test
    public void testGetComponentDataType() throws TransmissionException, SQLException, MeandreServerException{
       String componentURI="meandre://seasr.org/components/datatypetestcomponent";
-      String instanceURI = "http://test.org/datatypetest/instance/datatypetestcomponent/0";
-      String flowURI = "http://test.org/datatypetest/";
+      String instanceURI = "http://www.imirsel.org/test/testdynamiccomponentflow/instance/datatypetestcomponent/0";
+      String flowURI = "http://www.imirsel.org/test/testdynamiccomponentflow/";
       Component component= new Component();
       component.setInstanceUri(instanceURI);
       component.setUri(componentURI);
       Map<String, Property> map=meandreServerProxy.getComponentPropertyDataType(component, flowURI);
       assertTrue(map.size()>0);
    }
-   
+   @Ignore
    @Test
    public void testComponentDataTypeValidValue() throws TransmissionException, SQLException, MeandreServerException{
       String componentURI="meandre://seasr.org/components/datatypetestcomponent";
-      String instanceURI = "http://test.org/datatypetest/instance/datatypetestcomponent/0";
-      String flowURI = "http://test.org/datatypetest/";
+      String instanceURI = "http://www.imirsel.org/test/testdynamiccomponentflow/instance/datatypetestcomponent/0";
+      String flowURI = "http://www.imirsel.org/test/testdynamiccomponentflow/";
       Component component= new Component();
       component.setInstanceUri(instanceURI);
       component.setUri(componentURI);
@@ -175,10 +177,10 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
       }
           
    }
-   
+   @Ignore
    @Test
    public void testGetComponents() throws MeandreServerException{
-      String flowUri="http://test.org/datatypetest/";
+      String flowUri="http://www.imirsel.org/test/testdynamiccomponentflow/";
       List<Component>componentList=meandreServerProxy.getComponents(flowUri);
       for(int i=0;i< componentList.size();i++){
          System.out.println("--> "+componentList.get(i).getInstanceUri() + " : " + componentList.get(i).getUri());
@@ -186,9 +188,10 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
       
    }
    
+   @Ignore
    @Test 
    public void testcreateNewFlow(){
-      String flowURI="http://test.org/datatypetest/";
+      String flowURI="http://www.imirsel.org/test/testdynamiccomponentflow/";
       HashMap<String,String> paramMap = new HashMap<String,String>();
       paramMap.put("datatypetestcomponent_0_mfcc","false");
       String fileName=null;
@@ -201,4 +204,13 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
       }
       System.out.println("filename is: " + fileName);
    }
+   
+   
+   @Test
+   public void testGetListComponentsDataTypes() throws TransmissionException, SQLException, MeandreServerException{
+      String flowURI = "http://www.imirsel.org/test/testdynamiccomponentflow/";
+      Map<Component,List<Property>> componentPropertyMap=meandreServerProxy.getAllComponentsPropertyDataTypes(flowURI);
+      assertTrue(componentPropertyMap.size()>0);
+   }
+   
 }

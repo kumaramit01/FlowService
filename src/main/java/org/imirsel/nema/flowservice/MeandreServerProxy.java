@@ -104,6 +104,11 @@ public interface MeandreServerProxy {
    public String getConsole(String uri) throws MeandreServerException;
 
 
+   /**
+    * Return a map of string and flowdescription
+    * 
+    * @return a Map of String and {@link FlowDescription}
+    */
    public Map<String, FlowDescription> getAvailableFlowDescriptionsMap();
 
    /**
@@ -113,14 +118,37 @@ public interface MeandreServerProxy {
     */
    public Set<Resource> getAvailableFlows();
 
+   /** Return the ExecutableComponentDescription
+    * 
+    * @param flowResource
+    * @return {@link ExecutableComponentDescription}
+    */
    public ExecutableComponentDescription getComponentDescription(
          Resource flowResource);
 
+   /**Return the flow uri
+    * 
+    * @return Set of {@link URI}
+    * @throws MeandreServerException
+    */
    public Set<URI> getFlowUris() throws MeandreServerException;
 
+   /**
+    * Return the component description
+    * 
+    * @param componentUri
+    * @return ExecutableComponentDescription 
+    * @throws MeandreServerException
+    */
    public ExecutableComponentDescription getComponentDescription(
          String componentUri) throws MeandreServerException;
 
+   /**
+    * Return the flow description
+    * @param flowUri
+    * @return flow description
+    * @throws MeandreServerException
+    */
    public FlowDescription getFlowDescription(String flowUri)
          throws MeandreServerException;
 
@@ -160,13 +188,36 @@ public interface MeandreServerProxy {
    public String createFlow( HashMap<String, String> paramMap,
          String flowUri, long userId) throws MeandreServerException;
 
+   /**
+    * Remove flow
+    * 
+    * @param uri
+    * @return true/false
+    * @throws MeandreServerException
+    */
    public boolean removeFlow(String uri) throws MeandreServerException;
 
+   /**
+    * Return the component property data type
+    * 
+    * @param component
+    * @param flowUri
+    * @return Map of String and {@link Property}
+    * @throws MeandreServerException
+    */
    public Map<String, Property> getComponentPropertyDataType(
          Component component, String flowUri) throws MeandreServerException;
 
+   /**Return the client connection pool
+    * 
+    * @return the repository client connection pool
+    */
    public RepositoryClientConnectionPool getRepositoryClientConnectionPool();
 
+   /**
+    *  Set the repository client connection pool
+    * @param repositoryClientConnectionPool
+    */
    public void setRepositoryClientConnectionPool(
          RepositoryClientConnectionPool repositoryClientConnectionPool);
 
@@ -221,5 +272,14 @@ public interface MeandreServerProxy {
     * @param artifactService
     */
    public void setArtifactService(ArtifactService artifactService);
+
+   /**
+    * Returns the component property data types.
+    * @param flowUri
+    * @return The Map of {@link Component} and List of {@link Property}
+ * @throws MeandreServerException 
+    */
+   public Map<Component, List<Property>> getAllComponentsPropertyDataTypes(String flowUri) throws MeandreServerException;
+		
 
 }

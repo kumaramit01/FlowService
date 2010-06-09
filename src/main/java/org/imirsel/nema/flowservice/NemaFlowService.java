@@ -485,4 +485,17 @@ public class NemaFlowService implements FlowService {
 		return bytes;
 	}
 
+	@Override
+	public Map<Component, List<Property>> getAllComponentsPropertyDataTypes(
+			String flowUri) {
+		Map<Component, List<Property>> componentPropertyDataTypes = null;
+		try {
+			componentPropertyDataTypes = headServer.getAllComponentsPropertyDataTypes(flowUri);
+		} catch (MeandreServerException e) {
+			throw new ServiceException("A problem occurred while retrieving "
+					+ "component data types for flow: " + flowUri, e);
+		}
+		return componentPropertyDataTypes;
+	}
+
 }
