@@ -279,7 +279,7 @@ public interface MeandreServerProxy {
     * @return The Map of {@link Component} and List of {@link Property}
  * @throws MeandreServerException 
     */
-   public Map<Component, List<Property>> getAllComponentsPropertyDataTypes(String flowUri) throws MeandreServerException;
+   public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(String flowUri) throws MeandreServerException;
 		
 
 }

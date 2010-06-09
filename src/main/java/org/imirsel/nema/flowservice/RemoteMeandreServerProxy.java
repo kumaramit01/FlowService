@@ -457,9 +457,9 @@ public void setArtifactService(ArtifactService artifactService) {
 }
 
 @Override
-public Map<Component, List<Property>> getAllComponentsPropertyDataTypes(
+public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(
 		String flowUri) throws MeandreServerException {
-	return meandreFlowStore.getAllComponentsPropertyDataTypes(flowUri);
+	return meandreFlowStore.getAllComponentsAndPropertyDataTypes(flowUri);
 }
 
 }

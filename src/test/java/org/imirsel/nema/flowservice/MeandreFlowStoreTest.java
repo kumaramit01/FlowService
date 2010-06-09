@@ -209,7 +209,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
    @Test
    public void testGetListComponentsDataTypes() throws TransmissionException, SQLException, MeandreServerException{
       String flowURI = "http://www.imirsel.org/test/testdynamiccomponentflow/";
-      Map<Component,List<Property>> componentPropertyMap=meandreServerProxy.getAllComponentsPropertyDataTypes(flowURI);
+      Map<Component,List<Property>> componentPropertyMap=meandreServerProxy.getAllComponentsAndPropertyDataTypes(flowURI);
       assertTrue(componentPropertyMap.size()>0);
    }
    
