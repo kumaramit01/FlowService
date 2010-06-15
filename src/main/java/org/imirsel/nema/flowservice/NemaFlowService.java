@@ -128,7 +128,7 @@ public class NemaFlowService implements FlowService {
 		JobDao jobDao = daoFactory.getJobDao();
 
 		Flow flowInstance = flowDao.findById(flowInstanceId, false);
-
+		
 		Job job = new Job();
 		job.setToken(token);
 		job.setName(name);
@@ -141,11 +141,13 @@ public class NemaFlowService implements FlowService {
 		job.setCredentials(serialized);
 		jobDao.makePersistent(job);
 		
+		logger.info("adding job to the queue: " + job.getToken());
 
 		jobScheduler.scheduleJob(job);
 		job.setJobStatus(JobStatus.SCHEDULED);
 		jobDao.makePersistent(job);
 
+		logger.info("starting job status monitor for the job: " + job.getToken());
 		jobStatusMonitor.start(job, notificationCreator);
 
 		return job;
@@ -241,10 +243,11 @@ public class NemaFlowService implements FlowService {
 			
 		
 			String uri = resourcePath.getProtocol() + ":"+resourcePath.getWorkspace()+"://"+ resourcePath.getPath();
-			System.out.println("\n\nDebugging; Flow uri" + uri);
+			System.out.println("\n\n Flow uri" + uri);
 			flow.setUri(uri);
-
+			
 			this.storeFlowInstance(flow);
+			System.out.println("After storing flow instance... -returning flow");
 		} catch (MeandreServerException e) {
 			throw new ServiceException("Could not create flow: " + flowUri, e);
 		} catch (ContentRepositoryServiceException e) {

@@ -30,6 +30,7 @@ import org.imirsel.nema.client.beans.converters.MeandreConverter;
 import org.imirsel.nema.client.beans.repository.WBFlowDescription;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.NemaDataset;
+import org.imirsel.nema.model.NemaTask;
 import org.imirsel.nema.model.Property;
 import org.imirsel.nema.renderers.CollectionRenderer;
 import org.imirsel.nema.repository.RepositoryClientConnectionPool;
@@ -438,7 +439,7 @@ public class MeandreFlowStore {
 					String value1 = tmp.getValue();
 					if (key.endsWith(propertyName + DATATYPE_KEY)) {
 						dataTypes = getDataTypeBeanFromJson(value1);
-						updatePropertyWithCollectionMetadata(property,
+						updatePropertyWithTaskMetadata(property,
 								dataTypes);
 						property.setDataTypeBeanList(dataTypes);
 						foundDataType = true;
@@ -463,7 +464,7 @@ public class MeandreFlowStore {
 		return dataTypeMap;
 	}
 
-	private void updatePropertyWithCollectionMetadata(Property property,
+	private void updatePropertyWithTaskMetadata(Property property,
 			List<DataTypeBean> dataTypes) {
 		for (DataTypeBean dtb : dataTypes) {
 			if (dtb.getRenderer().equals(CollectionRenderer.class.getName())) {
@@ -473,10 +474,10 @@ public class MeandreFlowStore {
 				RepositoryClientInterface rpi = repositoryClientConnectionPool
 						.getFromPool();
 				try {
-					List<NemaDataset> ltb = rpi.getDatasets();
-					for (NemaDataset dataset : ltb) {
-						String label = dataset.getName();
-						int value = dataset.getId();
+					List<NemaTask> ltb = rpi.getTasks();
+					for (NemaTask task : ltb) {
+						String label = task.getName();
+						int value = task.getId();
 						labelList.add(label);
 						valueList.add(value);
 					}
@@ -708,7 +709,7 @@ public class MeandreFlowStore {
 						String value1 = tmp.getValue();
 						if (key.endsWith(propertyName + DATATYPE_KEY)) {
 							dataTypes = getDataTypeBeanFromJson(value1);
-							updatePropertyWithCollectionMetadata(property,
+							updatePropertyWithTaskMetadata(property,
 									dataTypes);
 							property.setDataTypeBeanList(dataTypes);
 							foundDataType = true;

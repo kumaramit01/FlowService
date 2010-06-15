@@ -195,9 +195,8 @@ public class MeandreJobScheduler implements JobScheduler {
             job.incrementNumTries();
             job.setJobStatus(JobStatus.SUBMITTED);
             job.setSubmitTimestamp(new Date());
-            logger.info("$$$$ credentials for the job is: " + job.getCredentials());
-
-            logger.fine("Preparing to update job " + job.getId()
+        
+            logger.info("Preparing to update job " + job.getId()
                   + " as submitted.");
 
             Transaction transaction = session.beginTransaction();
@@ -205,7 +204,7 @@ public class MeandreJobScheduler implements JobScheduler {
             try {
                jobDao.makePersistent(job);
                transaction.commit();
-               logger.fine("Job " + job.getId() + " updated.");
+               logger.info("Job " + job.getId() + " updated.");
             } catch (HibernateException e) {
                logger.warning("Data access exception: " + e.getMessage());
                rollback(transaction);
@@ -221,11 +220,11 @@ public class MeandreJobScheduler implements JobScheduler {
             }
 
             try {
-               logger.fine("Attempting to contact server " + server
+               logger.info("Attempting to contact server " + server
                      + " to execute job.");
 
                ExecResponse response = server.executeJob(job);
-               logger.fine("Execution response received.");
+               logger.info("Execution response received.");
                
                // If the executeJob() method above succeeded, the Meandre
                // server will have (most likely) changed the job status to
@@ -238,7 +237,7 @@ public class MeandreJobScheduler implements JobScheduler {
                // will be lost.
                session.refresh(job);
                
-               logger.fine("Attempting to record job execution response.");
+               logger.info("Attempting to record job execution response.");
                job.setHost(server.getConfig().getHost());
                job.setPort(server.getConfig().getPort());
                job.setExecPort(response.getPort());
