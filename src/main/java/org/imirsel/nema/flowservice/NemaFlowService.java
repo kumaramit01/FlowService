@@ -144,7 +144,11 @@ public class NemaFlowService implements FlowService {
 		logger.info("adding job to the queue: " + job.getToken());
 
 		jobScheduler.scheduleJob(job);
+		logger.info("after adding job to the queue: " + job.getToken());
+
 		job.setJobStatus(JobStatus.SCHEDULED);
+		
+		logger.info("making job peristent: " + job.getToken());
 		jobDao.makePersistent(job);
 
 		logger.info("starting job status monitor for the job: " + job.getToken());
