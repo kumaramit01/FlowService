@@ -1,11 +1,8 @@
 package org.imirsel.nema.flowservice;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -35,11 +32,11 @@ public class NemaFlowServiceTest {
       ctx = new ClassPathXmlApplicationContext(
             "applicationContext-flowservice-test.xml");
       String username="admin";
-      String passwordHash="d033e22ae348aeb5660fc2140aec35850c4da997";
+      String passwordHash="b2cebd873228d3e6753d9b39195730694e3d1bbc";
 
       FlowService flowService = (FlowService) ctx.getBean("flowService");
 
-      Flow template = flowService.getFlow(2);
+      Flow template = flowService.getFlow(10);
 
       Flow instance = new Flow();
       instance.setCreatorId(0L);
@@ -51,7 +48,6 @@ public class NemaFlowServiceTest {
       instance.setDescription("An instance for testing.");
       instance.setType(template.getType());
 
-      //long instanceId = flowService.storeFlowInstance(instance);
       long userId=0l;
       SimpleCredentials credentials = new SimpleCredentials(username,passwordHash.toCharArray());
       String flowUri ="http://www.imirsel.org/test/testdynamiccomponentflow/";
@@ -70,8 +66,7 @@ public class NemaFlowServiceTest {
          } catch (InterruptedException e) {
             e.printStackTrace();
          }
-         SimpleCredentials simpleCredentials = new SimpleCredentials("admin","admin".toCharArray());
-         flowService.executeJob(simpleCredentials,UUID.randomUUID().toString(), "Test: "
+         flowService.executeJob(credentials,UUID.randomUUID().toString(), "Test: "
                + new Date().toString(), "Test job " + i, instanceId, 0L,
                "shirk@uiuc.edu");
       }
