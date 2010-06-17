@@ -39,7 +39,6 @@ import org.imirsel.nema.model.Property;
 import org.imirsel.nema.model.ResourcePath;
 import org.imirsel.nema.model.Job.JobStatus;
 import org.springframework.orm.ObjectRetrievalFailureException;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A {@link FlowService} implementation for the NEMA project.
@@ -136,22 +135,16 @@ public class NemaFlowService implements FlowService {
 		job.setFlow(flowInstance);
 		job.setOwnerId(userId);
 		job.setOwnerEmail(userEmail);
-		SimpleCredentials sc=(SimpleCredentials)credentials;
-		String serialized = sc.getUserID()+":"+ new String(sc.getPassword());
-		job.setCredentials(serialized);
+		SimpleCredentials simpleCreds =(SimpleCredentials)credentials;
+		String serializedCreds = simpleCreds.getUserID() + ":" + 
+		   new String(simpleCreds.getPassword());
+		job.setCredentials(serializedCreds);
 		jobDao.makePersistent(job);
 		
-		logger.info("adding job to the queue: " + job.getToken());
-
 		jobScheduler.scheduleJob(job);
-		logger.info("after adding job to the queue: " + job.getToken());
-
 		job.setJobStatus(JobStatus.SCHEDULED);
-		
-		logger.info("making job peristent: " + job.getToken());
 		jobDao.makePersistent(job);
 
-		logger.info("starting job status monitor for the job: " + job.getToken());
 		jobStatusMonitor.start(job, notificationCreator);
 
 		return job;
@@ -175,7 +168,6 @@ public class NemaFlowService implements FlowService {
 	@Override
 	public Job getJob(long jobId) {
 		JobDao jobDao = daoFactory.getJobDao();
-		logger.info("getting job with id " + jobId);
 		Job job;
 		try {
 			logger.fine("Retrieving job " + jobId);
@@ -209,7 +201,6 @@ public class NemaFlowService implements FlowService {
 	 * @see FlowService#storeFlowInstance(Flow)
 	 * 
 	 */
-	@Transactional 
 	public Long storeFlowInstance(Flow instance) {
 		FlowDao flowDao = daoFactory.getFlowDao();
 		flowDao.makePersistent(instance);
@@ -236,22 +227,21 @@ public class NemaFlowService implements FlowService {
 		try {
 			result = headServer.createFlow(paramMap, flowUri,userId);
 			byte[] flowContent = readFileAsBytes(result);
-			assert this.getArtifactService()!=null;
-			assert flow != null :  "flow is null";
-			assert credentials != null:  "credentials are null";
-			assert flowContent != null: "flowcontent is null";
-			logger.info("flow id is: " +flow.getId()+"");
+			
+			assert getArtifactService()!=null : "Artifact service is null.";
+			assert flow != null : "Flow is null.";
+			assert credentials != null: "Credentials are null.";
+			assert flowContent != null: "Flowcontent is null.";
+
 			String id = UUID.randomUUID().toString();
-			ResourcePath resourcePath=this.getArtifactService().saveFlow((SimpleCredentials) credentials, flow,id, flowContent);
+			ResourcePath resourcePath=getArtifactService().
+			   saveFlow((SimpleCredentials) credentials, flow,id, flowContent);
 			
-			
-		
-			String uri = resourcePath.getProtocol() + ":"+resourcePath.getWorkspace()+"://"+ resourcePath.getPath();
-			System.out.println("\n\n Flow uri" + uri);
+			String uri = resourcePath.getProtocol() + ":" + 
+			   resourcePath.getWorkspace() + "://" + resourcePath.getPath();
 			flow.setUri(uri);
 			
-			this.storeFlowInstance(flow);
-			System.out.println("After storing flow instance... -returning flow");
+			storeFlowInstance(flow);
 		} catch (MeandreServerException e) {
 			throw new ServiceException("Could not create flow: " + flowUri, e);
 		} catch (ContentRepositoryServiceException e) {
@@ -321,8 +311,7 @@ public class NemaFlowService implements FlowService {
 			result = headServer.removeFlow(flowUri);
 		} catch (MeandreServerException e) {
 			throw new ServiceException(
-					"A problem occured while trying to remove flow: " + flowUri,
-					e);
+					"A problem occured while trying to remove flow: " + flowUri, e);
 		}
 		return result;
 	}
@@ -488,7 +477,6 @@ public class NemaFlowService implements FlowService {
 		}catch(Exception ex){
 			// error closing stream -okay
 		}
-		logger.info("read: " + bytes.length + " of flow " + fileLocation);
 		return bytes;
 	}
 
