@@ -166,12 +166,12 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       runningLock.lock();
       try {
          assert meandreClient != null : "Meandre client null";
-         assert this.artifactService != null: "Artifact service is null";
-         ResourcePath rp = getResourcePath(job.getFlow().getUri());
+         assert artifactService != null : "Artifact service is null";
+
+         ResourcePath resPath = getResourcePath(job.getFlow().getUri());
          SimpleCredentials credentials = getCredentials(job.getCredentials());
-         byte[] flowData=this.artifactService.retrieveFlow(credentials, rp);
-         meandreClient.runAsyncModelBytes(
-               flowData, job.getToken(), probes);
+         byte[] flowData = artifactService.retrieveFlow(credentials, resPath);
+         meandreClient.runAsyncModelBytes(flowData, job.getToken(), probes);
          response = meandreClient.getFlowExecutionInstanceId(job.getToken());
          logger.fine("Job " + job.getId()
                + " successfully submitted to server " + getServerString()
@@ -183,34 +183,34 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
                + "communicating with server " + getServerString()
                + " in order to execute job " + job.getId() + ".", e);
       } catch (ContentRepositoryServiceException e) {
-    	  throw new MeandreServerException("A problem occurred while "
-    			  + "trying to retrive the flow ", e);
-                 
-	} finally {
+         e.printStackTrace();
+         throw new MeandreServerException("A problem occurred while "
+               + "trying to retrive the flow ", e);
+      } finally {
          runningLock.unlock();
       }
 
       return response;
    }
    
-   
-
    private SimpleCredentials getCredentials(String credentials) {
-	   assert credentials!= null : "User Credentials are null";
-	   String[] splits = credentials.split(":");
-	   String username = splits[0];
-	   String password =splits[1];
-	   SimpleCredentials sc = new SimpleCredentials(username,password.toCharArray());
-	   return sc;
-}
+      assert credentials != null : "User Credentials are null";
+      String[] splits = credentials.split(":");
+      String username = splits[0];
+      String password = splits[1];
+      SimpleCredentials sc = new SimpleCredentials(username, password
+            .toCharArray());
+      return sc;
+   }
 
    private ResourcePath getResourcePath(String uri) {
-	   String splits[] = uri.split("://");
-	   String pcol = splits[0];
-	   String path = splits[1];
-	   String workspace = "default";
-	   RepositoryResourcePath rp = new  RepositoryResourcePath(pcol,workspace,path);
-	   return rp;
+      String splits[] = uri.split("://");
+      String pcol = splits[0];
+      String path = splits[1];
+      String workspace = "default";
+      RepositoryResourcePath rp = new RepositoryResourcePath(pcol, workspace,
+            path);
+      return rp;
    }
 
 /**
@@ -450,16 +450,16 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
       return config.getHost() + ":" + config.getPort();
    }
 
-@Override
-public void setArtifactService(ArtifactService artifactService) {
-	this.artifactService=artifactService;
-	
-}
+   @Override
+   public void setArtifactService(ArtifactService artifactService) {
+      this.artifactService = artifactService;
 
-@Override
-public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(
-		String flowUri) throws MeandreServerException {
-	return meandreFlowStore.getAllComponentsAndPropertyDataTypes(flowUri);
-}
+   }
+
+   @Override
+   public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(
+         String flowUri) throws MeandreServerException {
+      return meandreFlowStore.getAllComponentsAndPropertyDataTypes(flowUri);
+   }
 
 }
