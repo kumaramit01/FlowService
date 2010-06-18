@@ -1,8 +1,10 @@
 package org.imirsel.nema.flowservice;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -163,6 +165,20 @@ public class MeandreJobScheduler implements JobScheduler {
       }
    }
 
+   /**
+    * @see org.imirsel.nema.flowservice.JobScheduler#getScheduledJobs()
+    */
+   public List<Job> getScheduledJobs() {
+      queueLock.lock();
+      try {
+         List<Job> scheduledJobs = new ArrayList<Job>();
+         scheduledJobs.addAll(jobQueue);
+         return scheduledJobs;
+      } finally {
+         queueLock.unlock();
+      }
+   }
+   
    /**
     * Attempt to run any queued jobs.
     */

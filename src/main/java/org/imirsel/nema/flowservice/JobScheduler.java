@@ -1,5 +1,6 @@
 package org.imirsel.nema.flowservice;
 
+import java.util.List;
 import java.util.Map;
 
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
@@ -31,6 +32,13 @@ public interface JobScheduler {
     * @param job The job to halt execution for.
     */
    public void abortJob(Job job);
+   
+   /**
+    * Return the jobs that are scheduled.
+    * 
+    * @return Jobs that are scheduled for execution.
+    */
+   public List<Job> getScheduledJobs();
    
    /**
     * Return the execution state of all worker servers. The key in the returned
