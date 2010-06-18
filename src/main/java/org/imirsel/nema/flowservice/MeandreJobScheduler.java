@@ -3,6 +3,7 @@ package org.imirsel.nema.flowservice;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class MeandreJobScheduler implements JobScheduler {
 
    /** Meandre servers for processing jobs. */
    @GuardedBy("workersLock")
-   private Set<MeandreServerProxy> workers;
+   private Set<MeandreServerProxy> workers = new HashSet<MeandreServerProxy>();
 
    private DaoFactory daoFactory;
 
@@ -107,6 +108,7 @@ public class MeandreJobScheduler implements JobScheduler {
       for(MeandreServerProxyConfig workerConfig : workerConfigs) {
          MeandreServerProxy server = 
             serverFactory.getServerProxyInstance(workerConfig);
+         workers.add(server);
          loadBalancer.addServer(server);
       }
       ScheduledExecutorService executor = Executors
