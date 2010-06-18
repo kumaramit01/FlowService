@@ -153,6 +153,7 @@ public class NemaFlowService implements FlowService {
 	/**
 	 * @see FlowService#getScheduledJobs()
 	 */
+	@Override
 	public List<Job> getScheduledJobs() {
 	   return jobScheduler.getScheduledJobs();   
 	}
