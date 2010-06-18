@@ -1,5 +1,7 @@
 package org.imirsel.nema.flowservice.config;
 
+import java.io.Serializable;
+
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 
 /**
@@ -9,7 +11,17 @@ import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
  * @author shirk
  * @since 0.4.0
  */
-public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig{
+public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig, Serializable{
+	
+	
+	
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 891236792738963L;
+	
+	
 	private String host;
 	private int port;
 	private int maxConcurrentJobs;
