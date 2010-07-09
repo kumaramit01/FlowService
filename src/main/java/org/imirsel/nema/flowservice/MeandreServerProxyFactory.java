@@ -58,6 +58,15 @@ public class MeandreServerProxyFactory {
 	}
 
 	/**
+	 * Release any held references to the specified proxy.
+	 * 
+	 * @param proxy {@link MeandreServerProxy} to release.
+	 */
+	public synchronized void release(MeandreServerProxy proxy) {
+	   proxyInstances.remove(proxy);
+	}
+	
+	/**
 	 * Create a key to be used in the instance map for the given
 	 * {@link MeandreServerProxyConfig}.
 	 * 

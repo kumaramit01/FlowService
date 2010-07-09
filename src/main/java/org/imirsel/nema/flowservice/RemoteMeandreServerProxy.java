@@ -24,7 +24,7 @@ import org.imirsel.nema.contentrepository.client.ContentRepositoryServiceExcepti
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyStatus;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
-import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
+import org.imirsel.nema.flowservice.monitor.JobStatusUpdateListener;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.Property;
@@ -44,7 +44,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * @since 0.4.0
  */
 @ThreadSafe
-public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, MeandreServerProxy {
+public class RemoteMeandreServerProxy implements JobStatusUpdateListener, MeandreServerProxy {
 
    private static final Logger logger = Logger
          .getLogger(RemoteMeandreServerProxy.class.getName());
@@ -63,21 +63,23 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
    private final Set<Job> abortPending = new HashSet<Job>(8);
    private final Lock abortingLock = new ReentrantLock();
 
+   private boolean acceptingJobs = true;
    private JobStatusMonitor jobStatusMonitor;
    private MeandreClient meandreClient;
    private MeandreFlowStore meandreFlowStore;
    private ArtifactService artifactService;
    
    /**
-    * Constructor that takes config
-    * @param config
+    * Creates a new instance using the provided configuration. Used for testing.
+    * 
+    * @param config Config to use.
     */
    public RemoteMeandreServerProxy(MeandreServerProxyConfig config) {
       this.config = config;
    }
 
    /**
-    * 
+    * Creates a new instance.
     */
    public RemoteMeandreServerProxy() {}
 
@@ -127,11 +129,35 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
     */
    public boolean isBusy() {
       runningLock.lock();
+      abortingLock.lock();
       try {
-         return config.getMaxConcurrentJobs() == runningJobs.size();
+         return config.getMaxConcurrentJobs() <= 
+            (runningJobs.size() + abortPending.size());
       } finally {
+         abortingLock.unlock();
          runningLock.unlock();
       }
+   }
+   
+   /**
+    * @see MeandreServerProxy#isIdle()
+    */
+   public boolean isIdle() {
+      runningLock.lock();
+      abortingLock.lock();
+      try {
+         return runningJobs.size() + abortPending.size() == 0;
+      } finally {
+         abortingLock.unlock();
+         runningLock.unlock();
+      }   
+   }
+   
+   /**
+    * @see MeandreServerProxy#isAcceptingJobs()
+    */
+   public boolean isAcceptingJobs() {
+      return acceptingJobs;
    }
 
    /**
@@ -147,10 +173,30 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
    }
 
    /**
+    * @see MeandreServerProxy#startAcceptingJobs()
+    */
+   public synchronized void startAcceptingJobs() {
+      acceptingJobs = true;
+   }
+   
+   /**
+    * @see MeandreServerProxy#stopAcceptingJobs()
+    */
+   public synchronized void stopAcceptingJobs() {
+      acceptingJobs = false;
+   }
+   
+   /**
     * @see MeandreServerProxy#executeJob(org.imirsel.nema.model.Job)
     */
-   public ExecResponse executeJob(Job job) throws MeandreServerException {
+   public synchronized ExecResponse executeJob(Job job) throws MeandreServerException {
 
+      if (!isAcceptingJobs()) {
+         throw new IllegalStateException("Could not execute job " + job.getId()
+               + " because server " + getServerString() + " is no longer " +
+               		"accepting jobs.");
+      }
+      
       if (isBusy()) {
          throw new IllegalStateException("Could not execute job " + job.getId()
                + " because server " + getServerString() + " is busy.");
@@ -243,7 +289,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateHandler, Meandre
    }
 
    /** 
-    * @see JobStatusUpdateHandler#jobStatusUpdate(Job)
+    * @see JobStatusUpdateListener#jobStatusUpdate(Job)
     */
    @Override
    public void jobStatusUpdate(Job job) {

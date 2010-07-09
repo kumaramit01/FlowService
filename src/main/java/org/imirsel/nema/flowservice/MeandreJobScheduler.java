@@ -28,7 +28,6 @@ import org.hibernate.Transaction;
 import org.imirsel.meandre.client.ExecResponse;
 import org.imirsel.nema.dao.DaoFactory;
 import org.imirsel.nema.dao.JobDao;
-import org.imirsel.nema.flowservice.config.FlowServiceConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyStatus;
 import org.imirsel.nema.model.Job;
@@ -45,8 +44,9 @@ import org.springframework.dao.DataAccessException;
 @ThreadSafe
 public class MeandreJobScheduler implements JobScheduler {
 
-   private static final int POLL_PERIOD = 5;
-
+   private static final int QUEUE_POLL_PERIOD = 5;
+   private static final int DECOMMISSIONER_POLL_PERIOD = 30;
+   
    private static final Logger logger = Logger
          .getLogger(MeandreJobScheduler.class.getName());
 
@@ -55,7 +55,8 @@ public class MeandreJobScheduler implements JobScheduler {
    //~ Instance fields ---------------------------------------------------------
 
    /** The configuration for this job scheduler. */
-   private FlowServiceConfig config;
+   @GuardedBy("workersLock")
+   private Set<MeandreServerProxyConfig> workerConfigs;
 
    /** Used to get references to Meandre server proxies. */
    private MeandreServerProxyFactory serverFactory;
@@ -71,14 +72,18 @@ public class MeandreJobScheduler implements JobScheduler {
    /** Lock for the job queue. */
    private final Lock queueLock = new ReentrantLock();
 
-   /** Periodically checks for jobs in the queue and runs them. */
-   @SuppressWarnings("unused")
-   private ScheduledFuture<?> runJobsFuture;
-
    /** Meandre servers for processing jobs. */
    @GuardedBy("workersLock")
    private Set<MeandreServerProxy> workers = new HashSet<MeandreServerProxy>();
 
+   /** 
+    * Workers that have been removed as a result of a configuration change,
+    * but are still processing jobs.
+    */
+   @GuardedBy("workersLock")
+   private Set<MeandreServerProxy> removedWorkers = 
+      new HashSet<MeandreServerProxy>();
+   
    private DaoFactory daoFactory;
 
    /**
@@ -103,8 +108,8 @@ public class MeandreJobScheduler implements JobScheduler {
     */
    @PostConstruct
    public void init() {
-      assert config != null : "No configuration was provided to the job scheduler.";
-      Set<MeandreServerProxyConfig> workerConfigs = config.getWorkerConfigs();
+      assert workerConfigs != null : "No worker configs were " +
+      		"provided to the job scheduler.";
       for(MeandreServerProxyConfig workerConfig : workerConfigs) {
          MeandreServerProxy server = 
             serverFactory.getServerProxyInstance(workerConfig);
@@ -114,8 +119,11 @@ public class MeandreJobScheduler implements JobScheduler {
       ScheduledExecutorService executor = Executors
             .newSingleThreadScheduledExecutor();
 
-      runJobsFuture = executor.scheduleWithFixedDelay(new RunQueuedJobs(), 15,
-      POLL_PERIOD, TimeUnit.SECONDS);
+      executor.scheduleWithFixedDelay(new RunQueuedJobs(), 15,
+          QUEUE_POLL_PERIOD, TimeUnit.SECONDS);
+
+      executor.scheduleWithFixedDelay(new DecommissionServers(), 15,
+          DECOMMISSIONER_POLL_PERIOD, TimeUnit.SECONDS);
    }
 
    /**
@@ -203,7 +211,7 @@ public class MeandreJobScheduler implements JobScheduler {
             MeandreServerProxy server = loadBalancer.nextAvailableServer();
             if (server == null) {
                logger.info("All servers are busy. Will try again in "
-                     + POLL_PERIOD + " seconds.");
+                     + QUEUE_POLL_PERIOD + " seconds.");
                return;
             }
             logger.fine("Server " + server + " is available for processing.");
@@ -347,36 +355,6 @@ public class MeandreJobScheduler implements JobScheduler {
    }
 
    /**
-    * Add a server to the job scheduler.
-    * 
-    * @param server Server to add.
-    */
-   public void addServer(MeandreServerProxy server) {
-      workersLock.lock();
-      try {
-         workers.add(server);
-         loadBalancer.addServer(server);
-      } finally {
-         workersLock.unlock();
-      }
-   }
-
-   /**
-    * Remove a server from the job scheduler.
-    * 
-    * @param server Server to remove.
-    */
-   public void removeServer(MeandreServerProxy server) {
-      workersLock.lock();
-      try {
-         workers.remove(server);
-         loadBalancer.removeServer(server);
-      } finally {
-         workersLock.unlock();
-      }
-   }
-
-   /**
     * Return the number of servers the scheduler is managing.
     * 
     * @return Number of servers the scheduler is managing.
@@ -427,21 +405,75 @@ public class MeandreJobScheduler implements JobScheduler {
    }
 
    /**
-    * Return the {@link FlowServiceConfig} currently in use.
-    * 
-    * @return The {@link FlowServiceConfig} currently in use.
+    * @see MeandreJobScheduler#getWorkerConfigs()
     */
-   public FlowServiceConfig getFlowServiceConfig() {
-      return config;
+   public Set<MeandreServerProxyConfig> getWorkerConfigs() {
+      return workerConfigs;
    }
 
    /**
-    * Set the {@link FlowServiceConfig} to use.
-    * 
-    * @param config The {@link FlowServiceConfig} to use.
+    * @see MeandreJobScheduler#setWorkerConfigs(Set)
     */
-   public void setFlowServiceConfig(FlowServiceConfig config) {
-      this.config = config;
+   public void setWorkerConfigs(Set<MeandreServerProxyConfig> newWorkerConfigs) {
+      workersLock.lock();
+      try {
+         if (workerConfigs == null) {
+            workerConfigs = newWorkerConfigs;
+         } else { // Handle the updating of configs.
+            Set<MeandreServerProxyConfig> toAdd = 
+               new HashSet<MeandreServerProxyConfig>();
+            Set<MeandreServerProxyConfig> toRemove = 
+               new HashSet<MeandreServerProxyConfig>();
+
+            // Find servers that have been added
+            for (MeandreServerProxyConfig config : newWorkerConfigs) {
+               if (!workerConfigs.contains(config)) {
+                  toAdd.add(config);
+               }
+            }
+
+            // Find servers that have been removed
+            for (MeandreServerProxyConfig config : workerConfigs) {
+               if (!newWorkerConfigs.contains(config)) {
+                  toRemove.add(config);
+               }
+            }
+
+            // Add new servers
+            for (MeandreServerProxyConfig newConfig : toAdd) {
+               MeandreServerProxy proxyToAdd = serverFactory
+                     .getServerProxyInstance(newConfig);
+               // If the server was removed while jobs were still processing,
+               // but has now been added back.
+               if(removedWorkers.contains(proxyToAdd)) {
+                  // proxyToAdd.synchWithServer() check for status r;
+                  removedWorkers.remove(proxyToAdd);
+               }
+               workers.add(proxyToAdd);
+               loadBalancer.addServer(proxyToAdd);
+               proxyToAdd.startAcceptingJobs();
+            }
+
+            // Remove old servers
+            for (MeandreServerProxyConfig oldConfig : toRemove) {
+               MeandreServerProxy proxyToRemove = serverFactory
+                     .getServerProxyInstance(oldConfig);
+               proxyToRemove.stopAcceptingJobs();
+               // If the server is still processing jobs
+               if (!proxyToRemove.isIdle()) {
+                  removedWorkers.add(proxyToRemove);
+               } else {
+                  serverFactory.release(proxyToRemove);
+               }
+               workers.remove(proxyToRemove);
+               loadBalancer.removeServer(proxyToRemove);
+            }
+
+            workerConfigs = newWorkerConfigs;
+         }
+      } finally {
+         workersLock.unlock();
+      }
    }
 
    /**
@@ -486,6 +518,23 @@ public class MeandreJobScheduler implements JobScheduler {
       public void run() {
          logger.fine("Checking for queued jobs...");
          runJobs();
+      }
+   }
+   
+   private class DecommissionServers implements Runnable {
+      public void run() {
+         workersLock.lock();
+         try {
+            logger.finest("Decommissioning servers...");
+            for (MeandreServerProxy proxy : removedWorkers) {
+               if (proxy.isIdle()) {
+                  removedWorkers.remove(proxy);
+                  serverFactory.release(proxy);
+               }
+            }
+         } finally {
+            workersLock.unlock();
+         }
       }
    }
 }

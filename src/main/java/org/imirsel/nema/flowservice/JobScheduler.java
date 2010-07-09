@@ -2,6 +2,7 @@ package org.imirsel.nema.flowservice;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyStatus;
@@ -49,5 +50,22 @@ public interface JobScheduler {
     * {@link MeandreServerProxyStatus}.
     */
    public Map<MeandreServerProxyConfig,MeandreServerProxyStatus> getWorkerStatus();
+   
+   /**
+    * Return the {@link MeandreServerProxyConfig}s that are currently being
+    * used.
+    * 
+    * @return The {@link MeandreServerProxyConfig}s that are currently being
+    * used.
+    */
+   public Set<MeandreServerProxyConfig> getWorkerConfigs();
+
+   /**
+    * Set the {@link MeandreServerProxyConfig}s to use to instantiate new
+    * worker servers.
+    * 
+    * @param workerConfigs Configurations to use to create new servers.
+    */
+   public void setWorkerConfigs(Set<MeandreServerProxyConfig> workerConfigs);
    
 }

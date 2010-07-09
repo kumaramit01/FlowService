@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.imirsel.nema.dao.DaoFactory;
+import org.imirsel.nema.flowservice.config.ConfigChangeListener;
 import org.imirsel.nema.flowservice.config.FlowServiceConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.config.SimpleMeandreServerProxyConfig;
@@ -75,6 +76,16 @@ public class MeandreJobSchedulerTest {
          public Set<MeandreServerProxyConfig> getWorkerConfigs() {
             return workers;
          }
+
+         @Override
+         public void addChangeListener(ConfigChangeListener listener) {
+            throw new RuntimeException("Method not supported.");
+         }
+
+         @Override
+         public void removeChangeListener(ConfigChangeListener listener) {
+            throw new RuntimeException("Method not supported.");
+         }
       };
       
       RepositoryClientConnectionPool mockRepositoryClient  = 
@@ -88,7 +99,7 @@ public class MeandreJobSchedulerTest {
       proxyFactory.setRepositoryClientConnectionPool(mockRepositoryClient);
       jobScheduler.setLoadBalancer(loadBalancer);
       jobScheduler.setMeandreServerProxyFactory(proxyFactory);
-      jobScheduler.setFlowServiceConfig(serviceConfig);
+      jobScheduler.setWorkerConfigs(serviceConfig.getWorkerConfigs());
       jobScheduler.setDaoFactory(mockDaoFactory);
       jobScheduler.init();
 

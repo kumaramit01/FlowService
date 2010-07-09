@@ -53,8 +53,8 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
     * notified of status changes.
     */
    @GuardedBy("jobsLock")
-   private final Map<Job, Set<JobStatusUpdateHandler>> jobs =
-      new HashMap<Job, Set<JobStatusUpdateHandler>>();
+   private final Map<Job, Set<JobStatusUpdateListener>> jobs =
+      new HashMap<Job, Set<JobStatusUpdateListener>>();
 
    /** Concurrency lock for the jobs list. */
    private final Lock jobsLock = new ReentrantLock();
@@ -84,9 +84,9 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    //~ Methods -----------------------------------------------------------------
 
    /**
-    * @see JobStatusMonitor#start(Job, JobStatusUpdateHandler)
+    * @see JobStatusMonitor#start(Job, JobStatusUpdateListener)
     */
-   public void start(Job job, JobStatusUpdateHandler updateHandler) {
+   public void start(Job job, JobStatusUpdateListener updateHandler) {
       logger.fine(
          "Starting to monitor job " + job.getId() + " for " + updateHandler +
          ".");
@@ -99,8 +99,8 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
                "Adding a handler for job " + job.getId() +
                " to an existing handler set.");
          } else {
-            Set<JobStatusUpdateHandler> handlerSet =
-               new HashSet<JobStatusUpdateHandler>();
+            Set<JobStatusUpdateListener> handlerSet =
+               new HashSet<JobStatusUpdateListener>();
             handlerSet.add(updateHandler);
             logger.fine("Created a handler set for job " + job.getId() + ".");
             jobs.put(job.clone(), handlerSet);
@@ -111,15 +111,15 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    }
 
    /**
-    * @see JobStatusMonitor#stop(Job, JobStatusUpdateHandler)
+    * @see JobStatusMonitor#stop(Job, JobStatusUpdateListener)
     */
-   public void stop(Job job, JobStatusUpdateHandler updateHandler) {
+   public void stop(Job job, JobStatusUpdateListener updateHandler) {
       logger.fine(
          "Stopping the monitoring of job " + job.getId() + " for " +
          updateHandler + ".");
       jobsLock.lock();
       try {
-         Set<JobStatusUpdateHandler> handlers = jobs.get(job);
+         Set<JobStatusUpdateListener> handlers = jobs.get(job);
          if (handlers != null) {
             handlers.remove(updateHandler);
             if (handlers.isEmpty()) {
@@ -217,14 +217,14 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
                      cachedJob.setEndTimestamp(persistedJob.getEndTimestamp());
 
                      // Invoke the update handlers for this job
-                     Set<JobStatusUpdateHandler> handlers = jobs.get(cachedJob);
+                     Set<JobStatusUpdateListener> handlers = jobs.get(cachedJob);
                      if (handlers == null) {
                         logger.fine(
                            "No handlers registered for job " +
                            cachedJob.getId() + ".");
                         return;
                      } else {
-                        for (JobStatusUpdateHandler handler : handlers) {
+                        for (JobStatusUpdateListener handler : handlers) {
                            logger.fine(
                               "Dispatching a job status update for job " +
                               cachedJob.getId() + " to handler " + handler +

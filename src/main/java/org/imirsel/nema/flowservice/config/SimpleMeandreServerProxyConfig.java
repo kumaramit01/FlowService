@@ -13,11 +13,8 @@ import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
  */
 public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig, Serializable{
 	
-	
-	
-	
 	/**
-	 * 
+	 * Version of this class.
 	 */
 	private static final long serialVersionUID = 891236792738963L;
 	

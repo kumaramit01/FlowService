@@ -18,10 +18,10 @@ public interface JobStatusMonitor {
     * an update occurs. 
     *
     * @param job The {@link Job} to monitor.
-    * @param updateHandler The {@link JobStatusUpdateHandler} to notify when an
+    * @param updateHandler The {@link JobStatusUpdateListener} to notify when an
     * update occurs.
     */
-   public void start(Job job, JobStatusUpdateHandler updateHandler);
+   public void start(Job job, JobStatusUpdateListener updateHandler);
 
    /**
     * Explicitly stop monitoring the specified job. The status monitor will
@@ -30,8 +30,8 @@ public interface JobStatusMonitor {
     * updates before the job has ended.
     *
     * @param job The {@link Job} to stop monitoring.
-    * @param updateHandler The {@link JobStatusUpdateHandler} that was specified
+    * @param updateHandler The {@link JobStatusUpdateListener} that was specified
     * when monitoring was started.
     */
-   public void stop(Job job, JobStatusUpdateHandler updateHandler);
+   public void stop(Job job, JobStatusUpdateListener updateHandler);
 }

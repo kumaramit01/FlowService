@@ -51,12 +51,36 @@ public interface MeandreServerProxy {
    public int getNumJobsAborting();
 
    /**
-    * Tests if the server is busy such that it cannot process any more jobs.
+    * Test if the server is busy such that it cannot process any more jobs.
     * 
     * @return True if the server cannot accept any more jobs.
     */
    public boolean isBusy();
 
+   /**
+    * Test if the server is idle.
+    * 
+    * @return True if the server is neither running nor aborting any jobs.
+    */
+   public boolean isIdle();
+   
+   /**
+    * Instruct the server to stop accepting further jobs.
+    */
+   public void stopAcceptingJobs();
+   
+   /**
+    * Instruct the server to start accepting jobs.
+    */
+   public void startAcceptingJobs();
+   
+   /**
+    * Tests if the server will accept new job requests.
+    * 
+    * @return True if the server will accept new job requests.
+    */
+   public boolean isAcceptingJobs();
+   
    /**
     * Tests if specified job is currently pending abort on this server.
     * 

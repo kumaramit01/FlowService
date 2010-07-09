@@ -9,11 +9,10 @@ import java.util.Set;
  * @author shirk
  * @since 0.4.0
  */
-public class SimpleFlowServiceConfig implements
-		FlowServiceConfig {
+public class SimpleFlowServiceConfig extends FlowServiceConfigBase {
 
-	MeandreServerProxyConfig head;
-	Set<MeandreServerProxyConfig> servers;
+	private MeandreServerProxyConfig head;
+	private Set<MeandreServerProxyConfig> servers;
 	
 	/**
 	 * @see org.imirsel.nema.flowservice.config.FlowServiceConfig#getHeadConfig()

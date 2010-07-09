@@ -25,6 +25,7 @@ import org.imirsel.nema.dao.FlowDao;
 import org.imirsel.nema.dao.JobDao;
 import org.imirsel.nema.dao.JobResultDao;
 import org.imirsel.nema.flowservice.config.FlowServiceConfig;
+import org.imirsel.nema.flowservice.config.ConfigChangeListener;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyConfig;
 import org.imirsel.nema.flowservice.config.MeandreServerProxyStatus;
 import org.imirsel.nema.flowservice.monitor.JobStatusMonitor;
@@ -46,7 +47,7 @@ import org.springframework.orm.ObjectRetrievalFailureException;
  * @author shirk
  * @since 0.4.0
  */
-public class NemaFlowService implements FlowService {
+public class NemaFlowService implements FlowService, ConfigChangeListener {
 
 	private static final Logger logger = Logger.getLogger(NemaFlowService.class
 			.getName());
@@ -79,6 +80,7 @@ public class NemaFlowService implements FlowService {
 		notificationCreator = new JobStatusNotificationCreator(daoFactory);
 		headServer = meandreServerProxyFactory
 				.getServerProxyInstance(flowServiceConfig.getHeadConfig());
+		flowServiceConfig.addChangeListener(this);
 	}
 
 	/**
@@ -500,5 +502,11 @@ public class NemaFlowService implements FlowService {
 		}
 		return componentPropertyDataTypes;
 	}
+
+   @Override
+   public void configChanged() {
+      logger.info("Received configuration change notification.");
+      jobScheduler.setWorkerConfigs(flowServiceConfig.getWorkerConfigs());
+   }
 
 }

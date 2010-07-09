@@ -8,7 +8,7 @@ import org.imirsel.nema.model.Job;
  * @author shirk
  * @since 0.4.0
  */
-public interface JobStatusUpdateHandler {
+public interface JobStatusUpdateListener {
 
 	/**
 	 * Receive a status update and handle it accordingly. The implementation

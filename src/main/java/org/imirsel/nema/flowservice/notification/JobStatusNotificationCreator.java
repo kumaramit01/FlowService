@@ -6,7 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.imirsel.nema.dao.DaoFactory;
 import org.imirsel.nema.dao.NotificationDao;
-import org.imirsel.nema.flowservice.monitor.JobStatusUpdateHandler;
+import org.imirsel.nema.flowservice.monitor.JobStatusUpdateListener;
 import org.imirsel.nema.model.Job;
 import org.imirsel.nema.model.Notification;
 
@@ -16,7 +16,7 @@ import org.imirsel.nema.model.Notification;
  * @author shirk
  * @since 0.5.0
  */
-public class JobStatusNotificationCreator implements JobStatusUpdateHandler {
+public class JobStatusNotificationCreator implements JobStatusUpdateListener {
 
 	private static final Logger logger = 
 		Logger.getLogger(JobStatusNotificationCreator.class.getName());

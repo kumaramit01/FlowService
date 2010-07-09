@@ -29,4 +29,20 @@ public interface FlowServiceConfig {
 	 * jobs.
 	 */
 	public Set<MeandreServerProxyConfig> getWorkerConfigs();
+	
+	/**
+	 * Register an object to listen for changes to the configuration.
+	 * 
+	 * @param listener The listener to register.
+	 */
+	public void addChangeListener(ConfigChangeListener listener);
+	
+   /**
+    * Unregister an object from listening for changes to the configuration.
+    * 
+    * @param listener The listener to unregister.
+    */
+   public void removeChangeListener(ConfigChangeListener listener);
+   
+   
 }

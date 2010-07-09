@@ -123,6 +123,9 @@
 		<property name="propertiesFileName" value="flowservice.properties"/>
     </bean>
 
+    <bean id="workerConfigs"
+        factory-bean="flowServiceConfig" factory-method="getWorkerConfigs"/>
+    
     <bean id="repositoryClientConnectionPool" 
         class="org.imirsel.nema.repository.RepositoryClientConnectionPool" />
         
@@ -155,7 +158,7 @@
 		<property name="loadBalancer" ref="loadBalancer" />
 		<property name="daoFactory" ref="daoFactory" />
 		<property name="meandreServerProxyFactory" ref="meandreServerProxyFactory"/>
-		<property name="flowServiceConfig" ref="flowServiceConfig" />
+		<property name="workerConfigs" ref="workerConfigs" />
 	</bean>
 
 	<bean id="flowService" class="org.imirsel.nema.flowservice.NemaFlowService">
