@@ -29,7 +29,6 @@ import org.imirsel.nema.annotations.parser.beans.StringDataTypeBean;
 import org.imirsel.nema.client.beans.converters.MeandreConverter;
 import org.imirsel.nema.client.beans.repository.WBFlowDescription;
 import org.imirsel.nema.model.Component;
-import org.imirsel.nema.model.NemaDataset;
 import org.imirsel.nema.model.NemaTask;
 import org.imirsel.nema.model.Property;
 import org.imirsel.nema.renderers.CollectionRenderer;
