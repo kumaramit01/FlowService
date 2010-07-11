@@ -19,5 +19,13 @@ public interface JobDao extends GenericDao<Job, Long>{
     * @return List of {@link Job}s that are owned by the specified user.
     */
 	public abstract List<Job> getJobsByOwnerId(long userId);
+	
+   /**
+    * Return all jobs that are have a certain status.
+    * 
+    * @param status Status of the jobs to be fetched.
+    * @return List of {@link Job}s that are of the same status.
+    */
+   public abstract List<Job> getJobsByStatus(Job.JobStatus status);
 
 }

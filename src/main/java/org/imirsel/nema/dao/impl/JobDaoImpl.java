@@ -24,4 +24,11 @@ public class JobDaoImpl extends GenericDaoImpl<Job, Long>implements JobDao {
 		return this.findByCriteriaDistinct(userId);
 	}
 	
+   /**
+    * @see JobDao#getJobsByStatus(Job.JobStatus)
+    */
+   public List<Job> getJobsByStatus(Job.JobStatus status) {
+      Criterion statusCode=Restrictions.eq("statusCode", status.getCode());
+      return this.findByCriteriaDistinct(statusCode);
+   }
 }

@@ -115,6 +115,7 @@ public class MeandreJobScheduler implements JobScheduler {
          workers.add(server);
          loadBalancer.addServer(server);
       }
+      
       ScheduledExecutorService executor = Executors
             .newSingleThreadScheduledExecutor();
 

@@ -81,6 +81,16 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
 		headServer = meandreServerProxyFactory
 				.getServerProxyInstance(flowServiceConfig.getHeadConfig());
 		flowServiceConfig.addChangeListener(this);
+		
+		// Any jobs marked as scheduled in the database will be put back in the
+		// queue for execution.
+      JobDao jobDao = daoFactory.getJobDao();
+      List<Job> scheduledJobs = jobDao.getJobsByStatus(Job.JobStatus.SCHEDULED);
+      for(Job job:scheduledJobs) {
+         jobScheduler.scheduleJob(job);
+         jobStatusMonitor.start(job, notificationCreator);
+      }
+      
 	}
 
 	/**
@@ -96,7 +106,8 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
 		try {
          jobScheduler.abortJob(job);
       } catch (MeandreServerException e) {
-         throw new ServiceException(e);
+         throw new ServiceException(
+               "Job " + jobId + " could not be aborted.",e);
       }
 	}
 
