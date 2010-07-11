@@ -93,7 +93,11 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
 			throw new IllegalStateException("Cannot abort job " + jobId
 					+ " because it has already completed.");
 		}
-		jobScheduler.abortJob(job);
+		try {
+         jobScheduler.abortJob(job);
+      } catch (MeandreServerException e) {
+         throw new ServiceException(e);
+      }
 	}
 
 	/**

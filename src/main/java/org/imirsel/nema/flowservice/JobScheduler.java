@@ -31,8 +31,12 @@ public interface JobScheduler {
     * Request that the processing of a currently executing job is halted.
     *
     * @param job The job to halt execution for.
+    * @throws IllegalStateException if the job is neither scheduled nor running.
+    * @throws MeandreServerException if there is a problem when a request is
+    * made to the Meandre server to abort the job.
     */
-   public void abortJob(Job job);
+   public void abortJob(Job job) throws IllegalStateException, 
+                                                       MeandreServerException;
    
    /**
     * Return the jobs that are scheduled.

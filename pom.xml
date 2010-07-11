@@ -9,7 +9,7 @@
 	<url>http://nema-dev.lis.illinois.edu/development/nema-flow-service</url>
 
 	<prerequisites>
-		<maven>2.2.0</maven>
+		<maven>2.0.9</maven>
 	</prerequisites>
 
 	<mailingLists>

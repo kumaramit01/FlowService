@@ -128,13 +128,34 @@ public class MeandreJobScheduler implements JobScheduler {
    /**
     * @see org.imirsel.nema.flowservice.JobScheduler#abortJob(org.imirsel.nema.model.Job)
     */
-   public void abortJob(Job job) {
-      MeandreServerProxy executingServer = findExecutingServer(job);
+   public void abortJob(Job job) throws IllegalStateException,
+         MeandreServerException {
+      queueLock.lock();
+
+      JobDao jobDao = daoFactory.getJobDao();
+
       try {
-         executingServer.abortJob(job);
-      } catch (MeandreServerException e) {
-         // TODO Perhaps do something more intelligent here
-         throw new RuntimeException(e);
+         if (jobQueue.contains(job)) {
+            jobQueue.remove(job);
+
+            job.setJobStatus(Job.JobStatus.ABORTED);
+            jobDao.makePersistent(job);
+
+         } else {
+            MeandreServerProxy executingServer = findExecutingServer(job);
+            if (executingServer == null) {
+               throw new IllegalStateException("Job " + job.getId() + " is "
+                     + "transitioning states. It is neither queued nor is it "
+                     + "executing on a server. Try aborting again later.");
+            }
+
+            // The Meandre probe will change the job state once the job has
+            // actually aborted. So, we won't do it manually here.
+            executingServer.abortJob(job);
+
+         }
+      } finally {
+         queueLock.unlock();
       }
    }
 

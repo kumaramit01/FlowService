@@ -32,6 +32,9 @@
 		<aop:advisor id="notificationCreatorTx" advice-ref="notificationCreatorTxAdvice"
 			pointcut="execution(* *..flowservice.NotificationCreator.*(..))"
 			order="0" />
+        <aop:advisor id="jobSchedulerTx" advice-ref="jobSchedulerTxAdvice"
+            pointcut="execution(* *..flowservice.JobScheduler.*(..))"
+            order="0" />
 	</aop:config>
 
 	<tx:advice id="flowServiceTxAdvice">
@@ -55,6 +58,12 @@
 		</tx:attributes>
 	</tx:advice>
 
+    <tx:advice id="jobSchedulerTxAdvice">
+        <tx:attributes>
+            <tx:method name="abortJob" rollback-for="DataAccessException" />
+        </tx:attributes>
+    </tx:advice>
+    
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host" value="${mail.host}"/>
     </bean>
