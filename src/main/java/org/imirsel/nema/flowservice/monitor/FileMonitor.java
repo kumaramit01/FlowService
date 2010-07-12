@@ -58,7 +58,7 @@ public class FileMonitor {
 		FileChangeDetector fileChangeDetector = new FileChangeDetector();
 		executorService.scheduleWithFixedDelay(fileChangeDetector, 0,
 				interval, TimeUnit.SECONDS);
-		logger.info("Starting to monitor file " + file.getName() + 
+		logger.info("Starting to monitor " + file.getName() + 
 		      " for changes.");
 	}
 
