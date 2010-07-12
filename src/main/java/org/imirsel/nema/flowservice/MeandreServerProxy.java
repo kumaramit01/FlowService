@@ -37,6 +37,20 @@ public interface MeandreServerProxy {
    public void init();
 
    /**
+    * Set whether or not this is a head server.
+    * 
+    * @param isHead Whether or not this is a head server.
+    */
+   public void setHead(boolean isHead);
+   
+   /**
+    * Test if this is a head server.
+    * 
+    * @return True if this is a head server.
+    */
+   public boolean isHead();
+   
+   /**
     * Return the number of jobs currently running on this server.
     * 
     * @return Number of jobs currently running on this server.

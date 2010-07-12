@@ -39,7 +39,7 @@ public class MeandreServerProxyFactory {
 	 * @return A {@link MeandreServerProxy} instance.
 	 */
 	public synchronized MeandreServerProxy getServerProxyInstance(
-			MeandreServerProxyConfig config) {
+			MeandreServerProxyConfig config, boolean isHead) {
 		String key = keyFor(config);
 		MeandreServerProxy instance = null;
 		if (proxyInstances.containsKey(key)) {

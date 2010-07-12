@@ -79,7 +79,7 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
 
 		notificationCreator = new JobStatusNotificationCreator(daoFactory);
 		headServer = meandreServerProxyFactory
-				.getServerProxyInstance(flowServiceConfig.getHeadConfig());
+				.getServerProxyInstance(flowServiceConfig.getHeadConfig(),true);
 		flowServiceConfig.addChangeListener(this);
 		
 		// Any jobs marked as scheduled in the database will be put back in the

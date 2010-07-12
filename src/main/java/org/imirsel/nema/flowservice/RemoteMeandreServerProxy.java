@@ -56,6 +56,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
    private MeandreServerProxyConfig config;
    private String host;
    private int port;
+   private boolean head;
    
    private RepositoryClientConnectionPool repositoryClientConnectionPool;
 
@@ -92,16 +93,19 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     */
    @PostConstruct
    public void init() {
-      host=config.getHost();
-      port=config.getPort();
+      host = config.getHost();
+      port = config.getPort();
       meandreClient = new MeandreClient(config.getHost(), config.getPort());
       meandreClient.setLogger(logger);
       meandreClient.setCredentials(config.getUsername(), config.getPassword());
-      
-      meandreFlowStore = new MeandreFlowStore();
-      meandreFlowStore.setMeandreClient(meandreClient);
-      meandreFlowStore.setRepositoryClientConnectionPool(repositoryClientConnectionPool);
-      meandreFlowStore.init();
+
+      if (head) {
+         meandreFlowStore = new MeandreFlowStore();
+         meandreFlowStore.setMeandreClient(meandreClient);
+         meandreFlowStore
+               .setRepositoryClientConnectionPool(repositoryClientConnectionPool);
+         meandreFlowStore.init();
+      }
    }
 
    /**
@@ -403,13 +407,23 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     * @see MeandreServerProxy#getAvailableFlowDescriptionsMap()
     */
    public Map<String, FlowDescription> getAvailableFlowDescriptionsMap() {
+      ensureHead();
       return meandreFlowStore.getAvailableFlowDescriptionsMap();
+   }
+
+   private void ensureHead() {
+      if(!head) {
+         throw new IllegalStateException("Server " + this.toString() + 
+               " is configured as a worker. This method is not supported for" +
+               " worker servers.");
+      }
    }
 
    /**
     * @see MeandreServerProxy#getAvailableFlows()
     */
    public Set<Resource> getAvailableFlows() {
+      ensureHead();
       return meandreFlowStore.getAvailableFlows();
    }
 
@@ -418,6 +432,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     */
    public ExecutableComponentDescription getComponentDescription(
          Resource flowResource) {
+      ensureHead();
       return meandreFlowStore.getComponentDescription(flowResource);
    }
 
@@ -425,6 +440,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     * @see MeandreServerProxy#getFlowUris()
     */
    public Set<URI> getFlowUris() throws MeandreServerException {
+      ensureHead();
       return meandreFlowStore.getFlowUris();
    }
 
@@ -433,6 +449,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     */
    public ExecutableComponentDescription getComponentDescription(
          String componentUri) throws MeandreServerException {
+      ensureHead();
       return meandreFlowStore.getComponentDescription(componentUri);
    }
 
@@ -441,6 +458,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     */
    public FlowDescription getFlowDescription(String flowUri)
          throws MeandreServerException {
+      ensureHead();
       return meandreFlowStore.getFlowDescription(flowUri);
    }
 
@@ -448,6 +466,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     * @see MeandreServerProxy#getComponentUrisInRepository()
     */
    public Set<URI> getComponentUrisInRepository() throws MeandreServerException {
+      ensureHead();
       return meandreFlowStore.getComponentUrisInRepository();
    }
 
@@ -456,6 +475,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     */
    public List<Component> getComponents(String flowUri)
          throws MeandreServerException {
+      ensureHead();
       return meandreFlowStore.getComponents(flowUri);
    }
 
@@ -464,6 +484,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     */
    public synchronized String createFlow(HashMap<String, String> paramMap,
          String flowUri, long userId) throws MeandreServerException {
+      ensureHead();
       return meandreFlowStore.createFlow(paramMap, flowUri, userId);
    }
 
@@ -471,6 +492,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     * @see MeandreServerProxy#removeFlow(java.lang.String)
     */
    public boolean removeFlow(String uri) throws MeandreServerException {
+      ensureHead();
       return meandreFlowStore.removeFlow(uri);
    }
 
@@ -479,9 +501,17 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     */
    public Map<String, Property> getComponentPropertyDataType(
          Component component, String flowUri) throws MeandreServerException {
+      ensureHead();
       return meandreFlowStore.getComponentPropertyDataType(component, flowUri);
    }
 
+   @Override
+   public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(
+         String flowUri) throws MeandreServerException {
+      ensureHead();
+      return meandreFlowStore.getAllComponentsAndPropertyDataTypes(flowUri);
+   }
+   
    /**
     * @see MeandreServerProxy#getRepositoryClientConnectionPool()
     */
@@ -497,6 +527,20 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
       this.repositoryClientConnectionPool = repositoryClientConnectionPool;
    }
 
+   /**
+    * @see MeandreServerProxy#setHead(boolean)
+    */
+   public void setHead(boolean head) {
+      this.head = head;
+   }
+   
+   /**
+    * @see MeandreServerProxy#isHead()
+    */
+   public boolean isHead() {
+      return head;
+   }
+   
    /**
     * @see MeandreServerProxy#getConfig()
     */
@@ -579,12 +623,6 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
    public void setArtifactService(ArtifactService artifactService) {
       this.artifactService = artifactService;
 
-   }
-
-   @Override
-   public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(
-         String flowUri) throws MeandreServerException {
-      return meandreFlowStore.getAllComponentsAndPropertyDataTypes(flowUri);
    }
 
 }
