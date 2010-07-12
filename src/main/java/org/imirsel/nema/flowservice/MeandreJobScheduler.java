@@ -441,6 +441,9 @@ public class MeandreJobScheduler implements JobScheduler {
          if (workerConfigs == null) {
             workerConfigs = newWorkerConfigs;
          } else { // Handle the updating of configs.
+            
+            logger.info("Received new worker configuration.");
+            
             Set<MeandreServerProxyConfig> toAdd = 
                new HashSet<MeandreServerProxyConfig>();
             Set<MeandreServerProxyConfig> toRemove = 
@@ -460,21 +463,22 @@ public class MeandreJobScheduler implements JobScheduler {
                }
             }
 
-            // Add new servers
-            for (MeandreServerProxyConfig newConfig : toAdd) {
-               MeandreServerProxy proxyToAdd = serverFactory
-                     .getServerProxyInstance(newConfig,false);
-               // If the server was removed while jobs were still processing,
-               // but has now been added back.
-               if(removedWorkers.contains(proxyToAdd)) {
-                  proxyToAdd.syncJobsWithServer();
-                  removedWorkers.remove(proxyToAdd);
-               }
-               workers.add(proxyToAdd);
-               loadBalancer.addServer(proxyToAdd);
-               proxyToAdd.startAcceptingJobs();
+            if(toAdd.size()==0 && toRemove.size()==0) {
+               logger.info("No changes found in worker configuration.");   
             }
-
+            
+            if(toAdd.size()>0) {
+               String serverStr = toAdd.size()==1?"server":"servers";
+               logger.info("Found " + toAdd.size() + " " + 
+                     serverStr + " to add.");
+            }
+            
+            if(toRemove.size()>0) {
+               String serverStr = toRemove.size()==1?"server":"servers";
+               logger.info("Found " + toRemove.size() + " " + serverStr + 
+                     " to remove.");
+            }
+            
             // Remove old servers
             for (MeandreServerProxyConfig oldConfig : toRemove) {
                MeandreServerProxy proxyToRemove = serverFactory
@@ -488,6 +492,21 @@ public class MeandreJobScheduler implements JobScheduler {
                }
                workers.remove(proxyToRemove);
                loadBalancer.removeServer(proxyToRemove);
+            }
+            
+            // Add new servers
+            for (MeandreServerProxyConfig newConfig : toAdd) {
+               MeandreServerProxy proxyToAdd = serverFactory
+                     .getServerProxyInstance(newConfig,false);
+               // If the server was removed while jobs were still processing,
+               // but has now been added back.
+               if(removedWorkers.contains(proxyToAdd)) {
+                  proxyToAdd.syncJobsWithServer();
+                  removedWorkers.remove(proxyToAdd);
+               }
+               workers.add(proxyToAdd);
+               loadBalancer.addServer(proxyToAdd);
+               proxyToAdd.startAcceptingJobs();
             }
 
             workerConfigs = newWorkerConfigs;

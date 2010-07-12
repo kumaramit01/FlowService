@@ -39,6 +39,7 @@
 
 	<tx:advice id="flowServiceTxAdvice">
 		<tx:attributes>
+		    <tx:method name="init" read-only="true" />
 			<tx:method name="abortJob" read-only="true" />
 			<tx:method name="deleteJob" rollback-for="DataAccessException" />
 			<tx:method name="executeJob" rollback-for="DataAccessException" />
@@ -178,7 +179,7 @@
 		<property name="notificationSender" ref="notificationSender"/>
 		<property name="flowServiceConfig" ref="flowServiceConfig"/>
 		<property name="artifactService" ref="contentRepositoryService"/>
-  </bean>
+    </bean>
 
 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
 		<property name="serviceName" value="FlowService" />

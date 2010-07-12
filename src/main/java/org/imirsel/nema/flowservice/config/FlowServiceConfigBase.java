@@ -1,11 +1,13 @@
 package org.imirsel.nema.flowservice.config;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class FlowServiceConfigBase implements FlowServiceConfig {
-   private Set<ConfigChangeListener> listeners;
+   private Set<ConfigChangeListener> listeners = 
+      new HashSet<ConfigChangeListener>();
    private Lock listenersLock = new ReentrantLock();
    
    @Override

@@ -77,10 +77,8 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
       }
 
       if (server.getNumJobsRunning() != 0) {
-         throw new IllegalStateException(
-            "Server " +
-            server.getServerString() +
-            " cannot be removed from the scheduler because it is currently running a job.");
+         logger.warning("Server " + server.toString() + " will be removed " +
+         		"from the load balancer, but it is still running jobs.");
       }
 
       if (size == 1) {
@@ -92,6 +90,7 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
          match.getNext().setPrev(match.getPrev());
          match.getPrev().setNext(match.getNext());
       }
+      logger.fine("Removed server " + server + " from load balancer");
       size--;
    }
 

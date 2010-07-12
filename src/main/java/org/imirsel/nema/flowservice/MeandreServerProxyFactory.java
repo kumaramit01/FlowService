@@ -2,6 +2,7 @@ package org.imirsel.nema.flowservice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import net.jcip.annotations.ThreadSafe;
 
@@ -20,14 +21,17 @@ import org.imirsel.nema.repository.RepositoryClientConnectionPool;
 @ThreadSafe
 public class MeandreServerProxyFactory {
 
+   private static Logger logger = Logger.getLogger(
+         MeandreServerProxyFactory.class.getName());
+   
 	private JobStatusMonitor jobStatusMonitor;
 
 	private ArtifactService artifactService;
 	private RepositoryClientConnectionPool repositoryClientConnectionPool;
 	
 
-	private Map<String, MeandreServerProxy> proxyInstances = new HashMap<String, MeandreServerProxy>(
-			8);
+	private Map<String, MeandreServerProxy> proxyInstances = 
+	   new HashMap<String, MeandreServerProxy>(8);
 
 	/**
 	 * Given a {@link MeandreServerProxyConfig}, create a new
@@ -36,6 +40,8 @@ public class MeandreServerProxyFactory {
 	 * @param config
 	 *            The configuration upon which the new
 	 *            {@link MeandreServerProxy} instance should be based.
+	 * @param head
+	 *            Whether or not the instance will be a head server.
 	 * @return A {@link MeandreServerProxy} instance.
 	 */
 	public synchronized MeandreServerProxy getServerProxyInstance(
@@ -48,12 +54,14 @@ public class MeandreServerProxyFactory {
 			instance = new RemoteMeandreServerProxy();
 			instance.setConfig(config);
 			instance.setJobStatusMonitor(jobStatusMonitor);
-			instance
-					.setRepositoryClientConnectionPool(repositoryClientConnectionPool);
+			instance.setRepositoryClientConnectionPool(
+			      repositoryClientConnectionPool);
+	      instance.setHead(isHead);
 			instance.init();
 			instance.setArtifactService(artifactService);
 			proxyInstances.put(key, instance);
 		}
+
 		return instance;
 	}
 
@@ -63,6 +71,7 @@ public class MeandreServerProxyFactory {
 	 * @param proxy {@link MeandreServerProxy} to release.
 	 */
 	public synchronized void release(MeandreServerProxy proxy) {
+	   logger.fine("Releasing server " + proxy.toString() + ".");
 	   proxyInstances.remove(proxy);
 	}
 	

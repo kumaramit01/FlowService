@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,6 +18,8 @@ import javax.annotation.PostConstruct;
 import javax.jcr.Credentials;
 import javax.jcr.SimpleCredentials;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.imirsel.nema.NoSuchEntityException;
 import org.imirsel.nema.contentrepository.client.ArtifactService;
 import org.imirsel.nema.contentrepository.client.ContentRepositoryServiceException;
@@ -85,7 +88,22 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
 		// Any jobs marked as scheduled in the database will be put back in the
 		// queue for execution.
       JobDao jobDao = daoFactory.getJobDao();
-      List<Job> scheduledJobs = jobDao.getJobsByStatus(Job.JobStatus.SCHEDULED);
+      List<Job> scheduledJobs;
+      try {
+         Session session = jobDao.getSessionFactory().openSession();
+         jobDao.startManagedSession(session);
+         scheduledJobs = jobDao.getJobsByStatus(Job.JobStatus.SCHEDULED);
+         jobDao.endManagedSession();
+         session.close();
+      } catch (HibernateException e) {
+         throw new RuntimeException("Problem searching for scheduled jobs" +
+         		" in the database.",e);
+      }
+      
+      if(scheduledJobs != null && scheduledJobs.size() > 0) {
+         logger.info(scheduledJobs.size() + " scheduled jobs found in the " +
+      		"database. Jobs will be rescheduled for execution.");
+      }
       for(Job job:scheduledJobs) {
          jobScheduler.scheduleJob(job);
          jobStatusMonitor.start(job, notificationCreator);
@@ -160,6 +178,7 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
 		
 		jobScheduler.scheduleJob(job);
 		job.setJobStatus(JobStatus.SCHEDULED);
+		job.setScheduleTimestamp(new Date());
 		jobDao.makePersistent(job);
 
 		jobStatusMonitor.start(job, notificationCreator);
@@ -522,6 +541,13 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
    public void configChanged() {
       logger.info("Received configuration change notification.");
       jobScheduler.setWorkerConfigs(flowServiceConfig.getWorkerConfigs());
+      if(!headServer.getConfig().equals(flowServiceConfig.getHeadConfig())) {
+         //meandreServerProxyFactory.release(headServer);
+         headServer = meandreServerProxyFactory.getServerProxyInstance(
+               flowServiceConfig.getHeadConfig(), true);
+         logger.info("Head server configuration has changed. New head " +
+         		"server is " + headServer.toString());
+      }
    }
 
 }

@@ -32,10 +32,14 @@
         <aop:advisor id="notificationCreatorTx" advice-ref="notificationCreatorTxAdvice"
             pointcut="execution(* *..flowservice.NotificationCreator.*(..))"
             order="0" />
+        <aop:advisor id="jobSchedulerTx" advice-ref="jobSchedulerTxAdvice"
+            pointcut="execution(* *..flowservice.JobScheduler.*(..))"
+            order="0" />
     </aop:config>
 
     <tx:advice id="flowServiceTxAdvice">
         <tx:attributes>
+            <tx:method name="init" read-only="true" />
             <tx:method name="abortJob" read-only="true" />
             <tx:method name="deleteJob" rollback-for="DataAccessException" />
             <tx:method name="executeJob" rollback-for="DataAccessException" />
@@ -55,6 +59,12 @@
         </tx:attributes>
     </tx:advice>
 
+    <tx:advice id="jobSchedulerTxAdvice">
+        <tx:attributes>
+            <tx:method name="abortJob" rollback-for="DataAccessException" />
+        </tx:attributes>
+    </tx:advice>
+    
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host" value="${mail.host}"/>
     </bean>
@@ -123,6 +133,9 @@
         <property name="propertiesFileName" value="flowservice.properties"/>
     </bean>
 
+    <bean id="workerConfigs"
+        factory-bean="flowServiceConfig" factory-method="getWorkerConfigs"/>
+    
     <bean id="repositoryClientConnectionPool" 
         class="org.imirsel.nema.repository.RepositoryClientConnectionPool" />
         
@@ -134,7 +147,7 @@
     
     <bean id="remoteContentRepository" factory-bean="clientRepositoryFactory" 
      factory-method="getRepository">
-        <constructor-arg value="rmi://nema-dev.lis.illinois.edu:2099/jackrabbit.repository"/>
+        <constructor-arg value="${contentrepository.rmi.url}"/>
      </bean>
     
     <bean id="clientRepositoryFactory" 
@@ -155,7 +168,7 @@
         <property name="loadBalancer" ref="loadBalancer" />
         <property name="daoFactory" ref="daoFactory" />
         <property name="meandreServerProxyFactory" ref="meandreServerProxyFactory"/>
-        <property name="flowServiceConfig" ref="flowServiceConfig" />
+        <property name="workerConfigs" ref="workerConfigs" />
     </bean>
 
     <bean id="flowService" class="org.imirsel.nema.flowservice.NemaFlowService">
@@ -166,25 +179,15 @@
         <property name="notificationSender" ref="notificationSender"/>
         <property name="flowServiceConfig" ref="flowServiceConfig"/>
         <property name="artifactService" ref="contentRepositoryService"/>
-  </bean>
-
-    <bean class="org.springframework.remoting.rmi.RmiServiceExporter">
-        <property name="serviceName" value="FlowService" />
-        <property name="service" ref="flowService" />
-        <property name="serviceInterface" value="org.imirsel.nema.flowservice.FlowService" />
-        <property name="registryPort" value="1099" />
-        <!--  property name="registryHost" value="128.174.154.145" THIS IS FOR THE TEST MACHINE -->
-        <property name="servicePort" value="9001"/>
     </bean>
 
-    <bean id="remoteFlowService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+    <!-- bean id="remoteFlowService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
 
-        <!--<property name="serviceUrl" value="${diy.flowservice.location}"/>-->
         <property name="serviceUrl"
             value="rmi://localhost:1099/FlowService" />
 
         <property name="serviceInterface" value="org.imirsel.nema.flowservice.FlowService" />
         <property name="refreshStubOnConnectFailure" value="true" />
-    </bean>
+    </bean -->
     
 </beans>

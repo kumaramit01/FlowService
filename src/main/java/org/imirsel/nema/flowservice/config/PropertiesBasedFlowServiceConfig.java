@@ -123,13 +123,21 @@ public class PropertiesBasedFlowServiceConfig extends FlowServiceConfigBase
     * @throws ConfigException if a problem occurs while loading the config.
     */
    private MeandreServerProxyConfig loadHeadConfig() throws ConfigException {
+      String headServer = properties.getProperty("headserver.host");
       String headServerPortStr = properties.getProperty("headserver.port");
-      String headMaxCurrentJobsStr = properties
-            .getProperty("headserver.maxConcurrentJobs");
       String headUsername = properties.getProperty("headserver.username");
       String headPassword = properties.getProperty("headserver.password");
-      String headServer = properties.getProperty("headserver.host");
+      String headMaxCurrentJobsStr = properties
+            .getProperty("headserver.maxConcurrentJobs");
 
+      if(nullOrEmpty(headServer) || nullOrEmpty(headServerPortStr) || 
+            nullOrEmpty(headUsername) || nullOrEmpty(headPassword) || 
+            nullOrEmpty(headMaxCurrentJobsStr)) {
+         throw new ConfigException(
+               "Invalid flow service configuration file. Some headserver " +
+               "properties are missing.");
+      }
+      
       int headServerPort;
       int headMaxCurrentJobs;
       try {
@@ -156,7 +164,8 @@ public class PropertiesBasedFlowServiceConfig extends FlowServiceConfigBase
          throws ConfigException {
       if (propertiesResource == null) {
          throw new ConfigException(
-               "Could not find configuration file " + propertiesFileName + ".");
+               "Could not find flow service configuration file: " + 
+                                                  propertiesFileName);
       }
       InputStream is = null;
       try {
@@ -242,5 +251,12 @@ public class PropertiesBasedFlowServiceConfig extends FlowServiceConfigBase
       loadProperties();
       head = loadHeadConfig();
       workers = loadWorkerConfigs();
+   }
+   
+   private boolean nullOrEmpty(String str) {
+      if(null==str || "".equals(str)) {
+         return true;
+      }
+      return false;
    }
 }
