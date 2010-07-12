@@ -298,6 +298,11 @@ public interface MeandreServerProxy {
    public void setArtifactService(ArtifactService artifactService);
 
    /**
+    * Attempt to synchronize the job state of the proxy with the server. 
+    */
+   public void syncJobsWithServer();
+   
+   /**
     * Returns the component property data types.
     * @param flowUri
     * @return The Map of {@link Component} and List of {@link Property}

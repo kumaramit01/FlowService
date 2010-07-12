@@ -467,7 +467,7 @@ public class MeandreJobScheduler implements JobScheduler {
                // If the server was removed while jobs were still processing,
                // but has now been added back.
                if(removedWorkers.contains(proxyToAdd)) {
-                  // proxyToAdd.synchWithServer() check for status r;
+                  proxyToAdd.syncJobsWithServer();
                   removedWorkers.remove(proxyToAdd);
                }
                workers.add(proxyToAdd);

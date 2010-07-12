@@ -1,11 +1,13 @@
 package org.imirsel.nema.flowservice;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
@@ -45,6 +47,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 @ThreadSafe
 public class RemoteMeandreServerProxy implements JobStatusUpdateListener, MeandreServerProxy {
+
+   private static final String MEANDRE_STATUS_CODE_RUNNING = "R";
 
    private static final Logger logger = Logger
          .getLogger(RemoteMeandreServerProxy.class.getName());
@@ -320,6 +324,81 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
       return consoleOutput;
    }
 
+   /**
+    * @see MeandreServerProxy#syncJobsWithServer()
+    * 
+    * <p>This implementation is a "best try" at synchronizing the jobs with
+    * the server. In terms of concurrency, there's still a lot that could go
+    * wrong. For example, a job might have just been completed on the server,
+    * but the Flow Service does not have the new state yet. In that case,
+    * this method will think the job is erroneous and will stop tracking it.
+    * However, we can't control these variables, so this is the best we can do.
+    */
+   public void syncJobsWithServer() {
+      // We'll make copies of the running and aborting lists and remove 
+      // from them matching jobs that are running/aborting on the server.
+      // What will be left are the jobs we need to dispose of.
+      List<Job> runningJobsCopy = new ArrayList<Job>(runningJobs);
+      List<Job> abortingJobsCopy = new ArrayList<Job>(abortPending);
+
+      try {
+         // Returns all jobs, all status, in Meandre server's database
+         Vector<Map<String, String>> serverJobList = meandreClient
+               .retrieveJobStatuses();
+
+         for (Map<String, String> serverJobDetails : serverJobList) {
+            // We're only interested in jobs that are running.
+            if (MEANDRE_STATUS_CODE_RUNNING.equals(serverJobDetails
+                  .get("status"))) {
+               // Find running job matches
+               for (Job job : runningJobsCopy) {
+                  String execInstanceId = serverJobDetails.get("job_id");
+                  if (job.getExecutionInstanceId().equals(execInstanceId)) {
+                     runningJobsCopy.remove(job);
+                  }
+               }
+               // Find aborting job matches
+               for (Job job : abortingJobsCopy) {
+                  String execInstanceId = serverJobDetails.get("job_id");
+                  if (job.getExecutionInstanceId().equals(execInstanceId)) {
+                     runningJobsCopy.remove(job);
+                     // Meandre has no "aborting" state, so we'll go ahead 
+                     // and try to abort again since we have no clue if 
+                     // it's already aborting or not.
+                     meandreClient.abortFlow(job.getExecPort());
+                  }
+               }
+            }
+         }
+
+         // Now, in order to complete the synchronization with the server,
+         // we have to get rid of jobs that are not actually running on the
+         // server.
+         for (Job job : runningJobsCopy) {
+            logger.info("Job " + job.getExecutionInstanceId() + " is no "
+                  + "longer running on server " + this.toString()
+                  + ". It will " + "be removed from the list of running jobs.");
+            runningJobs.remove(job);
+            jobStatusMonitor.stop(job, this);
+         }
+
+         for (Job job : abortingJobsCopy) {
+            logger.info("Job " + job.getExecutionInstanceId() + " is no "
+                  + "longer aborting on server " + this.toString() + ". It "
+                  + "will be removed from the list of aborting jobs.");
+            runningJobs.remove(job);
+            jobStatusMonitor.stop(job, this);
+         }
+
+      } catch (TransmissionException e) {
+         logger.warning("A communication error occured while attempting to "
+               + "sync jobs with the server: " + e.getMessage() + ". Server "
+               + this.toString() + "may be in an invalid state. You "
+               + "should remove this server from the configuration"
+               + "and restart the Meandre server.");
+      }
+   }
+   
    /**
     * @see MeandreServerProxy#getAvailableFlowDescriptionsMap()
     */
