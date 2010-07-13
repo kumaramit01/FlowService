@@ -470,9 +470,10 @@ public class MeandreFlowStore {
 				// this is a collection
 				ArrayList<String> labelList = new ArrayList<String>();
 				ArrayList<Object> valueList = new ArrayList<Object>();
-				RepositoryClientInterface rpi = repositoryClientConnectionPool
-						.getFromPool();
+				RepositoryClientInterface rpi=null;
 				try {
+					 rpi = repositoryClientConnectionPool
+						.getFromPool();
 					List<NemaTask> ltb = rpi.getTasks();
 					for (NemaTask task : ltb) {
 						String label = task.getName();
@@ -483,6 +484,7 @@ public class MeandreFlowStore {
 				} catch (SQLException e) {
 					e.printStackTrace();
 				} finally {
+					if(rpi!=null)
 					repositoryClientConnectionPool.returnToPool(rpi);
 				}
 
