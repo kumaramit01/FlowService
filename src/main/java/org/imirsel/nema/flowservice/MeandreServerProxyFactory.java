@@ -57,9 +57,16 @@ public class MeandreServerProxyFactory {
 			instance.setRepositoryClientConnectionPool(
 			      repositoryClientConnectionPool);
 	      instance.setHead(isHead);
-			instance.init();
-			instance.setArtifactService(artifactService);
+			try {
+            instance.init();
+         } catch (Exception e) {
+            throw new RuntimeException(
+                  "An error occured while instantiating server " + 
+                  instance.toString(),e);
+         }
+         instance.setArtifactService(artifactService);
 			proxyInstances.put(key, instance);
+         logger.info("Instantiated server " + instance.toString());
 		}
 
 		return instance;

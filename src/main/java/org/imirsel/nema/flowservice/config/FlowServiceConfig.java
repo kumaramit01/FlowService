@@ -44,5 +44,4 @@ public interface FlowServiceConfig {
     */
    public void removeChangeListener(ConfigChangeListener listener);
    
-   
 }

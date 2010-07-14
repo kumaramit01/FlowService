@@ -86,23 +86,23 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
    /**
     * @see JobStatusMonitor#start(Job, JobStatusUpdateListener)
     */
-   public void start(Job job, JobStatusUpdateListener updateHandler) {
+   public void start(Job job, JobStatusUpdateListener updateListener) {
       logger.fine(
-         "Starting to monitor job " + job.getId() + " for " + updateHandler +
+         "Starting to monitor job " + job.getId() + " for " + updateListener +
          ".");
       jobsLock.lock();
       try {
          if (jobs.containsKey(job)) {
             jobs.get(job)
-            .add(updateHandler);
+            .add(updateListener);
             logger.fine(
-               "Adding a handler for job " + job.getId() +
-               " to an existing handler set.");
+               "Adding a listener for job " + job.getId() +
+               " to an existing listener set.");
          } else {
             Set<JobStatusUpdateListener> handlerSet =
                new HashSet<JobStatusUpdateListener>();
-            handlerSet.add(updateHandler);
-            logger.fine("Created a handler set for job " + job.getId() + ".");
+            handlerSet.add(updateListener);
+            logger.fine("Created a listener set for job " + job.getId() + ".");
             jobs.put(job.clone(), handlerSet);
          }
       } finally {
@@ -220,14 +220,14 @@ public class PollingJobStatusMonitor implements JobStatusMonitor {
                      Set<JobStatusUpdateListener> handlers = jobs.get(cachedJob);
                      if (handlers == null) {
                         logger.fine(
-                           "No handlers registered for job " +
+                           "No listeners registered for job " +
                            cachedJob.getId() + ".");
                         return;
                      } else {
                         for (JobStatusUpdateListener handler : handlers) {
                            logger.fine(
                               "Dispatching a job status update for job " +
-                              cachedJob.getId() + " to handler " + handler +
+                              cachedJob.getId() + " to listener " + handler +
                               ".");
 
                            // anything can go wrong in a handler, so

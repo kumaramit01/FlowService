@@ -84,7 +84,14 @@ public class PropertiesBasedFlowServiceConfig extends FlowServiceConfigBase
       String[] passwordList = passwords.split(",");
       String[] maxConcurrentJobList = maxConcurrentJobs.split(",");
 
-      if (hostList.length != 0 && (hostList.length == portList.length)
+      // Validate at least one worker is specified
+      if("".equals(hosts) && "".equals(ports) && "".equals(usernames) && 
+            "".equals(passwords) && "".equals(maxConcurrentJobs)) {
+         throw new ConfigException("Invalid flow configuration file. " +
+         		"At least one worker server is required.");
+      }
+      
+      if ((hostList.length == portList.length)
             && (hostList.length == usernameList.length)
             && (hostList.length == passwordList.length)
             && (hostList.length == maxConcurrentJobList.length)) {
@@ -106,12 +113,17 @@ public class PropertiesBasedFlowServiceConfig extends FlowServiceConfigBase
             String password = passwordList[count];
             MeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
                   username, password, host, port, maxConcurrentJob);
+            if(workers.contains(config)) {
+               throw new ConfigException("Multiple instances of the same " +
+               		"worker server were found.");
+            }
             workers.add(config);
             count++;
          }
       } else {
          throw new ConfigException(
-               "Invalid flow service configuration file.");
+               "Invalid flow service configuration file. Inconsistent number " +
+               "of worker properties.");
       }
       return workers;
    }
@@ -249,8 +261,31 @@ public class PropertiesBasedFlowServiceConfig extends FlowServiceConfigBase
     */
    public void reload() throws ConfigException {
       loadProperties();
-      head = loadHeadConfig();
-      workers = loadWorkerConfigs();
+      MeandreServerProxyConfig newHeadConfig = loadHeadConfig();
+      Set<MeandreServerProxyConfig> newWorkerConfigs = loadWorkerConfigs();
+
+      // Ensure the head isn't also a worker.
+      if(newWorkerConfigs.contains(newHeadConfig)) {
+         throw new ConfigException("A head server cannot also be a worker.");
+      }
+      
+      // Ensure a worker hasn't been moved to the head.
+      if(workers.contains(newHeadConfig)) {
+         throw new ConfigException("Worker servers cannot be simultaneously " +
+         		"moved from the worker pool and made a head server. Remove " +
+         		"the worker first and then make it the head in a subsequent " +
+         		"configuration update.");
+      }
+      // Ensure the head hasn't moved to the worker pool.
+      if(newWorkerConfigs.contains(head)) {
+         throw new ConfigException("A head server cannot be simultaneously " +
+               "removed from the head and placed in the worker pool. Remove " +
+               "the head server first and then make it a worker in a " +
+               "subsequent configuration update.");
+      }
+      
+      head = newHeadConfig;
+      workers = newWorkerConfigs;
    }
    
    private boolean nullOrEmpty(String str) {

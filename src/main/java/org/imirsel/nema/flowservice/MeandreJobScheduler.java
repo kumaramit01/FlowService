@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -444,45 +445,90 @@ public class MeandreJobScheduler implements JobScheduler {
             
             logger.info("Received new worker configuration.");
             
-            Set<MeandreServerProxyConfig> toAdd = 
+            Set<MeandreServerProxyConfig> added = 
                new HashSet<MeandreServerProxyConfig>();
-            Set<MeandreServerProxyConfig> toRemove = 
+            Set<MeandreServerProxyConfig> removed =
                new HashSet<MeandreServerProxyConfig>();
-
+            Set<MeandreServerProxyConfig> changed =
+               new HashSet<MeandreServerProxyConfig>();
+            Set<MeandreServerProxyConfig> unchanged =
+               new HashSet<MeandreServerProxyConfig>();
+            
             // Find servers that have been added
             for (MeandreServerProxyConfig config : newWorkerConfigs) {
                if (!workerConfigs.contains(config)) {
-                  toAdd.add(config);
+                  added.add(config);
                }
             }
 
             // Find servers that have been removed
             for (MeandreServerProxyConfig config : workerConfigs) {
                if (!newWorkerConfigs.contains(config)) {
-                  toRemove.add(config);
+                  removed.add(config);
                }
             }
-
-            if(toAdd.size()==0 && toRemove.size()==0) {
+            
+            // Determine which servers have had their configurations changed, and
+            // which remain the same. (e.g. username, password, maxconcurrentjobs)
+            for (MeandreServerProxyConfig existingConfig : workerConfigs) {
+               if (newWorkerConfigs.contains(existingConfig)) {
+                  MeandreServerProxyConfig newConfig = null;
+                  // Find the new config
+                  Iterator<MeandreServerProxyConfig> configIterator = 
+                     newWorkerConfigs.iterator();
+                  while(configIterator.hasNext()) {
+                     newConfig = configIterator.next();
+                     if(newConfig.equals(existingConfig)) {
+                        break;
+                     }
+                  }
+                  // New config is found, now compare properties
+                  if(existingConfig.getUsername().equals(newConfig.getUsername()) &&
+                     existingConfig.getPassword().equals(newConfig.getPassword()) &&
+                     existingConfig.getMaxConcurrentJobs()==
+                        newConfig.getMaxConcurrentJobs()) {
+                     // Nothing has changed...add to unchanged
+                     unchanged.add(newConfig);
+                  } else {
+                     // Something has changed...add to changed
+                     changed.add(newConfig);
+                  }
+               }
+            }
+            
+            if(added.size()==0 && removed.size()==0 && changed.size()==0) {
                logger.info("No changes found in worker configuration.");   
             }
             
-            if(toAdd.size()>0) {
-               String serverStr = toAdd.size()==1?"server":"servers";
-               logger.info("Found " + toAdd.size() + " " + 
-                     serverStr + " to add.");
+            if(added.size()>0) {
+               String serverStr = added.size()==1?"server was":"servers were";
+               logger.info(added.size() + " " + 
+                     serverStr + " added.");
             }
             
-            if(toRemove.size()>0) {
-               String serverStr = toRemove.size()==1?"server":"servers";
-               logger.info("Found " + toRemove.size() + " " + serverStr + 
-                     " to remove.");
+            if(removed.size()>0) {
+               String serverStr = removed.size()==1?"server was":"servers were";
+               logger.info(removed.size() + " " + serverStr + 
+                     " removed.");
             }
             
-            // Remove old servers
-            for (MeandreServerProxyConfig oldConfig : toRemove) {
+            if(changed.size()>0) {
+               String serverStr = changed.size()==1?"server was":"servers were";
+               logger.info(changed.size() + " " + serverStr + 
+                     " changed.");
+            }
+            
+            if((added.size()!=0 || removed.size()!=0 || changed.size()!=0) 
+                  && unchanged.size()>0) {
+               String serverStr = unchanged.size()==1?"server was":"servers were";
+               logger.info(unchanged.size() + " " + serverStr + 
+                     " left unchanged.");
+            }
+            
+            // Remove servers
+            for (MeandreServerProxyConfig remove : removed) {
                MeandreServerProxy proxyToRemove = serverFactory
-                     .getServerProxyInstance(oldConfig,false);
+                     .getServerProxyInstance(remove,false);
                proxyToRemove.stopAcceptingJobs();
                // If the server is still processing jobs
                if (!proxyToRemove.isIdle()) {
@@ -494,10 +540,10 @@ public class MeandreJobScheduler implements JobScheduler {
                loadBalancer.removeServer(proxyToRemove);
             }
             
-            // Add new servers
-            for (MeandreServerProxyConfig newConfig : toAdd) {
+            // Add servers
+            for (MeandreServerProxyConfig add : added) {
                MeandreServerProxy proxyToAdd = serverFactory
-                     .getServerProxyInstance(newConfig,false);
+                     .getServerProxyInstance(add,false);
                // If the server was removed while jobs were still processing,
                // but has now been added back.
                if(removedWorkers.contains(proxyToAdd)) {

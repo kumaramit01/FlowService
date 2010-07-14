@@ -34,7 +34,7 @@ public class NemaFlowServiceTest {
       String username="admin";
       String passwordHash="b2cebd873228d3e6753d9b39195730694e3d1bbc";
 
-      FlowService flowService = (FlowService) ctx.getBean("flowService");
+ /*     FlowService flowService = (FlowService) ctx.getBean("flowService");
 
       Flow template = flowService.getFlow(10);
 
@@ -70,7 +70,7 @@ public class NemaFlowServiceTest {
                + new Date().toString(), "Test job " + i, instanceId, 0L,
                "shirk@uiuc.edu");
       }
-
+*/
    }
 
 }

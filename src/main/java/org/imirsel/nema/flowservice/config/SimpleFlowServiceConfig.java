@@ -47,4 +47,5 @@ public class SimpleFlowServiceConfig extends FlowServiceConfigBase {
 	public void setServers(Set<MeandreServerProxyConfig> servers) {
 		this.servers = servers;
 	}
+	
 }
