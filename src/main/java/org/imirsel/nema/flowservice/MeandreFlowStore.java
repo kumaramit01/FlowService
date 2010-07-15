@@ -1,5 +1,6 @@
 package org.imirsel.nema.flowservice;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,6 +20,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.jcr.Credentials;
+import javax.jcr.SimpleCredentials;
 
 import net.jcip.annotations.GuardedBy;
 
@@ -28,9 +31,13 @@ import org.imirsel.nema.annotations.parser.beans.DataTypeBean;
 import org.imirsel.nema.annotations.parser.beans.StringDataTypeBean;
 import org.imirsel.nema.client.beans.converters.MeandreConverter;
 import org.imirsel.nema.client.beans.repository.WBFlowDescription;
+import org.imirsel.nema.contentrepository.client.ArtifactService;
+import org.imirsel.nema.contentrepository.client.ContentRepositoryServiceException;
 import org.imirsel.nema.model.Component;
+import org.imirsel.nema.model.InvalidResourcePathException;
 import org.imirsel.nema.model.NemaTask;
 import org.imirsel.nema.model.Property;
+import org.imirsel.nema.model.RepositoryResourcePath;
 import org.imirsel.nema.renderers.CollectionRenderer;
 import org.imirsel.nema.repository.RepositoryClientConnectionPool;
 import org.imirsel.nema.repositoryservice.RepositoryClientInterface;
@@ -62,12 +69,13 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 public class MeandreFlowStore {
 
 	private static final Logger logger = Logger
-			.getLogger(MeandreFlowStore.class.getName());
+	.getLogger(MeandreFlowStore.class.getName());
 
 	private static final String DATATYPE_KEY = "DATATYPE";
 	private final XStream xstream = new XStream(new JettisonMappedXmlDriver());
 
 	private RepositoryClientConnectionPool repositoryClientConnectionPool = null;
+	private ArtifactService artifactService = null;
 
 	private MeandreClient meandreClient = null;
 
@@ -78,15 +86,14 @@ public class MeandreFlowStore {
 
 	private String repositoryLocation;
 
-	
 	/**
-	 *  initialize the MeandreFlowStore
+	 * initialize the MeandreFlowStore
 	 */
 	@PostConstruct
 	public void init() {
 		DefaultResourceLoader drl = new DefaultResourceLoader();
 		org.springframework.core.io.Resource resource = drl
-				.getResource("flowrepository.properties");
+		.getResource("flowrepository.properties");
 		if (resource != null) {
 			Properties properties = new Properties();
 			try {
@@ -109,7 +116,7 @@ public class MeandreFlowStore {
 			if (!success) {
 				throw new RuntimeException(
 						"Could not create flow repository at location: "
-								+ file.getAbsolutePath());
+						+ file.getAbsolutePath());
 			}
 		}
 
@@ -117,7 +124,7 @@ public class MeandreFlowStore {
 
 		try {
 			String server = meandreClient.getServerHost() + ":"
-					+ meandreClient.getPort();
+			+ meandreClient.getPort();
 			logger.info("Retrieving repository from server " + server);
 			cachedRemoteRepository = meandreClient.retrieveRepository();
 		} catch (TransmissionException e) {
@@ -191,7 +198,7 @@ public class MeandreFlowStore {
 		repositoryLock.lock();
 		try {
 			ecd = cachedRemoteRepository
-					.getExecutableComponentDescription(flowResource);
+			.getExecutableComponentDescription(flowResource);
 		} catch (Exception ex) {
 		} finally {
 			repositoryLock.unlock();
@@ -220,7 +227,7 @@ public class MeandreFlowStore {
 		repositoryLock.lock();
 		try {
 			componentDesc = meandreClient
-					.retrieveComponentDescriptor(componentUri);
+			.retrieveComponentDescriptor(componentUri);
 		} catch (TransmissionException e) {
 			throw new MeandreServerException(e);
 		} finally {
@@ -230,7 +237,7 @@ public class MeandreFlowStore {
 	}
 
 	public FlowDescription getFlowDescription(String flowUri)
-			throws MeandreServerException {
+	throws MeandreServerException {
 		FlowDescription flowDesc = null;
 		repositoryLock.lock();
 		try {
@@ -253,7 +260,7 @@ public class MeandreFlowStore {
 	 *             Meandre server.
 	 */
 	public Set<URI> getComponentUrisInRepository()
-			throws MeandreServerException {
+	throws MeandreServerException {
 		Set<URI> componentUriSet = null;
 		repositoryLock.lock();
 		try {
@@ -269,7 +276,7 @@ public class MeandreFlowStore {
 	/**
 	 * For the given flow URI, return the list of {@link Component}s that make
 	 * up the flow.
-	 * 
+	 * @param credentials  The content repository credentials.
 	 * @param flowUri
 	 *            URI of the flow to get the components for.
 	 * @return List of {@link Component}s that make up the flow.
@@ -277,61 +284,86 @@ public class MeandreFlowStore {
 	 *             if a problem occurs while attempting to get the flows from
 	 *             the remote Meandre server.
 	 */
-	public List<Component> getComponents(String flowUri)
-			throws MeandreServerException {
-		Map<String, FlowDescription> map = null;
-		map = getAvailableFlowDescriptionsMap();
-		// Used later in case something goes wrong communicating with the
-		// server.
-		String errMsg = "Could not find components for the flow with URI: "
+	public List<Component> getComponents(Credentials credentials, String flowUri)
+	throws MeandreServerException {
+		FlowDescription flowDescription = null;
+		if (isContentRepositoryUrl(flowUri)) {
+			RepositoryResourcePath resourcePath;
+			byte[] byteData = null;
+			try {
+				resourcePath = getRepositoryResourcePath(flowUri);
+				byteData = this.getArtifactService().retrieveFlow(
+						(SimpleCredentials) credentials, resourcePath);
+				if (byteData == null) {
+					throw new MeandreServerException("Invalid flow data: "
+							+ flowUri);
+				}
+				flowDescription = getFlowDescriptionFromBytes(byteData);
+			} catch (ContentRepositoryServiceException e) {
+				throw new MeandreServerException(e);
+			} catch (InvalidResourcePathException e) {
+				throw new MeandreServerException(e);
+			}
+		}else{
+			Map<String, FlowDescription> map = null;
+			map = getAvailableFlowDescriptionsMap();
+			// Used later in case something goes wrong communicating with the
+			// server.
+			String errMsg = "Could not find components for the flow with URI: "
 				+ flowUri;
-		if (map == null) {
-			logger.severe(errMsg);
-			throw new MeandreServerException(errMsg);
+			if (map == null) {
+				logger.severe(errMsg);
+				throw new MeandreServerException(errMsg);
+			}
+			flowDescription = map.get(flowUri);
+			if (flowDescription == null) {
+				logger.severe(errMsg);
+				throw new MeandreServerException(errMsg);
+			}
 		}
-		FlowDescription flowDescription = map.get(flowUri);
-		if (flowDescription == null) {
-			logger.severe(errMsg);
-			throw new MeandreServerException(errMsg);
-		}
+
+		return getComponentListFromFlowDescription(flowDescription);
+	}
+
+	private List<Component> getComponentListFromFlowDescription(
+			FlowDescription flowDescription) {
 		Set<ExecutableComponentInstanceDescription> componentDescriptions = flowDescription
-				.getExecutableComponentInstances();
+		.getExecutableComponentInstances();
 		ArrayList<Component> list = new ArrayList<Component>(
 				componentDescriptions.size());
 		Iterator<ExecutableComponentInstanceDescription> descriptionsIterator = componentDescriptions
-				.iterator();
+		.iterator();
 		while (descriptionsIterator.hasNext()) {
 			ExecutableComponentInstanceDescription description = descriptionsIterator
-					.next();
+			.next();
 			String uri = description.getExecutableComponent().getURI();
 			String instanceUri = description.getExecutableComponentInstance()
-					.getURI();
+			.getURI();
 			Component component = new Component();
 			component.setUri(uri);
 			component.setInstanceUri(instanceUri);
 			component.setName(description.getName());
 			component.setDescription(description.getDescription());
-			component.setHidden(isHiddenComponentForFlow(flowUri, instanceUri));
+			component.setHidden(isHiddenComponentForFlow(instanceUri));
 			list.add(component);
 		}
 		return list;
 	}
 
-	private boolean isHiddenComponentForFlow(String flowUri,
-			String componentInstanceUri) {
+	private boolean isHiddenComponentForFlow(String componentInstanceUri) {
 		if (componentInstanceUri.indexOf("fork") != -1
 				|| componentInstanceUri.indexOf("printobject") != -1
 				|| componentInstanceUri.indexOf("runbinary") != -1
 				|| componentInstanceUri
-						.indexOf("StructuralSegmentationEvaluator"
+				.indexOf("StructuralSegmentationEvaluator"
+						.toLowerCase()) != -1
+						|| componentInstanceUri.indexOf("TrainTestGateKeeper"
 								.toLowerCase()) != -1
-				|| componentInstanceUri.indexOf("TrainTestGateKeeper"
-						.toLowerCase()) != -1
-				|| componentInstanceUri.indexOf("ClassificationEvaluator"
-						.toLowerCase()) != -1
-				|| componentInstanceUri
-						.indexOf("ClassificationEvaluationsAggregator"
-								.toLowerCase()) != -1) {
+								|| componentInstanceUri.indexOf("ClassificationEvaluator"
+										.toLowerCase()) != -1
+										|| componentInstanceUri
+										.indexOf("ClassificationEvaluationsAggregator"
+												.toLowerCase()) != -1) {
 			return true;
 		}
 		return false;
@@ -347,7 +379,7 @@ public class MeandreFlowStore {
 	public synchronized String createFlow(HashMap<String, String> paramMap,
 			String flowUri, long userId) throws MeandreServerException {
 		WBFlowDescription flowDesc = MeandreConverter.FlowDescriptionConverter
-				.convert(getFlowDescription(flowUri));
+		.convert(getFlowDescription(flowUri));
 		String name = flowDesc.getName();
 		name = name + System.currentTimeMillis();
 		flowDesc.setName(name);
@@ -380,85 +412,117 @@ public class MeandreFlowStore {
 		return success;
 	}
 
+	/** Returns the component property hashmap
+	 * 
+	 * @param credentials
+	 * @param component
+	 * @param flowUri
+	 * @return the Map of String component's property name and property
+	 * @throws MeandreServerException
+	 */
 	public Map<String, Property> getComponentPropertyDataType(
-			Component component, String flowUri) throws MeandreServerException {
-
+			Credentials credentials, Component component, String flowUri)
+			throws MeandreServerException {
 		Model model = getEmptyModel();
 		ExecutableComponentDescription ecd = getComponentDescription(model
 				.createResource(component.getUri()));
-		FlowDescription fd = getFlowDescription(flowUri);
-
-		if (ecd == null) {
-			logger.severe("component: " + component.getUri()
-					+ " could not be found.");
-
-			throw new MeandreServerException("component: " + component.getUri()
-					+ " could not be found.");
-		}
-		Model m = this.getEmptyModel();
-		ExecutableComponentInstanceDescription ecid = fd
-				.getExecutableComponentInstanceDescription(m
-						.createResource(component.getInstanceUri()));
-		if (ecid == null) {
-			logger.severe("component instance: " + component.getInstanceUri()
-					+ " could not be found.");
-
-			throw new MeandreServerException("component instance : "
-					+ component.getInstanceUri() + " could not be found.");
-		}
-		PropertiesDescriptionDefinition propertiesDefn = ecd.getProperties();
-		Set<String> propertiesSet = propertiesDefn.getKeys();
-		Iterator<String> it = propertiesSet.iterator();
 		Map<String, Property> dataTypeMap = new HashMap<String, Property>();
-		boolean foundDataType = Boolean.FALSE;
-		while (it.hasNext()) {
-			String propertyName = it.next();
-			Property property = new Property();
-			property.setName(propertyName);
 
-			Map<String, String> otherPropertyMap = propertiesDefn
-					.getOtherProperties(propertyName);
-			String description = propertiesDefn.getDescription(propertyName);
-			String defaultValue = propertiesDefn.getValue(propertyName);
-			String value = ecid.getProperties().getValue(propertyName);
-			if (value != null) {
-				property.setValue(value);
-			} else {
-				property.setValue(defaultValue);
+		FlowDescription flowDescription = null;
+		if (isContentRepositoryUrl(flowUri)) {
+			RepositoryResourcePath resourcePath;
+			byte[] byteData = null;
+			try {
+				resourcePath = getRepositoryResourcePath(flowUri);
+				byteData = this.getArtifactService().retrieveFlow(
+						(SimpleCredentials) credentials, resourcePath);
+				if (byteData == null) {
+					throw new MeandreServerException("Invalid flow data: "
+							+ flowUri);
+				}
+				flowDescription = getFlowDescriptionFromBytes(byteData);
+			} catch (ContentRepositoryServiceException e) {
+				throw new MeandreServerException(e);
+			} catch (InvalidResourcePathException e) {
+				throw new MeandreServerException(e);
 			}
-			property.setDefaultValue(defaultValue);
-			property.setDescription(description);
-			List<DataTypeBean> dataTypes = null;
-			if (!otherPropertyMap.isEmpty()) {
-				Iterator<Entry<String, String>> it1 = otherPropertyMap
-						.entrySet().iterator();
-				while (it1.hasNext()) {
-					Entry<String, String> tmp = it1.next();
-					String key = tmp.getKey();
-					String value1 = tmp.getValue();
-					if (key.endsWith(propertyName + DATATYPE_KEY)) {
-						dataTypes = getDataTypeBeanFromJson(value1);
-						updatePropertyWithTaskMetadata(property,
-								dataTypes);
+		} else {
+
+			flowDescription = getFlowDescription(flowUri);
+
+			if (ecd == null) {
+				logger.severe("component: " + component.getUri()
+						+ " could not be found.");
+
+				throw new MeandreServerException("component: "
+						+ component.getUri() + " could not be found.");
+			}
+			Model m = this.getEmptyModel();
+			ExecutableComponentInstanceDescription ecid = flowDescription
+			.getExecutableComponentInstanceDescription(m
+					.createResource(component.getInstanceUri()));
+			if (ecid == null) {
+				logger.severe("component instance: "
+						+ component.getInstanceUri() + " could not be found.");
+
+				throw new MeandreServerException("component instance : "
+						+ component.getInstanceUri() + " could not be found.");
+			}
+			PropertiesDescriptionDefinition propertiesDefn = ecd
+			.getProperties();
+			Set<String> propertiesSet = propertiesDefn.getKeys();
+			Iterator<String> it = propertiesSet.iterator();
+
+			boolean foundDataType = Boolean.FALSE;
+			while (it.hasNext()) {
+				String propertyName = it.next();
+				Property property = new Property();
+				property.setName(propertyName);
+
+				Map<String, String> otherPropertyMap = propertiesDefn
+				.getOtherProperties(propertyName);
+				String description = propertiesDefn
+				.getDescription(propertyName);
+				String defaultValue = propertiesDefn.getValue(propertyName);
+				String value = ecid.getProperties().getValue(propertyName);
+				if (value != null) {
+					property.setValue(value);
+				} else {
+					property.setValue(defaultValue);
+				}
+				property.setDefaultValue(defaultValue);
+				property.setDescription(description);
+				List<DataTypeBean> dataTypes = null;
+				if (!otherPropertyMap.isEmpty()) {
+					Iterator<Entry<String, String>> it1 = otherPropertyMap
+					.entrySet().iterator();
+					while (it1.hasNext()) {
+						Entry<String, String> tmp = it1.next();
+						String key = tmp.getKey();
+						String value1 = tmp.getValue();
+						if (key.endsWith(propertyName + DATATYPE_KEY)) {
+							dataTypes = getDataTypeBeanFromJson(value1);
+							updatePropertyWithTaskMetadata(property, dataTypes);
+							property.setDataTypeBeanList(dataTypes);
+							foundDataType = true;
+						}
+					}
+					// add the default data type
+					if (!foundDataType) {
+						dataTypes = getDefaultDataTypeBean();
 						property.setDataTypeBeanList(dataTypes);
-						foundDataType = true;
+					}
+				} else {
+					if (!foundDataType) {
+						dataTypes = getDefaultDataTypeBean();
+						property.setDataTypeBeanList(dataTypes);
 					}
 				}
-				// add the default data type
-				if (!foundDataType) {
-					dataTypes = getDefaultDataTypeBean();
-					property.setDataTypeBeanList(dataTypes);
-				}
-			} else {
-				if (!foundDataType) {
-					dataTypes = getDefaultDataTypeBean();
-					property.setDataTypeBeanList(dataTypes);
-				}
-			}
 
-			dataTypeMap.put(propertyName, property);
-			// reset to false for the next property
-			foundDataType = Boolean.FALSE;
+				dataTypeMap.put(propertyName, property);
+				// reset to false for the next property
+				foundDataType = Boolean.FALSE;
+			}
 		}
 		return dataTypeMap;
 	}
@@ -470,10 +534,9 @@ public class MeandreFlowStore {
 				// this is a collection
 				ArrayList<String> labelList = new ArrayList<String>();
 				ArrayList<Object> valueList = new ArrayList<Object>();
-				RepositoryClientInterface rpi=null;
+				RepositoryClientInterface rpi = null;
 				try {
-					 rpi = repositoryClientConnectionPool
-						.getFromPool();
+					rpi = repositoryClientConnectionPool.getFromPool();
 					List<NemaTask> ltb = rpi.getTasks();
 					for (NemaTask task : ltb) {
 						String label = task.getName();
@@ -484,8 +547,8 @@ public class MeandreFlowStore {
 				} catch (SQLException e) {
 					e.printStackTrace();
 				} finally {
-					if(rpi!=null)
-					repositoryClientConnectionPool.returnToPool(rpi);
+					if (rpi != null)
+						repositoryClientConnectionPool.returnToPool(rpi);
 				}
 
 				if (labelList.size() > 0) {
@@ -528,9 +591,9 @@ public class MeandreFlowStore {
 	 * @throws CorruptedFlowException
 	 */
 	public String saveFlow(WBFlowDescription wbFlow, long userId)
-			throws MeandreServerException {
+	throws MeandreServerException {
 		FlowDescription flow = MeandreConverter.WBFlowDescriptionConverter
-				.convert(wbFlow);
+		.convert(wbFlow);
 		String flowUri = flow.getFlowComponent().getURI();
 		logger.info("Saving flow " + flowUri);
 
@@ -551,7 +614,7 @@ public class MeandreFlowStore {
 				if (!success) {
 					throw new RuntimeException(
 							"Error could not create user directory "
-									+ file.getAbsolutePath());
+							+ file.getAbsolutePath());
 				}
 			}
 			ntFile = new File(file, fName + ".nt");
@@ -570,7 +633,7 @@ public class MeandreFlowStore {
 			RepositoryImpl repository = new RepositoryImpl(flowModel);
 			execStepMsg = "STEP2: Retrieving available flows";
 			Set<FlowDescription> flows = repository
-					.getAvailableFlowDescriptions();
+			.getAvailableFlowDescriptions();
 			execStepMsg = "STEP3: Getting flow";
 			flow = flows.iterator().next();
 			if (flow == null) {
@@ -579,8 +642,8 @@ public class MeandreFlowStore {
 		} catch (Exception e) {
 			MeandreServerException mException = (execStepMsg != null) ? new MeandreServerException(
 					execStepMsg, e)
-					: (MeandreServerException) e;
-			throw mException;
+			: (MeandreServerException) e;
+					throw mException;
 		} finally {
 			try {
 				if (ttlStream != null)
@@ -614,7 +677,8 @@ public class MeandreFlowStore {
 	}
 
 	/**
-	 *  Set the repository connection pool
+	 * Set the repository connection pool
+	 * 
 	 * @param repositoryClientConnectionPool
 	 */
 	public void setRepositoryClientConnectionPool(
@@ -636,28 +700,96 @@ public class MeandreFlowStore {
 		this.meandreClient = meandreClient;
 	}
 
-	
+	/**
+	 * Set the artifact service.
+	 * 
+	 * @param artifactService
+	 */
+	public void setArtifactService(ArtifactService artifactService) {
+		this.artifactService = artifactService;
+	}
+
+	/**
+	 * Returns the ArtifactService
+	 * 
+	 * @return {@link ArtifactService}
+	 */
+	public ArtifactService getArtifactService() {
+		return artifactService;
+	}
+
+	/**
+	 * 
+	 * @param flowUri
+	 * @return method returns true if the profileName starts with "jcr:"
+	 */
+	private boolean isContentRepositoryUrl(String flowUri) {
+		if (flowUri.startsWith("jcr:")) {
+			return true;
+		}
+		return false;
+	}
+
+	private RepositoryResourcePath getRepositoryResourcePath(final String jcrUri)
+	throws InvalidResourcePathException {
+		String split[] = jcrUri.split(":");
+		if (split.length != 3) {
+			throw new InvalidResourcePathException(
+			"The resource path is of the format protocol:workspace:nodepath");
+		}
+		String protocol = split[0];
+		String workspace = split[1];
+		String path = split[2];
+		// get rid of the first two slashes
+		path = path.substring(2);
+		RepositoryResourcePath rrp = new RepositoryResourcePath(protocol,
+				workspace, path);
+		return rrp;
+	}
+
 	/**
 	 * Return the map of the component and list of properties
+	 * 
+	 * @param credentials
 	 * @param flowUri
 	 * @return Map of {@link Component} and List of {@link Property}
 	 * @throws MeandreServerException
+	 * @since 0.9.0 -Added support for jcr based flow uris
 	 */
-	public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(String flowUri) throws MeandreServerException {
-			
-		
+	public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(
+			Credentials credentials, String flowUri)
+			throws MeandreServerException {
 		Map<Component, List<Property>> componentPropertyMap = new HashMap<Component, List<Property>>();
-
-		List<Component> componentList=null;
-		FlowDescription fd = null;
-		componentList = getComponents(flowUri);
-		fd = getFlowDescription(flowUri);
-	
+		List<Component> componentList = null;
+		FlowDescription flowDescription = null;
+		if (isContentRepositoryUrl(flowUri)) {
+			RepositoryResourcePath resourcePath;
+			byte[] byteData = null;
+			try {
+				resourcePath = getRepositoryResourcePath(flowUri);
+				byteData = this.getArtifactService().retrieveFlow(
+						(SimpleCredentials) credentials, resourcePath);
+				if (byteData == null) {
+					throw new MeandreServerException("Invalid flow data: "
+							+ flowUri);
+				}
+				flowDescription = getFlowDescriptionFromBytes(byteData);
+				componentList = getComponentListFromFlowDescription(flowDescription);
+			} catch (ContentRepositoryServiceException e) {
+				throw new MeandreServerException(e);
+			} catch (InvalidResourcePathException e) {
+				throw new MeandreServerException(e);
+			}
+		} else {
+			componentList = getComponents(null,flowUri);
+			flowDescription = getFlowDescription(flowUri);
+		}
 
 		for (Component component : componentList) {
 			List<Property> componentPropertyList = new ArrayList<Property>();
 			Model model = getEmptyModel();
-			ExecutableComponentDescription ecd = getComponentDescription(model.createResource(component.getUri()));
+			ExecutableComponentDescription ecd = getComponentDescription(model
+					.createResource(component.getUri()));
 			if (ecd == null) {
 				logger.severe("component: " + component.getUri()
 						+ " could not be found.");
@@ -665,9 +797,9 @@ public class MeandreFlowStore {
 				// component.getUri()+ " could not be found.");
 			}
 			Model m = this.getEmptyModel();
-			ExecutableComponentInstanceDescription ecid = fd
-					.getExecutableComponentInstanceDescription(m
-							.createResource(component.getInstanceUri()));
+			ExecutableComponentInstanceDescription ecid = flowDescription
+			.getExecutableComponentInstanceDescription(m
+					.createResource(component.getInstanceUri()));
 
 			if (ecid == null) {
 				logger.severe("component instance: "
@@ -677,20 +809,19 @@ public class MeandreFlowStore {
 			}
 
 			PropertiesDescriptionDefinition propertiesDefn = ecd
-					.getProperties();
+			.getProperties();
 			Set<String> propertiesSet = propertiesDefn.getKeys();
 			Iterator<String> it = propertiesSet.iterator();
-		
-			
+
 			boolean foundDataType = Boolean.FALSE;
 			while (it.hasNext()) {
 				String propertyName = it.next();
 				Property property = new Property();
 				property.setName(propertyName);
 				Map<String, String> otherPropertyMap = propertiesDefn
-						.getOtherProperties(propertyName);
+				.getOtherProperties(propertyName);
 				String description = propertiesDefn
-						.getDescription(propertyName);
+				.getDescription(propertyName);
 				String defaultValue = propertiesDefn.getValue(propertyName);
 				String value = ecid.getProperties().getValue(propertyName);
 				if (value != null) {
@@ -703,15 +834,14 @@ public class MeandreFlowStore {
 				List<DataTypeBean> dataTypes = null;
 				if (!otherPropertyMap.isEmpty()) {
 					Iterator<Entry<String, String>> it1 = otherPropertyMap
-							.entrySet().iterator();
+					.entrySet().iterator();
 					while (it1.hasNext()) {
 						Entry<String, String> tmp = it1.next();
 						String key = tmp.getKey();
 						String value1 = tmp.getValue();
 						if (key.endsWith(propertyName + DATATYPE_KEY)) {
 							dataTypes = getDataTypeBeanFromJson(value1);
-							updatePropertyWithTaskMetadata(property,
-									dataTypes);
+							updatePropertyWithTaskMetadata(property, dataTypes);
 							property.setDataTypeBeanList(dataTypes);
 							foundDataType = true;
 						}
@@ -736,4 +866,19 @@ public class MeandreFlowStore {
 		return componentPropertyMap;
 	}
 
+	// return the FlowDescription from the byte data
+	private FlowDescription getFlowDescriptionFromBytes(byte[] byteData) throws MeandreServerException {
+		Model flowModel = ModelFactory.createDefaultModel();
+	    try{
+	    	flowModel.read(new ByteArrayInputStream(byteData),null,"N-TRIPLE");
+	    }catch(Exception e){
+	       throw new MeandreServerException(e);
+	    }
+		QueryableRepository repo = new RepositoryImpl(flowModel);
+		Set<FlowDescription> repoFlows =
+			repo.getAvailableFlowDescriptions();
+		Iterator<FlowDescription> iter = repoFlows.iterator();
+		FlowDescription flow = iter.next();
+		return flow;
+	}
 }

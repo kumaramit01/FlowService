@@ -303,15 +303,15 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
 	
 
 	/**
-	 * @see FlowService#getComponentPropertyDataType(Component, Flow)
+	 * @see FlowService#getComponentPropertyDataType(Credentials,Component, Flow)
 	 */
 	@Override
 	public Map<String, Property> getComponentPropertyDataType(
-			Component component, String flowUri) {
+			Credentials credentials, Component component, String flowUri) {
 		Map<String, Property> propertyDataTypes = null;
 		try {
 			propertyDataTypes = headServer.getComponentPropertyDataType(
-					component, flowUri);
+					credentials,component, flowUri);
 		} catch (MeandreServerException e) {
 			throw new ServiceException("A problem occurred while retrieving "
 					+ "component data types for flow: " + flowUri, e);
@@ -320,13 +320,13 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
 	}
 
 	/**
-	 * @see FlowService#getComponents(Flow)
+	 * @see FlowService#getComponents(Credentials,Flow)
 	 */
 	@Override
-	public List<Component> getComponents(String flowUri) {
+	public List<Component> getComponents(Credentials credentials, String flowUri) {
 		List<Component> components = null;
 		try {
-			components = headServer.getComponents(flowUri);
+			components = headServer.getComponents(credentials,flowUri);
 		} catch (MeandreServerException e) {
 			throw new ServiceException("A problem occurred while retrieving "
 					+ "components for flow: " + flowUri, e);
@@ -530,10 +530,10 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
 
 	@Override
 	public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(
-			String flowUri) {
+			Credentials credentials, String flowUri) {
 		Map<Component, List<Property>> componentPropertyDataTypes = null;
 		try {
-			componentPropertyDataTypes = headServer.getAllComponentsAndPropertyDataTypes(flowUri);
+			componentPropertyDataTypes = headServer.getAllComponentsAndPropertyDataTypes(credentials,flowUri);
 		} catch (MeandreServerException e) {
 			throw new ServiceException("A problem occurred while retrieving "
 					+ "component data types for flow: " + flowUri, e);

@@ -13,6 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.jcr.Credentials;
 import javax.jcr.SimpleCredentials;
 
 import net.jcip.annotations.GuardedBy;
@@ -101,6 +102,10 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
 
       if (head) {
          meandreFlowStore = new MeandreFlowStore();
+         assert artifactService!=null; // test code does not inject so it is easy to miss
+         							   // setting the artifact service before calling init
+         assert repositoryClientConnectionPool!=null;
+         meandreFlowStore.setArtifactService(artifactService);
          meandreFlowStore.setMeandreClient(meandreClient);
          meandreFlowStore
                .setRepositoryClientConnectionPool(repositoryClientConnectionPool);
@@ -487,10 +492,10 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
    /**
     * @see MeandreServerProxy#getComponents(java.lang.String)
     */
-   public List<Component> getComponents(String flowUri)
+   public List<Component> getComponents( Credentials credentials,String flowUri)
          throws MeandreServerException {
       ensureHead();
-      return meandreFlowStore.getComponents(flowUri);
+      return meandreFlowStore.getComponents(credentials,flowUri);
    }
 
    /**
@@ -513,17 +518,17 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
    /**
     * @see MeandreServerProxy#getComponentPropertyDataType(org.imirsel.nema.model.Component, java.lang.String)
     */
-   public Map<String, Property> getComponentPropertyDataType(
+   public Map<String, Property> getComponentPropertyDataType( Credentials credentials,
          Component component, String flowUri) throws MeandreServerException {
       ensureHead();
-      return meandreFlowStore.getComponentPropertyDataType(component, flowUri);
+      return meandreFlowStore.getComponentPropertyDataType(credentials,component, flowUri);
    }
 
    @Override
    public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(
-         String flowUri) throws MeandreServerException {
+		   Credentials credentials, String flowUri) throws MeandreServerException {
       ensureHead();
-      return meandreFlowStore.getAllComponentsAndPropertyDataTypes(flowUri);
+      return meandreFlowStore.getAllComponentsAndPropertyDataTypes(credentials,flowUri);
    }
    
    /**

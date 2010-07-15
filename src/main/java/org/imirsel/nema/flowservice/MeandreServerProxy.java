@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jcr.Credentials;
+
 
 import org.imirsel.meandre.client.ExecResponse;
 import org.imirsel.meandre.client.MeandreClient;
@@ -207,13 +209,14 @@ public interface MeandreServerProxy {
    /**
     * For the given flow URI, return the list of {@link Component}s that make up
     * the flow.
+    * @param credentials Content Repository Credentials
     * 
     * @param flowUri URI of the flow to get the components for.
     * @return List of {@link Component}s that make up the flow.
     * @throws MeandreServerException if a problem occurs while attempting to get
     *            the flows from the remote Meandre server.
     */
-   public List<Component> getComponents(String flowUri)
+   public List<Component> getComponents(Credentials credentials, String flowUri)
          throws MeandreServerException;
 
    /**
@@ -240,6 +243,7 @@ public interface MeandreServerProxy {
 
    /**
     * Return the component property data type
+    * @param credentials Content Repository credentials
     * 
     * @param component
     * @param flowUri
@@ -247,7 +251,7 @@ public interface MeandreServerProxy {
     * @throws MeandreServerException
     */
    public Map<String, Property> getComponentPropertyDataType(
-         Component component, String flowUri) throws MeandreServerException;
+         Credentials credentials, Component component, String flowUri) throws MeandreServerException;
 
    /**Return the client connection pool
     * 
@@ -321,11 +325,13 @@ public interface MeandreServerProxy {
    
    /**
     * Returns the component property data types.
+    * @param credentials 
     * @param flowUri
     * @return The Map of {@link Component} and List of {@link Property}
- * @throws MeandreServerException 
+    * @throws MeandreServerException 
+    * @since 0.9.0 -Incompatiable method signature from previous releases
     */
-   public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(String flowUri) throws MeandreServerException;
+   public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(Credentials credentials, String flowUri) throws MeandreServerException;
 		
 
 }

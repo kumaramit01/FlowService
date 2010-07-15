@@ -12,16 +12,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import javax.jcr.Credentials;
+import javax.jcr.Repository;
 import javax.jcr.SimpleCredentials;
 
+import org.apache.jackrabbit.rmi.client.ClientRepositoryFactory;
 import org.imirsel.meandre.client.TransmissionException;
 import org.imirsel.nema.annotations.parser.beans.DataTypeBean;
+import org.imirsel.nema.contentrepository.client.ContentRepositoryService;
 import org.imirsel.nema.flowservice.MeandreServerException;
 import org.imirsel.nema.flowservice.RemoteMeandreServerProxy;
 import org.imirsel.nema.flowservice.config.SimpleMeandreServerProxyConfig;
 import org.imirsel.nema.model.Component;
 import org.imirsel.nema.model.Property;
+import org.imirsel.nema.repository.RepositoryClientConnectionPool;
 import org.imirsel.nema.test.BaseManagerTestCase;
 import org.junit.After;
 import org.junit.Before;
@@ -41,19 +44,51 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public class MeandreFlowStoreTest extends BaseManagerTestCase {
    private MeandreServerProxy meandreServerProxy;
    private String passwordHash=null;
-
+   private SimpleCredentials credentials = null;
+   private String flowURI = null;
+   private String componentURI = null;
+   private String componentInstance = null;
+   
+   private String componentProperty=null;
+   private String componentPropertyValue = null;
+   private String jcrFlowUri=null;
+   private ClientRepositoryFactory factory =null;
+   private RepositoryClientConnectionPool repositoryClientConnectionPool=null;
+   private String rmiContentServiceUrl;
+   
+   
    @Before
    public void setUp() throws Exception {
       String host = getPropertyAsString("host");
       String password = getPropertyAsString("password");
       String username = getPropertyAsString("username");
       passwordHash = getPropertyAsString("passwordHash");
+      flowURI = getPropertyAsString("testFlow1");
+      componentURI = getPropertyAsString("componentURI1");
+      componentInstance = getPropertyAsString("componentInstance1");
+      componentProperty = getPropertyAsString("componentProperty");
+      componentPropertyValue = getPropertyAsString("componentPropertyValue");
+      rmiContentServiceUrl = getPropertyAsString("rmiContentServiceUrl");
+      jcrFlowUri =  getPropertyAsString("jcrFlowUri");
+      
+      factory = new ClientRepositoryFactory();
+      Repository repository=factory.getRepository(rmiContentServiceUrl);
+      repositoryClientConnectionPool = RepositoryClientConnectionPool.getInstance();
+      
+      
       int port = getPropertyAsInteger("port");
+      credentials = new SimpleCredentials(username,passwordHash.toCharArray());
       int maxConcurrentJobs = 1;
       SimpleMeandreServerProxyConfig config = new SimpleMeandreServerProxyConfig(
             username, password, host, port, maxConcurrentJobs);
       meandreServerProxy = new RemoteMeandreServerProxy(config);
+      meandreServerProxy.setHead(true);
+      ContentRepositoryService crs = new ContentRepositoryService();
+      crs.setRepository(repository);
+      meandreServerProxy.setArtifactService(crs);
+      meandreServerProxy.setRepositoryClientConnectionPool(repositoryClientConnectionPool);
       meandreServerProxy.init();
+      
      
    }
 
@@ -78,20 +113,20 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
    @Test(expected = MeandreServerException.class)
    public void testGetComponentDescriptionDoesNotExist()
          throws MeandreServerException {
-      String componentURI = "meandre://seasr.org/components/input#invaliduri";
+      String componentURIInvalid = "meandre://seasr.org/components/input#invaliduri";
       ExecutableComponentDescription ecd = 
-         meandreServerProxy.getComponentDescription(componentURI);
+         meandreServerProxy.getComponentDescription(componentURIInvalid);
    }
    @Ignore
    @Test
    public void testGetComponentDescriptionExists()
          throws MeandreServerException {
-      String componentURI = "meandre://seasr.org/components/printobject";
       ExecutableComponentDescription ecd = meandreServerProxy
             .getComponentDescription(componentURI);
       assertTrue(ecd != null);
       assertTrue(ecd.getName().length() > 0);
    }
+ 
    @Ignore
    @Test
    public void testGetFlowUrls() {
@@ -110,7 +145,6 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
    @Ignore
    @Test
    public void testGetFlowDescription() {
-      String flowURI = "http://www.imirsel.org/test/testdynamiccomponentflow/";
       try {
          FlowDescription wfd = meandreServerProxy.getFlowDescription(flowURI);
          assertTrue(wfd != null);
@@ -130,37 +164,28 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
    @Ignore
    @Test(expected=MeandreServerException.class)
    public void testGetComponentDataTypeNotExist() throws TransmissionException, SQLException, MeandreServerException{
-      String componentURI="meandre://seasr.org/components/datatypetestcomponent-invalid";
-      String instanceURI = "http://www.imirsel.org/test/testdynamiccomponentflow/instance/datatypetestcomponent/0";
-      String flowURI = "http://www.imirsel.org/test/testdynamiccomponentflow/";
       Component component= new Component();
-      component.setInstanceUri(instanceURI);
+      component.setInstanceUri(componentInstance);
       component.setUri(componentURI);
-      Map<String, Property> map=meandreServerProxy.getComponentPropertyDataType(component, flowURI);
+      Map<String, Property> map=meandreServerProxy.getComponentPropertyDataType(credentials,component, flowURI);
       assertTrue(map.size()==0);
    }
    @Ignore
    @Test
    public void testGetComponentDataType() throws TransmissionException, SQLException, MeandreServerException{
-      String componentURI="meandre://seasr.org/components/datatypetestcomponent";
-      String instanceURI = "http://www.imirsel.org/test/testdynamiccomponentflow/instance/datatypetestcomponent/0";
-      String flowURI = "http://www.imirsel.org/test/testdynamiccomponentflow/";
       Component component= new Component();
-      component.setInstanceUri(instanceURI);
+      component.setInstanceUri(componentInstance);
       component.setUri(componentURI);
-      Map<String, Property> map=meandreServerProxy.getComponentPropertyDataType(component, flowURI);
+      Map<String, Property> map=meandreServerProxy.getComponentPropertyDataType(credentials,component, flowURI);
       assertTrue(map.size()>0);
    }
    @Ignore
    @Test
    public void testComponentDataTypeValidValue() throws TransmissionException, SQLException, MeandreServerException{
-      String componentURI="meandre://seasr.org/components/datatypetestcomponent";
-      String instanceURI = "http://www.imirsel.org/test/testdynamiccomponentflow/instance/datatypetestcomponent/0";
-      String flowURI = "http://www.imirsel.org/test/testdynamiccomponentflow/";
       Component component= new Component();
-      component.setInstanceUri(instanceURI);
+      component.setInstanceUri(componentInstance);
       component.setUri(componentURI);
-      Map<String, Property> map=meandreServerProxy.getComponentPropertyDataType(component, flowURI);
+      Map<String, Property> map=meandreServerProxy.getComponentPropertyDataType(credentials,component, flowURI);
    
       Iterator<Entry<String,Property>> its = map.entrySet().iterator();
       while(its.hasNext()){
@@ -180,8 +205,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
    @Ignore
    @Test
    public void testGetComponents() throws MeandreServerException{
-      String flowUri="http://www.imirsel.org/test/testdynamiccomponentflow/";
-      List<Component>componentList=meandreServerProxy.getComponents(flowUri);
+      List<Component>componentList=meandreServerProxy.getComponents(credentials,flowURI);
       for(int i=0;i< componentList.size();i++){
          System.out.println("--> "+componentList.get(i).getInstanceUri() + " : " + componentList.get(i).getUri());
       }
@@ -191,9 +215,8 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
    @Ignore
    @Test 
    public void testcreateNewFlow(){
-      String flowURI="http://www.imirsel.org/test/testdynamiccomponentflow/";
       HashMap<String,String> paramMap = new HashMap<String,String>();
-      paramMap.put("datatypetestcomponent_0_mfcc","false");
+      paramMap.put(componentProperty,componentPropertyValue);
       String fileName=null;
       try {
     	 fileName=meandreServerProxy.createFlow( paramMap, flowURI, 0l);
@@ -208,9 +231,32 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
    
    @Test
    public void testGetListComponentsDataTypes() throws TransmissionException, SQLException, MeandreServerException{
-      String flowURI = "http://www.imirsel.org/test/testdynamiccomponentflow/";
-      Map<Component,List<Property>> componentPropertyMap=meandreServerProxy.getAllComponentsAndPropertyDataTypes(flowURI);
+      Map<Component,List<Property>> componentPropertyMap=meandreServerProxy.getAllComponentsAndPropertyDataTypes(credentials,flowURI);
       assertTrue(componentPropertyMap.size()>0);
+   }
+   
+   
+   @Test 
+   public void testGetComponentsFromJCR()throws MeandreServerException{
+	   List<Component>componentList=meandreServerProxy.getComponents(credentials,jcrFlowUri);
+	      for(int i=0;i< componentList.size();i++){
+	         System.out.println("--> "+componentList.get(i).getInstanceUri() + " : " + componentList.get(i).getUri());
+	      }
+	      
+   }
+   
+   @Test 
+   public void testGetAllComponentsAndPropertyDataTypesFromJCR()throws MeandreServerException{
+	   Map<Component, List<Property>>componentMap=meandreServerProxy.getAllComponentsAndPropertyDataTypes(credentials, jcrFlowUri);
+	    
+	   for(Entry<Component, List<Property>> entry:componentMap.entrySet()){
+		   System.out.println(" Property Name: "+entry.getKey().getName() + "  Property Value: " + entry.getValue().size());
+		   if(entry.getValue().size()>0){
+			   for(Property prop:entry.getValue()){
+				   System.out.println("Property Value: " +prop.getValue());
+			   }
+		   }
+	   }
    }
    
 }
