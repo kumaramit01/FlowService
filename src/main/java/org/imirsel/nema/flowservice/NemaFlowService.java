@@ -81,8 +81,12 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
 		logger.info("Initializing NEMA Flow Service...");
 
 		notificationCreator = new JobStatusNotificationCreator(daoFactory);
-		headServer = meandreServerProxyFactory
-				.getServerProxyInstance(flowServiceConfig.getHeadConfig(),true);
+		try {
+         headServer = meandreServerProxyFactory
+         		.getServerProxyInstance(flowServiceConfig.getHeadConfig(),true);
+      } catch (MeandreServerException e) {
+         throw new RuntimeException("Could not instantiate head server.",e);
+      }
 		flowServiceConfig.addChangeListener(this);
 		
 		// Any jobs marked as scheduled in the database will be put back in the
@@ -542,9 +546,13 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
       logger.info("Received configuration change notification.");
 
       if(!headServer.getConfig().equals(flowServiceConfig.getHeadConfig())) {
-         MeandreServerProxy newHead  = 
-            meandreServerProxyFactory.getServerProxyInstance(
+         MeandreServerProxy newHead;
+         try {
+            newHead = meandreServerProxyFactory.getServerProxyInstance(
                flowServiceConfig.getHeadConfig(), true);
+         } catch (MeandreServerException e) {
+            throw new RuntimeException("Could not instantiate head server.",e);
+         }
          meandreServerProxyFactory.release(headServer);
          headServer = newHead;
          logger.info("Head server configuration has changed. New head " +

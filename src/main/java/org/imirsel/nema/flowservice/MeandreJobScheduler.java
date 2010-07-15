@@ -111,8 +111,16 @@ public class MeandreJobScheduler implements JobScheduler {
       assert workerConfigs != null : "No worker configs were " +
       		"provided to the job scheduler.";
       for(MeandreServerProxyConfig workerConfig : workerConfigs) {
-         MeandreServerProxy server = 
-            serverFactory.getServerProxyInstance(workerConfig,false);
+         MeandreServerProxy server;
+         try {
+            server = serverFactory.getServerProxyInstance(workerConfig,false);
+         } catch (MeandreServerException e) {
+            e.printStackTrace();
+            logger.warning("Could not instantiate server " + 
+                  workerConfig.getHost() + ":" + workerConfig.getPort() + 
+                  ". Skipping...");
+            continue;
+         }
          workers.add(server);
          loadBalancer.addServer(server);
       }
@@ -527,8 +535,13 @@ public class MeandreJobScheduler implements JobScheduler {
             
             // Remove servers
             for (MeandreServerProxyConfig remove : removed) {
-               MeandreServerProxy proxyToRemove = serverFactory
-                     .getServerProxyInstance(remove,false);
+               MeandreServerProxy proxyToRemove = null;
+               try {
+                  proxyToRemove = serverFactory
+                        .getServerProxyInstance(remove,false);
+               } catch (MeandreServerException e) {
+                  // this should never happen
+               }
                proxyToRemove.stopAcceptingJobs();
                // If the server is still processing jobs
                if (!proxyToRemove.isIdle()) {
@@ -542,8 +555,17 @@ public class MeandreJobScheduler implements JobScheduler {
             
             // Add servers
             for (MeandreServerProxyConfig add : added) {
-               MeandreServerProxy proxyToAdd = serverFactory
-                     .getServerProxyInstance(add,false);
+               MeandreServerProxy proxyToAdd = null;
+               try {
+                  proxyToAdd = serverFactory
+                        .getServerProxyInstance(add,false);
+               } catch (MeandreServerException e) {
+                  e.printStackTrace();
+                  logger.warning("Could not instantiate server " + 
+                        add.getHost() + ":" + add.getPort() + 
+                        ". Skipping...");
+                  continue;
+               }
                // If the server was removed while jobs were still processing,
                // but has now been added back.
                if(removedWorkers.contains(proxyToAdd)) {
@@ -556,6 +578,18 @@ public class MeandreJobScheduler implements JobScheduler {
             }
 
             // Sync changed servers
+            for (MeandreServerProxyConfig change : changed) {
+               // Find the server
+               Iterator<MeandreServerProxy> proxyIterator = 
+                  workers.iterator();
+               while(proxyIterator.hasNext()) {
+                  MeandreServerProxy proxyToChange = proxyIterator.next();
+                  if(proxyToChange.getConfig().equals(change)) {
+                     proxyToChange.setConfig(change);
+                     break;
+                  }
+               }
+            }
             
             workerConfigs = newWorkerConfigs;
          }

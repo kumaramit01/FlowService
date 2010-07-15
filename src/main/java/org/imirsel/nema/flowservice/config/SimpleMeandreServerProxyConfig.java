@@ -98,6 +98,11 @@ public class SimpleMeandreServerProxyConfig implements MeandreServerProxyConfig,
 		this.password = password;
 	}
 
+	@Override
+	public String toString() {
+	   return host+":"+port+":"+username+":"+password+":"+maxConcurrentJobs;
+	}
+	
    @Override
    public int hashCode() {
       final int prime = 31;

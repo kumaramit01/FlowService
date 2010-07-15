@@ -566,6 +566,10 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     * @see MeandreServerProxy#setConfig(org.imirsel.nema.flowservice.config.MeandreServerProxyConfig)
     */
    public void setConfig(MeandreServerProxyConfig config) {
+      logger.fine("Changing server configuration to: " + config);
+      if(meandreClient!=null) {
+         meandreClient.setCredentials(config.getUsername(), config.getPassword());
+      }
       this.config = config;
       host=config.getHost();
       port=config.getPort();

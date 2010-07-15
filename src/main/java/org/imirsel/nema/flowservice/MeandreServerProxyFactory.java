@@ -40,12 +40,14 @@ public class MeandreServerProxyFactory {
 	 * @param config
 	 *            The configuration upon which the new
 	 *            {@link MeandreServerProxy} instance should be based.
-	 * @param head
+	 * @param isHead
 	 *            Whether or not the instance will be a head server.
 	 * @return A {@link MeandreServerProxy} instance.
+	 * @throws MeandreServerException if there is a problem instantiating
+	 * the server, such as a communication error, or an unknown server.
 	 */
 	public synchronized MeandreServerProxy getServerProxyInstance(
-			MeandreServerProxyConfig config, boolean isHead) {
+			MeandreServerProxyConfig config, boolean isHead) throws MeandreServerException {
 		String key = keyFor(config);
 		MeandreServerProxy instance = null;
 		if (proxyInstances.containsKey(key)) {
@@ -58,11 +60,7 @@ public class MeandreServerProxyFactory {
 			instance.setRepositoryClientConnectionPool(
 			      repositoryClientConnectionPool);
 	      instance.setHead(isHead);
-         try {
-            instance.init();
-         } catch (MeandreServerException e) {
-            throw new RuntimeException("Could not instantiate server " + instance.toString());
-         }
+         instance.init();
          instance.setArtifactService(artifactService);
 			proxyInstances.put(key, instance);
          logger.info("Instantiated server " + instance.toString());
