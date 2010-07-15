@@ -5,6 +5,15 @@
 													------------
 													2010-04-23
 													------------
+
+Release Notes for 0.9.0
+
+	Version 0.9.0 has various optimizations including ability to add/remove meandre slave
+	servers at the runtime by editing the property file. The Flowservice interface has
+	changed with the addition of support for JCR based template flows.
+
+
+
 Release Notes for 0.7.0
 
 	Version 0.7.0 stores the flows to a content repository. Earlier versions of this 
