@@ -33,8 +33,11 @@ public interface MeandreServerProxy {
    /**
     * Initialize this server proxy instance. This method must be called before
     * an instance is used.
+    * 
+    * @throws MeandreServerException if a problem occurs while initializing the
+    * server.
     */
-   public void init();
+   public void init() throws MeandreServerException;
 
    /**
     * Set whether or not this is a head server.

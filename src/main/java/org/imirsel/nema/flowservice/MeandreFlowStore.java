@@ -118,7 +118,7 @@ public class MeandreFlowStore {
 		try {
 			String server = meandreClient.getServerHost() + ":"
 					+ meandreClient.getPort();
-			logger.info("Retrieve Repository from the server : " + server);
+			logger.info("Retrieving repository from server " + server);
 			cachedRemoteRepository = meandreClient.retrieveRepository();
 		} catch (TransmissionException e) {
 			throw new RuntimeException(

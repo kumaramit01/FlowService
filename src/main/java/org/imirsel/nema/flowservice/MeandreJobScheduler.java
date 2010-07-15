@@ -469,7 +469,7 @@ public class MeandreJobScheduler implements JobScheduler {
             }
             
             // Determine which servers have had their configurations changed, and
-            // which remain the same. (e.g. username, password, maxconcurrentjobs)
+            // which remain the same. (e.g. username, password, maxConcurrentJobs)
             for (MeandreServerProxyConfig existingConfig : workerConfigs) {
                if (newWorkerConfigs.contains(existingConfig)) {
                   MeandreServerProxyConfig newConfig = null;
@@ -555,6 +555,8 @@ public class MeandreJobScheduler implements JobScheduler {
                proxyToAdd.startAcceptingJobs();
             }
 
+            // Sync changed servers
+            
             workerConfigs = newWorkerConfigs;
          }
       } finally {

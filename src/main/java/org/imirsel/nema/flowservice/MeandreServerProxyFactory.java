@@ -50,6 +50,7 @@ public class MeandreServerProxyFactory {
 		MeandreServerProxy instance = null;
 		if (proxyInstances.containsKey(key)) {
 			instance = proxyInstances.get(key);
+         logger.info("Returning cached instance of server " + instance.toString());
 		} else {
 			instance = new RemoteMeandreServerProxy();
 			instance.setConfig(config);
@@ -57,12 +58,10 @@ public class MeandreServerProxyFactory {
 			instance.setRepositoryClientConnectionPool(
 			      repositoryClientConnectionPool);
 	      instance.setHead(isHead);
-			try {
+         try {
             instance.init();
-         } catch (Exception e) {
-            throw new RuntimeException(
-                  "An error occured while instantiating server " + 
-                  instance.toString(),e);
+         } catch (MeandreServerException e) {
+            throw new RuntimeException("Could not instantiate server " + instance.toString());
          }
          instance.setArtifactService(artifactService);
 			proxyInstances.put(key, instance);
@@ -79,7 +78,7 @@ public class MeandreServerProxyFactory {
 	 */
 	public synchronized void release(MeandreServerProxy proxy) {
 	   logger.fine("Releasing server " + proxy.toString() + ".");
-	   proxyInstances.remove(proxy);
+	   proxyInstances.remove(keyFor(proxy.getConfig()));
 	}
 	
 	/**

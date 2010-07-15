@@ -540,14 +540,19 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
    @Override
    public void configChanged() {
       logger.info("Received configuration change notification.");
-      jobScheduler.setWorkerConfigs(flowServiceConfig.getWorkerConfigs());
+
       if(!headServer.getConfig().equals(flowServiceConfig.getHeadConfig())) {
-         //meandreServerProxyFactory.release(headServer);
-         headServer = meandreServerProxyFactory.getServerProxyInstance(
+         MeandreServerProxy newHead  = 
+            meandreServerProxyFactory.getServerProxyInstance(
                flowServiceConfig.getHeadConfig(), true);
+         meandreServerProxyFactory.release(headServer);
+         headServer = newHead;
          logger.info("Head server configuration has changed. New head " +
          		"server is " + headServer.toString());
+      } else {
+         logger.info("Head server has not changed.");
       }
+      jobScheduler.setWorkerConfigs(flowServiceConfig.getWorkerConfigs());
    }
 
 }

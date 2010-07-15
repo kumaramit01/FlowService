@@ -92,7 +92,7 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     * @see MeandreServerProxy#init()
     */
    @PostConstruct
-   public void init() {
+   public void init() throws MeandreServerException {
       host = config.getHost();
       port = config.getPort();
       meandreClient = new MeandreClient(config.getHost(), config.getPort());
@@ -104,7 +104,12 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
          meandreFlowStore.setMeandreClient(meandreClient);
          meandreFlowStore
                .setRepositoryClientConnectionPool(repositoryClientConnectionPool);
-         meandreFlowStore.init();
+         try {
+            meandreFlowStore.init();
+         } catch (Exception e) {
+            throw new MeandreServerException("Could not initialize server " + 
+                  this.toString() + ".",e);
+         }
       }
    }
 
