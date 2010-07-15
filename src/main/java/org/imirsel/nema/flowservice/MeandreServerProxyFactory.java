@@ -60,9 +60,9 @@ public class MeandreServerProxyFactory {
 			instance.setRepositoryClientConnectionPool(
 			      repositoryClientConnectionPool);
 	      instance.setHead(isHead);
-         instance.init();
-         instance.setArtifactService(artifactService);
-			proxyInstances.put(key, instance);
+	      instance.setArtifactService(artifactService);
+	      instance.init();
+      	proxyInstances.put(key, instance);
          logger.info("Instantiated server " + instance.toString());
 		}
 
