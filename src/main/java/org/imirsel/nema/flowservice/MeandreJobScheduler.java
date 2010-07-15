@@ -578,14 +578,21 @@ public class MeandreJobScheduler implements JobScheduler {
             }
 
             // Sync changed servers
-            for (MeandreServerProxyConfig change : changed) {
+            for (MeandreServerProxyConfig changes : changed) {
                // Find the server
                Iterator<MeandreServerProxy> proxyIterator = 
                   workers.iterator();
                while(proxyIterator.hasNext()) {
                   MeandreServerProxy proxyToChange = proxyIterator.next();
-                  if(proxyToChange.getConfig().equals(change)) {
-                     proxyToChange.setConfig(change);
+                  // If you find this queer, you would be right. However,
+                  // the identity of server proxies and configs are based
+                  // on a combination of host and port. There are other
+                  // configuration properties that can change though even
+                  // if the identity of the server hasn't changed. So, in
+                  // this case, we have to find the matching config, then
+                  // replace it with the one that has changes.
+                  if(proxyToChange.getConfig().equals(changes)) {
+                     proxyToChange.setConfig(changes);
                      break;
                   }
                }
