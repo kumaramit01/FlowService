@@ -541,6 +541,9 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
 		return componentPropertyDataTypes;
 	}
 
+	/**
+	 * @see ConfigChangeListener#configChanged()
+	 */
    @Override
    public void configChanged() {
       logger.info("Received configuration change notification.");

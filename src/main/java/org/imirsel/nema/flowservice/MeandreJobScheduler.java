@@ -643,6 +643,9 @@ public class MeandreJobScheduler implements JobScheduler {
    
    //~ Inner Classes -----------------------------------------------------------
 
+   /**
+    * Periodically runs to execute scheduled jobs.
+    */
    private class RunQueuedJobs implements Runnable {
       public void run() {
          logger.fine("Checking for queued jobs...");
@@ -650,6 +653,12 @@ public class MeandreJobScheduler implements JobScheduler {
       }
    }
    
+   /**
+    * Periodically runs to remove temporary references to servers that were
+    * removed from the worker configuration, but were not done processing jobs.
+    * 
+    * @author shirk
+    */
    private class DecommissionServers implements Runnable {
       public void run() {
          workersLock.lock();
