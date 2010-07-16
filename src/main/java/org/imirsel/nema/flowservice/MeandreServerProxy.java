@@ -189,10 +189,11 @@ public interface MeandreServerProxy {
    /**
     * Return the flow description
     * @param flowUri
+    * @param credentials
     * @return flow description
     * @throws MeandreServerException
     */
-   public FlowDescription getFlowDescription(String flowUri)
+   public FlowDescription getFlowDescription(Credentials credentials, String flowUri)
          throws MeandreServerException;
 
    /**
@@ -223,13 +224,14 @@ public interface MeandreServerProxy {
     * Create a new flow and save it in the local repository. The the supplied
     * parameter map containing custom properties that a user has set based on a
     * template flow and creates a new flow.
+    * @param credentials -Credentials of the content repository user
     * @param paramMap
     * @param flowUri
     * @param userId
     * 
     * @returns URI of the new flow.
     */
-   public String createFlow( HashMap<String, String> paramMap,
+   public String createFlow(Credentials credentials,  HashMap<String, String> paramMap,
          String flowUri, long userId) throws MeandreServerException;
 
    /**

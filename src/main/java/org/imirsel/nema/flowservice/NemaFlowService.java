@@ -273,7 +273,7 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
 			HashMap<String, String> paramMap, String flowUri, long userId) {
 		String result = null;
 		try {
-			result = headServer.createFlow(paramMap, flowUri,userId);
+			result = headServer.createFlow(credentials,paramMap, flowUri,userId);
 			byte[] flowContent = readFileAsBytes(result);
 			
 			assert getArtifactService()!=null : "Artifact service is null.";

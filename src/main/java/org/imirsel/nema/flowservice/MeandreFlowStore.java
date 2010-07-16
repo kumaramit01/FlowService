@@ -236,9 +236,29 @@ public class MeandreFlowStore {
 		return componentDesc;
 	}
 
-	public FlowDescription getFlowDescription(String flowUri)
+	public FlowDescription getFlowDescription(Credentials credentials,String flowUri)
 	throws MeandreServerException {
 		FlowDescription flowDesc = null;
+		
+		if (isContentRepositoryUrl(flowUri)) {
+			RepositoryResourcePath resourcePath;
+			byte[] byteData = null;
+			try {
+				resourcePath = getRepositoryResourcePath(flowUri);
+				byteData = this.getArtifactService().retrieveFlow(
+						(SimpleCredentials) credentials, resourcePath);
+				if (byteData == null) {
+					throw new MeandreServerException("Invalid flow data: "
+							+ flowUri);
+				}
+				flowDesc = getFlowDescriptionFromBytes(byteData);
+			} catch (ContentRepositoryServiceException e) {
+				throw new MeandreServerException(e);
+			} catch (InvalidResourcePathException e) {
+				throw new MeandreServerException(e);
+			}
+		}
+		
 		repositoryLock.lock();
 		try {
 			flowDesc = meandreClient.retrieveFlowDescriptor(flowUri);
@@ -376,10 +396,10 @@ public class MeandreFlowStore {
 	 * 
 	 * @returns URI of the new flow.
 	 */
-	public synchronized String createFlow(HashMap<String, String> paramMap,
+	public synchronized String createFlow(Credentials credentials,HashMap<String, String> paramMap,
 			String flowUri, long userId) throws MeandreServerException {
 		WBFlowDescription flowDesc = MeandreConverter.FlowDescriptionConverter
-		.convert(getFlowDescription(flowUri));
+		.convert(getFlowDescription(credentials,flowUri));
 		String name = flowDesc.getName();
 		name = name + System.currentTimeMillis();
 		flowDesc.setName(name);
@@ -429,26 +449,7 @@ public class MeandreFlowStore {
 		Map<String, Property> dataTypeMap = new HashMap<String, Property>();
 
 		FlowDescription flowDescription = null;
-		if (isContentRepositoryUrl(flowUri)) {
-			RepositoryResourcePath resourcePath;
-			byte[] byteData = null;
-			try {
-				resourcePath = getRepositoryResourcePath(flowUri);
-				byteData = this.getArtifactService().retrieveFlow(
-						(SimpleCredentials) credentials, resourcePath);
-				if (byteData == null) {
-					throw new MeandreServerException("Invalid flow data: "
-							+ flowUri);
-				}
-				flowDescription = getFlowDescriptionFromBytes(byteData);
-			} catch (ContentRepositoryServiceException e) {
-				throw new MeandreServerException(e);
-			} catch (InvalidResourcePathException e) {
-				throw new MeandreServerException(e);
-			}
-		} else {
-
-			flowDescription = getFlowDescription(flowUri);
+			flowDescription = getFlowDescription(credentials,flowUri);
 
 			if (ecd == null) {
 				logger.severe("component: " + component.getUri()
@@ -523,7 +524,7 @@ public class MeandreFlowStore {
 				// reset to false for the next property
 				foundDataType = Boolean.FALSE;
 			}
-		}
+		
 		return dataTypeMap;
 	}
 
@@ -762,29 +763,9 @@ public class MeandreFlowStore {
 		Map<Component, List<Property>> componentPropertyMap = new HashMap<Component, List<Property>>();
 		List<Component> componentList = null;
 		FlowDescription flowDescription = null;
-		if (isContentRepositoryUrl(flowUri)) {
-			RepositoryResourcePath resourcePath;
-			byte[] byteData = null;
-			try {
-				resourcePath = getRepositoryResourcePath(flowUri);
-				byteData = this.getArtifactService().retrieveFlow(
-						(SimpleCredentials) credentials, resourcePath);
-				if (byteData == null) {
-					throw new MeandreServerException("Invalid flow data: "
-							+ flowUri);
-				}
-				flowDescription = getFlowDescriptionFromBytes(byteData);
-				componentList = getComponentListFromFlowDescription(flowDescription);
-			} catch (ContentRepositoryServiceException e) {
-				throw new MeandreServerException(e);
-			} catch (InvalidResourcePathException e) {
-				throw new MeandreServerException(e);
-			}
-		} else {
-			componentList = getComponents(null,flowUri);
-			flowDescription = getFlowDescription(flowUri);
-		}
-
+		componentList = getComponents(null,flowUri);
+		flowDescription = getFlowDescription(credentials,flowUri);
+	
 		for (Component component : componentList) {
 			List<Property> componentPropertyList = new ArrayList<Property>();
 			Model model = getEmptyModel();

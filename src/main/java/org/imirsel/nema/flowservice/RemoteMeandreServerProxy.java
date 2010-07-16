@@ -473,12 +473,12 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
    }
 
    /**
-    * @see MeandreServerProxy#getFlowDescription(java.lang.String)
+    * @see MeandreServerProxy#getFlowDescription(Credentials,java.lang.String)
     */
-   public FlowDescription getFlowDescription(String flowUri)
+   public FlowDescription getFlowDescription(Credentials credentials, String flowUri)
          throws MeandreServerException {
       ensureHead();
-      return meandreFlowStore.getFlowDescription(flowUri);
+      return meandreFlowStore.getFlowDescription(credentials, flowUri);
    }
 
    /**
@@ -499,12 +499,12 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
    }
 
    /**
-    * @see MeandreServerProxy#createFlow(java.util.HashMap, java.lang.String, long)
+    * @see MeandreServerProxy#createFlow(Credentials,java.util.HashMap, java.lang.String, long)
     */
-   public synchronized String createFlow(HashMap<String, String> paramMap,
+   public synchronized String createFlow(Credentials credentials, HashMap<String, String> paramMap,
          String flowUri, long userId) throws MeandreServerException {
       ensureHead();
-      return meandreFlowStore.createFlow(paramMap, flowUri, userId);
+      return meandreFlowStore.createFlow(credentials, paramMap, flowUri, userId);
    }
 
    /**

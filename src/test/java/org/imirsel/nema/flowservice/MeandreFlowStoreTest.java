@@ -55,6 +55,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
    private ClientRepositoryFactory factory =null;
    private RepositoryClientConnectionPool repositoryClientConnectionPool=null;
    private String rmiContentServiceUrl;
+   private String productionFlow;
    
    
    @Before
@@ -70,6 +71,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
       componentPropertyValue = getPropertyAsString("componentPropertyValue");
       rmiContentServiceUrl = getPropertyAsString("rmiContentServiceUrl");
       jcrFlowUri =  getPropertyAsString("jcrFlowUri");
+      productionFlow = getPropertyAsString("productionFlow1");
       
       factory = new ClientRepositoryFactory();
       Repository repository=factory.getRepository(rmiContentServiceUrl);
@@ -146,7 +148,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
    @Test
    public void testGetFlowDescription() {
       try {
-         FlowDescription wfd = meandreServerProxy.getFlowDescription(flowURI);
+         FlowDescription wfd = meandreServerProxy.getFlowDescription(this.credentials,flowURI);
          assertTrue(wfd != null);
       } catch (MeandreServerException e) {
          // TODO Auto-generated catch block
@@ -219,7 +221,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
       paramMap.put(componentProperty,componentPropertyValue);
       String fileName=null;
       try {
-    	 fileName=meandreServerProxy.createFlow( paramMap, flowURI, 0l);
+    	 fileName=meandreServerProxy.createFlow(this.credentials,paramMap, flowURI, 0l);
          assertTrue(fileName!=null);
          assertTrue(fileName.length()>0);
       } catch (MeandreServerException e) {
@@ -258,5 +260,16 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
 		   }
 	   }
    }
+   
+   
+   @Test
+   public void testProductionGetListComponentsDataTypes() throws TransmissionException, SQLException, MeandreServerException{
+	   System.out.println("PRODUCTION FLOW TEST");
+	   List<Component>componentList=meandreServerProxy.getComponents(credentials,productionFlow);
+	      for(int i=0;i< componentList.size();i++){
+	         System.out.println("--> "+componentList.get(i).getInstanceUri() + " : " + componentList.get(i).getUri());
+	      }
+   }
+   
    
 }
