@@ -52,7 +52,7 @@ public class MeandreServerProxyFactory {
 		MeandreServerProxy instance = null;
 		if (proxyInstances.containsKey(key)) {
 			instance = proxyInstances.get(key);
-         logger.info("Returning cached instance of server " + instance.toString());
+         logger.fine("Returning cached instance of server " + instance.toString());
 		} else {
 			instance = new RemoteMeandreServerProxy();
 			instance.setConfig(config);
@@ -63,7 +63,7 @@ public class MeandreServerProxyFactory {
 	      instance.setArtifactService(artifactService);
 	      instance.init();
       	proxyInstances.put(key, instance);
-         logger.info("Instantiated server " + instance.toString());
+         logger.fine("Instantiated server " + instance.toString());
 		}
 
 		return instance;
