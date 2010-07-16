@@ -239,7 +239,7 @@ public class MeandreFlowStore {
 	public FlowDescription getFlowDescription(Credentials credentials,String flowUri)
 	throws MeandreServerException {
 		FlowDescription flowDesc = null;
-		
+
 		if (isContentRepositoryUrl(flowUri)) {
 			RepositoryResourcePath resourcePath;
 			byte[] byteData = null;
@@ -256,16 +256,20 @@ public class MeandreFlowStore {
 				throw new MeandreServerException(e);
 			} catch (InvalidResourcePathException e) {
 				throw new MeandreServerException(e);
+			}finally{
+				return flowDesc;
 			}
-		}
-		
-		repositoryLock.lock();
-		try {
-			flowDesc = meandreClient.retrieveFlowDescriptor(flowUri);
-		} catch (TransmissionException e) {
-			throw new MeandreServerException(e);
-		} finally {
-			repositoryLock.unlock();
+
+		}else{
+
+			repositoryLock.lock();
+			try {
+				flowDesc = meandreClient.retrieveFlowDescriptor(flowUri);
+			} catch (TransmissionException e) {
+				throw new MeandreServerException(e);
+			} finally {
+				repositoryLock.unlock();
+			}
 		}
 		return flowDesc;
 	}
@@ -449,82 +453,82 @@ public class MeandreFlowStore {
 		Map<String, Property> dataTypeMap = new HashMap<String, Property>();
 
 		FlowDescription flowDescription = null;
-			flowDescription = getFlowDescription(credentials,flowUri);
+		flowDescription = getFlowDescription(credentials,flowUri);
 
-			if (ecd == null) {
-				logger.severe("component: " + component.getUri()
-						+ " could not be found.");
+		if (ecd == null) {
+			logger.severe("component: " + component.getUri()
+					+ " could not be found.");
 
-				throw new MeandreServerException("component: "
-						+ component.getUri() + " could not be found.");
+			throw new MeandreServerException("component: "
+					+ component.getUri() + " could not be found.");
+		}
+		Model m = this.getEmptyModel();
+		ExecutableComponentInstanceDescription ecid = flowDescription
+		.getExecutableComponentInstanceDescription(m
+				.createResource(component.getInstanceUri()));
+		if (ecid == null) {
+			logger.severe("component instance: "
+					+ component.getInstanceUri() + " could not be found.");
+
+			throw new MeandreServerException("component instance : "
+					+ component.getInstanceUri() + " could not be found.");
+		}
+		PropertiesDescriptionDefinition propertiesDefn = ecd
+		.getProperties();
+		Set<String> propertiesSet = propertiesDefn.getKeys();
+		Iterator<String> it = propertiesSet.iterator();
+
+		boolean foundDataType = Boolean.FALSE;
+		while (it.hasNext()) {
+			String propertyName = it.next();
+			Property property = new Property();
+			property.setName(propertyName);
+
+			Map<String, String> otherPropertyMap = propertiesDefn
+			.getOtherProperties(propertyName);
+			String description = propertiesDefn
+			.getDescription(propertyName);
+			String defaultValue = propertiesDefn.getValue(propertyName);
+			String value = ecid.getProperties().getValue(propertyName);
+			if (value != null) {
+				property.setValue(value);
+			} else {
+				property.setValue(defaultValue);
 			}
-			Model m = this.getEmptyModel();
-			ExecutableComponentInstanceDescription ecid = flowDescription
-			.getExecutableComponentInstanceDescription(m
-					.createResource(component.getInstanceUri()));
-			if (ecid == null) {
-				logger.severe("component instance: "
-						+ component.getInstanceUri() + " could not be found.");
-
-				throw new MeandreServerException("component instance : "
-						+ component.getInstanceUri() + " could not be found.");
-			}
-			PropertiesDescriptionDefinition propertiesDefn = ecd
-			.getProperties();
-			Set<String> propertiesSet = propertiesDefn.getKeys();
-			Iterator<String> it = propertiesSet.iterator();
-
-			boolean foundDataType = Boolean.FALSE;
-			while (it.hasNext()) {
-				String propertyName = it.next();
-				Property property = new Property();
-				property.setName(propertyName);
-
-				Map<String, String> otherPropertyMap = propertiesDefn
-				.getOtherProperties(propertyName);
-				String description = propertiesDefn
-				.getDescription(propertyName);
-				String defaultValue = propertiesDefn.getValue(propertyName);
-				String value = ecid.getProperties().getValue(propertyName);
-				if (value != null) {
-					property.setValue(value);
-				} else {
-					property.setValue(defaultValue);
-				}
-				property.setDefaultValue(defaultValue);
-				property.setDescription(description);
-				List<DataTypeBean> dataTypes = null;
-				if (!otherPropertyMap.isEmpty()) {
-					Iterator<Entry<String, String>> it1 = otherPropertyMap
-					.entrySet().iterator();
-					while (it1.hasNext()) {
-						Entry<String, String> tmp = it1.next();
-						String key = tmp.getKey();
-						String value1 = tmp.getValue();
-						if (key.endsWith(propertyName + DATATYPE_KEY)) {
-							dataTypes = getDataTypeBeanFromJson(value1);
-							updatePropertyWithTaskMetadata(property, dataTypes);
-							property.setDataTypeBeanList(dataTypes);
-							foundDataType = true;
-						}
-					}
-					// add the default data type
-					if (!foundDataType) {
-						dataTypes = getDefaultDataTypeBean();
+			property.setDefaultValue(defaultValue);
+			property.setDescription(description);
+			List<DataTypeBean> dataTypes = null;
+			if (!otherPropertyMap.isEmpty()) {
+				Iterator<Entry<String, String>> it1 = otherPropertyMap
+				.entrySet().iterator();
+				while (it1.hasNext()) {
+					Entry<String, String> tmp = it1.next();
+					String key = tmp.getKey();
+					String value1 = tmp.getValue();
+					if (key.endsWith(propertyName + DATATYPE_KEY)) {
+						dataTypes = getDataTypeBeanFromJson(value1);
+						updatePropertyWithTaskMetadata(property, dataTypes);
 						property.setDataTypeBeanList(dataTypes);
-					}
-				} else {
-					if (!foundDataType) {
-						dataTypes = getDefaultDataTypeBean();
-						property.setDataTypeBeanList(dataTypes);
+						foundDataType = true;
 					}
 				}
-
-				dataTypeMap.put(propertyName, property);
-				// reset to false for the next property
-				foundDataType = Boolean.FALSE;
+				// add the default data type
+				if (!foundDataType) {
+					dataTypes = getDefaultDataTypeBean();
+					property.setDataTypeBeanList(dataTypes);
+				}
+			} else {
+				if (!foundDataType) {
+					dataTypes = getDefaultDataTypeBean();
+					property.setDataTypeBeanList(dataTypes);
+				}
 			}
-		
+
+			dataTypeMap.put(propertyName, property);
+			// reset to false for the next property
+			foundDataType = Boolean.FALSE;
+		}
+
 		return dataTypeMap;
 	}
 
@@ -765,7 +769,7 @@ public class MeandreFlowStore {
 		FlowDescription flowDescription = null;
 		componentList = getComponents(null,flowUri);
 		flowDescription = getFlowDescription(credentials,flowUri);
-	
+
 		for (Component component : componentList) {
 			List<Property> componentPropertyList = new ArrayList<Property>();
 			Model model = getEmptyModel();
@@ -850,11 +854,11 @@ public class MeandreFlowStore {
 	// return the FlowDescription from the byte data
 	private FlowDescription getFlowDescriptionFromBytes(byte[] byteData) throws MeandreServerException {
 		Model flowModel = ModelFactory.createDefaultModel();
-	    try{
-	    	flowModel.read(new ByteArrayInputStream(byteData),null,"N-TRIPLE");
-	    }catch(Exception e){
-	       throw new MeandreServerException(e);
-	    }
+		try{
+			flowModel.read(new ByteArrayInputStream(byteData),null,"N-TRIPLE");
+		}catch(Exception e){
+			throw new MeandreServerException(e);
+		}
 		QueryableRepository repo = new RepositoryImpl(flowModel);
 		Set<FlowDescription> repoFlows =
 			repo.getAvailableFlowDescriptions();
