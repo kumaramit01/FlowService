@@ -248,13 +248,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-agent</artifactId>
+			<artifactId>spring-orm</artifactId>
 			<version>${spring-framework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-hibernate3</artifactId>
-			<version>2.0.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -262,30 +257,15 @@
 			<version>${spring-framework.version}</version>
 			<scope>test</scope>
 		</dependency>
-                <dependency>
-                          <groupId>org.springframework</groupId>
-                          <artifactId>spring-aspects</artifactId>
-			  <version>${spring-framework.version}</version>
-                </dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-annotations</artifactId>
-			<version>3.4.0.GA</version>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+		    <version>${spring-framework.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>c3p0</groupId>
 			<artifactId>c3p0</artifactId>
 			<version>0.8.4.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.5.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.5.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.imirsel</groupId>
@@ -360,10 +340,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-
-
-
-
 	</dependencies>
 	<properties>
 		<repositoryservice.version>0.4.0-SNAPSHOT</repositoryservice.version>
@@ -373,7 +349,7 @@
 		<imirsel-nema-core.version>0.7.0-SNAPSHOT</imirsel-nema-core.version>
 		<imirsel-meandre-client.version>0.8.0-SNAPSHOT</imirsel-meandre-client.version>
 		<meandre-server.version>1.4.8</meandre-server.version>
-		<spring-framework.version>2.5.6</spring-framework.version>
+		<spring-framework.version>3.0.3.RELEASE</spring-framework.version>
 		<jdbc.groupId>mysql</jdbc.groupId>
 		<jdbc.artifactId>mysql-connector-java</jdbc.artifactId>
 		<jdbc.version>5.0.5</jdbc.version>
@@ -580,6 +556,10 @@
 			<id>nema-artifactory-remote</id>
 			<url>http://nema-dev.lis.illinois.edu/artifactory/remote-repos</url>
 		</repository>
+        <repository>
+            <id>JBoss Public</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+        </repository>
 	</repositories>
 
 	<profiles>
