@@ -42,31 +42,43 @@ public class JobStatusNotificationCreator implements JobStatusUpdateListener {
 		Notification notification = new Notification();
 		notification.setRecipientId(job.getOwnerId());
 		notification.setRecipientEmail(job.getOwnerEmail());
-		notification.setSubject("The status of your NEMA job has changed.");
+		StringBuilder subjectBuilder = new StringBuilder();
+		subjectBuilder.append("Your NEMA job ");
 		StringBuilder messageBuilder = new StringBuilder();
 		messageBuilder.append("Job " + job.getId() + " (" + job.getName() + ")" + " ");
 		switch(job.getJobStatus()) {
 		  case UNKNOWN:
-			  messageBuilder.append("was queued: " + job.getSubmitTimestamp().toString() + ".");
+			  messageBuilder.append("was scheduled: " + job.getSubmitTimestamp().toString() + ".");
+			  subjectBuilder.append("has been scheduled.");
 			  break;
+		  case SCHEDULED:
+		     messageBuilder.append("was scheduled: " + job.getScheduleTimestamp().toString() + ".");
+           subjectBuilder.append("has been scheduled.");
+		     break;
 		  case SUBMITTED:
 			  messageBuilder.append("was submitted: " + job.getSubmitTimestamp().toString() + ".");
+           subjectBuilder.append("has been submitted.");
 			  break;
 		  case STARTED:
-			  messageBuilder.append("was started: " + job.getStartTimestamp().toString() + ".");
+			  messageBuilder.append("has started: " + job.getStartTimestamp().toString() + ".");
+           subjectBuilder.append("started.");
 			  break;
 		  case FINISHED:
 			  messageBuilder.append("has finished: " + job.getEndTimestamp().toString() + ".");
+           subjectBuilder.append("finished.");
 			  break;
 		  case FAILED:
 			  messageBuilder.append("has failed: " + job.getEndTimestamp().toString() + ".");
+           subjectBuilder.append("failed.");
 			  break;
 		  case ABORTED:
 			  messageBuilder.append("was aborted: " + job.getEndTimestamp().toString() + ".");
+           subjectBuilder.append("was aborted.");
 			  break;
 		}
 		messageBuilder.append("\n\nFor more details, see http://nema.lis.uiuc.edu/diy/get/JobManager.jobDetail?id=" + job.getId());
 		notification.setMessage(messageBuilder.toString());
+		notification.setSubject(subjectBuilder.toString());
 		NotificationDao notificationDao = daoFactory.getNotificationDao();
         Session session = notificationDao.getSessionFactory().openSession();
         notificationDao.startManagedSession(session);
