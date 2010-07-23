@@ -64,8 +64,7 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
    /**
     * @see MeandreLoadBalancer#removeServer(MeandreServerProxy)
     */
-   public synchronized void removeServer(MeandreServerProxy server)
-         throws IllegalStateException {
+   public synchronized void removeServer(MeandreServerProxy server) {
       if (size == 0) {
          return;
       }
@@ -139,14 +138,13 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
       Node iterNode = headNode;
 
       do {
-         if (!iterNode.getServer().isBusy()) {
+         MeandreServerProxy server = iterNode.getServer();
+         if (server.isAcceptingJobs() && !server.isBusy()) {
             curr = iterNode;
-        	MeandreServerProxy server = iterNode.getServer();
-        	logger.fine("Next available server: " + server);
+        	   logger.fine("Next available server: " + server);
             return server;
          }
          iterNode = iterNode.getNext();
-
       } while (!iterNode.equals(headNode));
 
       return null;
@@ -167,7 +165,8 @@ public class RoundRobinLoadBalancer implements MeandreLoadBalancer {
       Node iterNode = headNode;
 
       do {
-         if (!iterNode.getServer().isBusy()) {
+         if (iterNode.getServer().isAcceptingJobs() &&
+               !iterNode.getServer().isBusy()) {
             return true;
          }
          iterNode = iterNode.getNext();
