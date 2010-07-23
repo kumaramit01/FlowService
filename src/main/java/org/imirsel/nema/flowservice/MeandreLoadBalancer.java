@@ -38,10 +38,8 @@ public interface MeandreLoadBalancer {
     * Remove a {@link MeandreServerProxy} from the load balancer.
     *
     * @param server The server to remove.
-    * @throws IllegalStateException if the server is currently processing a
-    * job.
     */
-   public void removeServer(MeandreServerProxy server) throws IllegalStateException;
+   public void removeServer(MeandreServerProxy server);
    
    /**
     * Number of servers the load balancer is aware of.
