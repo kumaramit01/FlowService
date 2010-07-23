@@ -159,8 +159,8 @@ public class EmailNotificationSender implements NotificationSender {
 						transaction = session.beginTransaction();
 						logger.fine("Preparing to record notification status changes.");
 						dao.makePersistent(notification);
-						logger.fine("Successfully recorded notification status changes.");
 						transaction.commit();
+                  logger.fine("Successfully recorded notification status changes.");
 					} catch (Exception e) {
 						logger.warning(e.getMessage());
 						if (transaction != null) {
