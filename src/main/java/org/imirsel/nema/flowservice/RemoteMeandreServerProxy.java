@@ -82,6 +82,8 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
     */
    public RemoteMeandreServerProxy(MeandreServerProxyConfig config) {
       this.config = config;
+      host = config.getHost();
+      port = config.getPort();
    }
 
    /**
