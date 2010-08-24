@@ -31,4 +31,30 @@ public class JobDaoImpl extends GenericDaoImpl<Job, Long>implements JobDao {
       Criterion statusCode=Restrictions.eq("statusCode", status.getCode());
       return this.findByCriteriaDistinct(statusCode);
    }
+
+    /**
+     * @see JobDao#getJobsByOwnerIdAndTaskId(long, long)
+     */
+    @Override
+    public List<Job> getJobsByOwnerIdAndTaskId(long userId, long taskId) {
+        Criterion crit = Restrictions.eq("flow.taskId", taskId);
+        return this.findByCriteriaDistinct(crit);
+    }
+
+    /**
+     * @see JobDao#getJobsByOwnerIdAndKeyword(long, String)
+     */
+    @Override
+    public List<Job> getJobsByOwnerIdAndKeyword(long userId, String keyword) {
+        Criterion crit1 = Restrictions.like("name", "%" + keyword + "%");
+        Criterion crit2 = Restrictions.like("description", "%" + keyword + "%");
+        Criterion crit3 = Restrictions.like("flow.name", "%" + keyword + "%");
+        Criterion crit4 = Restrictions.like("flow.description", "%" + keyword + "%");
+        Criterion crit5 = Restrictions.like("flow.typeName", "%" + keyword + "%");
+        Criterion crit6 = Restrictions.like("flow.keyWords", "%" + keyword + "%");
+        Criterion crit  = Restrictions.or
+                (Restrictions.or(Restrictions.or(crit1,crit2),Restrictions.or(crit3, crit4)),
+                 Restrictions.or(crit5,crit6));
+        return this.findByCriteriaDistinct(crit);
+    }
 }
