@@ -230,7 +230,7 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
      * @see FlowService#getUserJobs(long,String)
      */
     @Override
-    public List<Job> getUserJobs(long userId, String keyword) {
+    public List<Job> getUserJobsByKeyword(long userId, String keyword) {
        return daoFactory.getJobDao().getJobsByOwnerIdAndKeyword(userId, keyword);
     }
 
@@ -238,7 +238,7 @@ public class NemaFlowService implements FlowService, ConfigChangeListener {
      * @see FlowService#getUserJobsByTaskId(long,long)
      */
     @Override
-    public List<Job> getJobsByTaskId(long userId, long taskId) {
+    public List<Job> getUserJobsByTaskId(long userId, long taskId) {
         return daoFactory.getJobDao().getJobsByOwnerIdAndTaskId(userId, taskId);
     }
     /**

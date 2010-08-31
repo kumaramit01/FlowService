@@ -65,11 +65,11 @@ public class JobDaoImpl extends GenericDaoImpl<Job, Long>implements JobDao {
 //                 Restrictions.or(crit5,crit6));
 //        return this.findByCriteriaDistinct(crit);
         Session session=getSession();
-        String hql="from Job where (ownerId=:userId) AND (name LIKE '%:keyword%' OR description LIKE '%:keyword%' "
-                +" OR flow.name LIKE '%:keyword%' OR flow.description LIKE '%:keyword%'"
-                +"OR flow.typeName LIKE '%:keyword%' OR flow.keyword LIKE '%:keyword%')";
+        String hql="from Job where (ownerId=:userId) AND ((name LIKE :keyword) OR (description LIKE :keyword) "
+                +" OR (flow.name LIKE :keyword) OR (flow.description LIKE :keyword)"
+                +"OR (flow.typeName LIKE :keyword) OR (flow.keyWords LIKE :keyword))";
         Query query=session.createQuery(hql);
-        query.setLong("userId", userId).setString("keyword", keyword);
+        query.setLong("userId", userId).setString("keyword", "%"+keyword+"%");
         return query.list();
     }
 }
