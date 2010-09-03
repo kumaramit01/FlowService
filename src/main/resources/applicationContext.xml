@@ -164,7 +164,7 @@
         <property name="artifactService" ref="contentRepositoryService"/>
     </bean>
         
-    <bean id="loadBalancer" class="org.imirsel.nema.flowservice.RoundRobinLoadBalancer" />
+    <bean id="loadBalancer" class="org.imirsel.nema.flowservice.LeastUsedLoadBalancer" />
 
     <bean id="jobScheduler" class="org.imirsel.nema.flowservice.MeandreJobScheduler">
         <property name="loadBalancer" ref="loadBalancer" />
