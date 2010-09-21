@@ -359,9 +359,9 @@ public class MeandreJobScheduler implements JobScheduler {
       } finally {
          workersLock.unlock();
          queueLock.unlock();
+         jobDao.endManagedSession();
          if (session != null) {
             try {
-               jobDao.endManagedSession();
                session.close();
             } catch (HibernateException e) {
                logger.warning(e.getMessage());
@@ -445,6 +445,9 @@ public class MeandreJobScheduler implements JobScheduler {
     * @see MeandreJobScheduler#setWorkerConfigs(Set)
     */
    public void setWorkerConfigs(Set<MeandreServerProxyConfig> newWorkerConfigs) {
+      if(newWorkerConfigs==null) {
+         return;
+      }
       workersLock.lock();
       try {
          if (workerConfigs == null) {
