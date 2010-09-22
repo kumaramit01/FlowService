@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<title>NEMA Flow Service Implementation</title>
+</head>
+<body>
+<p>Interfaces and classes that implement the NEMA Flow Service API.</p>
+
+<p>Author: Andrew Shirk (<a href="mailto:shirk@illinois.edu">shirk@illinois.edu</a>)</p>
+
+<h1>Purpose</h1>
+
+<p>
+NEMA uses the Meandre framework to implement and execute workflow processes.
+Meandre, however, lacks load balancing, job scheduling, and robust job 
+monitoring services. The NEMA Flow Service implements these features as an 
+abstraction layer that runs as a Java RMI service in front of a collection
+of Meandre servers.
+</p>
+
+<h1>Packages</h1>
+
+<ul>
+<li><code>org.imirsel.nema.dao.*</code>
+    <div style="margin-left: 20px">Implements a standard data access pattern 
+    using Java generics and the Hibernate framework. Transactions are
+    implemented declaratively using Spring AOP.</div>
+</li>
+<li><code>org.imirsel.nema.dao.flowservice</code>
+    <div style="margin-left: 20px">Classes and interfaces in this package
+    make up the bulk of the flow service implementation. This includes
+    a job scheduler, load balancers, and a proxy class for remote Meandre
+    servers.</div>
+</li>
+<li><code>org.imirsel.nema.dao.flowservice.config</code>
+    <div style="margin-left: 20px">Classes and interfaces related to
+    the configuration of the flow service.</div>
+</li>
+<li><code>org.imirsel.nema.dao.flowservice.monitor</code>
+    <div style="margin-left: 20px">Package for time-based monitors: job
+    and configuration file monitors.</div>
+</li>
+<li><code>org.imirsel.nema.dao.flowservice.notification</code>
+    <div style="margin-left: 20px">Classes and interfaces related to creation
+    and delivery of job status notifications.</div>
+</li>
+</ul>
+
+<h1>Job Scheduler</h1>
+
+<p>Implementations of <code>org.imirsel.nema.flowservice.JobScheduler</code>
+must be configured with a list of <code>MeandreServerProxyConfig</code>
+instances. This is currently done via Spring dependency injection. These proxy 
+configurations are used to create a set of worker
+servers to process job requests. Each proxy configuration is used by the job 
+scheduler to instantiate a new <code>MeandreServerProxy</code>, which it adds
+to the worker pool. <code>MeandreServerProxy</code> should not be directly
+instantiated. Rather, the factory method of 
+<code>org.imirsel.nema.flowservice.MeandreServerProxyFactory</code>
+should be used. For each Meandre server, there should be only one corresponding
+<code>MeandreServerProxy</code> instance. As a result, 
+<code>MeandreServerProxyFactory</code> manages a cache of proxy instances, 
+and may return an existing instance.</p>
+
+<p>A call to <code>FlowSerivce.executeJob()</code> causes the flow service
+to create a new <code>Job</code> instance containing the details provided to the
+method arguments. After the job instance is populated, it is persisted to
+the database and the job is sent to the job scheduler. At the time of this
+writing there is only one <code>JobScheduler</code> implementation 
+(<code>org.imirsel.nema.flowservice.MeandreJobScheduler</code>) 
+which simply places new jobs onto a queue. New implementations may provide more
+sophisticated queuing algorithms.</p>
+
+<p>After the <code>JobScheduler</code> has queued the job, control is
+immediately returned to the client. This ensures that starting a job is a
+non-blocking operation.</p>
+
+<p>The <code>MeandreJobScheduler</code> manages two scheduled future tasks that
+run periodically: one for running queued jobs, and the other (discussed later) 
+for cleaning up after configuration changes. When the job runner task starts up,
+it looks for a job at the head of the queue. If a job exists, it requests
+the next available server from the load balancer. If the load balancer returns
+a server proxy instance, the job scheduler tries to run the job on that server.
+If an exception is thrown while attempting to start the job, the job is kept 
+in the queue and the attempt is made again the next time the runner thread
+starts up. After five failed tries, the job is marked as failed and is removed
+from the queue.</p>
+
+<p>The job runner task occasionally persists the state of the job to the
+database. When doing so, managed transactions are used. This is because Spring
+AOP transactions do not work in executor threads.</p>
+
+<p>Calling <code>JobScheduler.setWorkerConfigs()</code> triggers an update
+to the worker pool configuration. The job scheduler looks at the set of
+configurations it has been provided and determines which servers have been
+added, which have been removed, which are changed, and which are unchanged. 
+It then modifies the pool to match the new configuration. If a server that 
+has been removed from the worker configuration is still running jobs, the 
+server is marked for removal and no further jobs are delegated to it.
+Periodically, a task runs (mentioned earlier) that looks for servers marked
+for removal. If a server marked for removal is no longer running jobs, it
+is removed all together, and the server is decommissioned. This is achieved
+by calling the <code>release()</code> method on the 
+<code>MeandreServerProxyFactory</code>, which removes the proxy from the
+cache.</p>
+
+<h1>Load Balancers</h1>
+
+<p>Injected into the <code>MeandreJobScheduler</code> is a
+<code>MeandreLoadBalancer</code> instance. The load balancer is responsible
+for providing the next available server among the servers in the worker pool.
+There are currently two implementations: <code>RoundRobinLoadBalancer</code>
+and <code>LeastUsedLoadBalancer</code>.</p>
+
+<p><code>RoundRobinLoadBalancer</code>
+maintains a circular linked list of server proxies, and a pointer to the
+last returned server. Each time a server request is made, the load balancer
+advances the pointer by one. If the server is not busy, it returns the server.
+If the server is busy, the load balancer moves on to the next server. If all
+servers are busy, it returns null.</p>
+
+<p><code>LeastUsedLoadBalancer</code> is more effective at balancing the load
+than <code>RoundRobinLoadBalancer</code>
+because it determines which server to return based on how much
+work the server is currently doing. Servers with the least load get returned
+first.</p>
+
+<h1>Job Monitoring</h1>
+
+<p>Job monitoring is implemented in a loosely coupled fashion from the Meandre
+server. Communication between a <code>MeandreServerProxy</code> and a 
+Meandre server is done via a RESTful web service interface, and thus persistent
+socket connections cannot be used to directly monitor jobs running on the
+server. Instead, each NEMA flow is run with an accompanying Meandre Probe.</p>
+
+<p>Probes are a facility provided by the Meandre API that can be used to
+listen for the various lifecycle events of a Meandre flow. The Probe gets
+notified when the various events occur. The Probe that was implemented for NEMA
+simply receives the event notifications, and then writes that execution status
+of the flow to the flow service's database.</p>
+
+<p>To detect status updates of executing jobs, the flow service periodically
+polls the database and compares the new status values with the cached
+values from the previous query. When a difference is found, that status has
+been updated by the NEMA Probe.</p>
+
+<p>In the <code>org.imirsel.nema.flowservice.monitor</code> package is the
+flow service's job monitor interface, <code>JobStatusMonitor</code>. The
+<code>start</code> method is used by clients to begin monitoring a particular
+job.</p>
+
+<p>For example, after a job has been issued to the
+<code>MeandreJobScheduler, </code>the <code>NemaFlowService</code> registers an
+instance of <code>JobStatusNotificationCreator</code> (which implements 
+<code>JobStatusUpdateListener</code>) with the job monitor in order to
+notify users when their job status changes. When the notification creator is
+called, it creates a new <code>Notification</code> object and persists it to
+the database.</p>
+
+<p>There is currently one <code>JobStatusMonitor</code> instance: 
+<code>PollingJotStatusMonitor</code>. As mentioned earlier, this status monitor
+polls the database for status changes for the jobs it is monitoring. Polling
+is performed periodically in a scheduled future task.</p>
+</body>
+</html>
