@@ -156,13 +156,13 @@
 
 
 	<dependencies>
-	
+
 		<dependency>
 			<groupId>com.structure101.java</groupId>
 			<artifactId>maven-structure101-plugin</artifactId>
 			<version>0.5</version>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -257,11 +257,11 @@
 			<version>${spring-framework.version}</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aspects</artifactId>
-		    <version>${spring-framework.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${spring-framework.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>c3p0</groupId>
 			<artifactId>c3p0</artifactId>
@@ -271,27 +271,27 @@
 			<groupId>org.imirsel</groupId>
 			<artifactId>nema-core</artifactId>
 			<version>${imirsel-nema-core.version}</version>
-                        <exclusions>
+			<exclusions>
 
-                        <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-aspects</artifactId>
-                        </exclusion>
-                        <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-orm</artifactId>
-                        </exclusion>
-                        <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-parent</artifactId>
-                        </exclusion>
-                        <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-test</artifactId>
-                        </exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-aspects</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-orm</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-parent</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-test</artifactId>
+				</exclusion>
 
-                        </exclusions>
- 
+			</exclusions>
+
 		</dependency>
 		<dependency>
 			<groupId>org.imirsel</groupId>
@@ -339,13 +339,13 @@
 			<version>${contentrepository-client.version}</version>
 			<scope>compile</scope>
 		</dependency>
-
 	</dependencies>
+
 	<properties>
 		<repositoryservice.version>0.4.0-SNAPSHOT</repositoryservice.version>
 		<flowservice.version>0.9.0-SNAPSHOT</flowservice.version>
 		<imirsel-nema-annotations.version>0.7.0-SNAPSHOT</imirsel-nema-annotations.version>
-                <contentrepository-client.version>0.0.4-SNAPSHOT</contentrepository-client.version>
+		<contentrepository-client.version>0.0.4-SNAPSHOT</contentrepository-client.version>
 		<imirsel-nema-core.version>0.7.0-SNAPSHOT</imirsel-nema-core.version>
 		<imirsel-meandre-client.version>0.8.0-SNAPSHOT</imirsel-meandre-client.version>
 		<meandre-server.version>1.4.8</meandre-server.version>
@@ -356,13 +356,13 @@
 		<jdbc.driverClassName>com.mysql.jdbc.Driver</jdbc.driverClassName>
 	</properties>
 	<build>
-              <extensions>
-                        <extension>
-                                <groupId>org.apache.maven.wagon</groupId>
-                                <artifactId>wagon-webdav</artifactId>
-                                <version>1.0-beta-2</version>
-                        </extension>
-                </extensions>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-webdav</artifactId>
+				<version>1.0-beta-2</version>
+			</extension>
+		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -556,10 +556,10 @@
 			<id>nema-artifactory-remote</id>
 			<url>http://nema-dev.lis.illinois.edu/artifactory/remote-repos</url>
 		</repository>
-        <repository>
-            <id>JBoss Public</id>
-            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </repository>
+		<repository>
+			<id>JBoss Public</id>
+			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+		</repository>
 	</repositories>
 
 	<profiles>
@@ -630,7 +630,7 @@
 				<jdbc.maxActive>${flowservice.jdbc.maxActive}</jdbc.maxActive>
 				<flowservice.db.name>flowservice060</flowservice.db.name>
 
-				<!--flowservice.properties-->
+				<!--flowservice.properties -->
 				<headserver.host>${meandre.headserver.host}</headserver.host>
 				<headserver.port>${meandre.headserver.port}</headserver.port>
 				<headserver.username>${meandre.headserver.username}</headserver.username>
@@ -672,7 +672,7 @@
 				<jdbc.maxActive>${flowservice.jdbc.maxActive}</jdbc.maxActive>
 				<flowservice.db.name>flowservice060</flowservice.db.name>
 
-				<!--flowservice.properties-->
+				<!--flowservice.properties -->
 				<headserver.host>${meandre.headserver.host}</headserver.host>
 				<headserver.port>${meandre.headserver.port}</headserver.port>
 				<headserver.username>${meandre.headserver.username}</headserver.username>

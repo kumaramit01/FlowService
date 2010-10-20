@@ -1,5 +1,5 @@
-#Wed Jun 09 13:26:13 CDT 2010
-activeProfiles=-Denv\=development
+#Thu Jul 08 21:21:31 CDT 2010
+activeProfiles=diy-development
 eclipse.preferences.version=1
 fullBuildGoals=process-test-resources
 includeModules=false

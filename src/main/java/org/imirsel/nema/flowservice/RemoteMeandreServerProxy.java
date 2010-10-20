@@ -471,6 +471,11 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
    public ExecutableComponentDescription getComponentDescription(
          String componentUri) throws MeandreServerException {
       ensureHead();
+      if(componentUri!=null){
+    	  componentUri = componentUri.trim();
+      }else{
+    	  throw new MeandreServerException("Invalid component uri");
+      }
       return meandreFlowStore.getComponentDescription(componentUri);
    }
 
@@ -480,6 +485,11 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
    public FlowDescription getFlowDescription(Credentials credentials, String flowUri)
          throws MeandreServerException {
       ensureHead();
+      if(flowUri!=null){
+    	  flowUri = flowUri.trim();
+      }else{
+    	  throw new MeandreServerException("Invalid flow uri");
+      }
       return meandreFlowStore.getFlowDescription(credentials, flowUri);
    }
 
@@ -497,6 +507,11 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
    public List<Component> getComponents( Credentials credentials,String flowUri)
          throws MeandreServerException {
       ensureHead();
+      if(flowUri!=null){
+    	  flowUri = flowUri.trim();
+      }else{
+    	  throw new MeandreServerException("Invalid flow uri");
+      }
       return meandreFlowStore.getComponents(credentials,flowUri);
    }
 
@@ -506,6 +521,11 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
    public synchronized String createFlow(Credentials credentials, HashMap<String, String> paramMap,
          String flowUri, long userId) throws MeandreServerException {
       ensureHead();
+      if(flowUri!=null){
+    	  flowUri = flowUri.trim();
+      }else{
+    	  throw new MeandreServerException("Invalid flow uri");
+      }
       return meandreFlowStore.createFlow(credentials, paramMap, flowUri, userId);
    }
 
@@ -523,6 +543,11 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
    public Map<String, Property> getComponentPropertyDataType( Credentials credentials,
          Component component, String flowUri) throws MeandreServerException {
       ensureHead();
+      if(flowUri!=null){
+    	  flowUri = flowUri.trim();
+      }else{
+    	  throw new MeandreServerException("Invalid flow uri");
+      }
       return meandreFlowStore.getComponentPropertyDataType(credentials,component, flowUri);
    }
 
@@ -530,6 +555,11 @@ public class RemoteMeandreServerProxy implements JobStatusUpdateListener, Meandr
    public Map<Component, List<Property>> getAllComponentsAndPropertyDataTypes(
 		   Credentials credentials, String flowUri) throws MeandreServerException {
       ensureHead();
+      if(flowUri!=null){
+    	  flowUri = flowUri.trim();
+      }else{
+    	  throw new MeandreServerException("Invalid flow uri");
+      }
       return meandreFlowStore.getAllComponentsAndPropertyDataTypes(credentials,flowUri);
    }
    

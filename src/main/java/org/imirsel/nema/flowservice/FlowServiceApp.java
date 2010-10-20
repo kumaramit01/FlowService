@@ -29,6 +29,7 @@ public class FlowServiceApp {
                + version);
       }
       try {
+          System.out.println("added now...");
          try {
             java.rmi.registry.LocateRegistry.createRegistry(1099);
             logger.config("RMI registry ready.");

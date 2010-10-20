@@ -93,6 +93,15 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
       
      
    }
+   
+   @Test
+   public void testGetComponents() throws MeandreServerException{
+      List<Component>componentList=meandreServerProxy.getComponents(credentials,productionFlow);
+      for(int i=0;i< componentList.size();i++){
+         System.out.println("--> "+componentList.get(i).getInstanceUri() + " : " + componentList.get(i).getUri());
+      }
+      
+   }
 
    @After
    public void tearDown() throws Exception {
@@ -204,15 +213,8 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
       }
           
    }
-   @Ignore
-   @Test
-   public void testGetComponents() throws MeandreServerException{
-      List<Component>componentList=meandreServerProxy.getComponents(credentials,flowURI);
-      for(int i=0;i< componentList.size();i++){
-         System.out.println("--> "+componentList.get(i).getInstanceUri() + " : " + componentList.get(i).getUri());
-      }
-      
-   }
+  
+
    
    @Ignore
    @Test 
@@ -230,14 +232,14 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
       System.out.println("filename is: " + fileName);
    }
    
-   
+   @Ignore
    @Test
    public void testGetListComponentsDataTypes() throws TransmissionException, SQLException, MeandreServerException{
       Map<Component,List<Property>> componentPropertyMap=meandreServerProxy.getAllComponentsAndPropertyDataTypes(credentials,flowURI);
       assertTrue(componentPropertyMap.size()>0);
    }
    
-   
+   @Ignore
    @Test 
    public void testGetComponentsFromJCR()throws MeandreServerException{
 	   List<Component>componentList=meandreServerProxy.getComponents(credentials,jcrFlowUri);
@@ -246,7 +248,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
 	      }
 	      
    }
-   
+   @Ignore
    @Test 
    public void testGetAllComponentsAndPropertyDataTypesFromJCR()throws MeandreServerException{
 	   Map<Component, List<Property>>componentMap=meandreServerProxy.getAllComponentsAndPropertyDataTypes(credentials, jcrFlowUri);
@@ -261,7 +263,7 @@ public class MeandreFlowStoreTest extends BaseManagerTestCase {
 	   }
    }
    
-   
+   @Ignore
    @Test
    public void testProductionGetListComponentsDataTypes() throws TransmissionException, SQLException, MeandreServerException{
 	   System.out.println("PRODUCTION FLOW TEST");

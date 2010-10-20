@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -239,6 +240,7 @@ public class MeandreFlowStore {
 	public FlowDescription getFlowDescription(Credentials credentials,String flowUri)
 	throws MeandreServerException {
 		FlowDescription flowDesc = null;
+		
 
 		if (isContentRepositoryUrl(flowUri)) {
 			RepositoryResourcePath resourcePath;
@@ -310,6 +312,11 @@ public class MeandreFlowStore {
 	 */
 	public List<Component> getComponents(Credentials credentials, String flowUri)
 	throws MeandreServerException {
+		if(flowUri!=null){
+			flowUri = flowUri.trim();
+		}else{
+			throw new MeandreServerException("Invalid flow name");
+		}
 		FlowDescription flowDescription = null;
 		if (isContentRepositoryUrl(flowUri)) {
 			RepositoryResourcePath resourcePath;
@@ -333,8 +340,8 @@ public class MeandreFlowStore {
 			map = getAvailableFlowDescriptionsMap();
 			// Used later in case something goes wrong communicating with the
 			// server.
-			String errMsg = "Could not find components for the flow with URI: "
-				+ flowUri;
+			String errMsg = "Could not find components for the flow with URI"
+				+ ":"+flowUri;
 			if (map == null) {
 				logger.severe(errMsg);
 				throw new MeandreServerException(errMsg);
